@@ -9,10 +9,10 @@
 // Declare your global variables here
 
 #define DATA_REGISTER_EMPTY (1<<UDRE)
-#define RX_COMPLETE (1<<RXC)
-#define FRAMING_ERROR (1<<FE)
-#define PARITY_ERROR (1<<UPE)
-#define DATA_OVERRUN (1<<DOR)
+#define RX_COMPLETE         (1<<RXC)
+#define FRAMING_ERROR       (1<<FE)
+#define PARITY_ERROR        (1<<UPE)
+#define DATA_OVERRUN        (1<<DOR)
 
 // USART Receiver buffer
 #define RX_BUFFER_SIZE 8
@@ -79,10 +79,14 @@ return data;
 // Standard Input/Output functions
 #include <stdio.h>
 
+// Global variables
+
 void main(void)
 {
 // Declare your local variables here
 int i;
+unsigned char write_data[] = {'M', '.', ' ', 'A', 'R', 'I', 'E', 'F', ' ', 'F', '.', '.', '.', '.', '.', '.'};
+
 // Input/Output Ports initialization
 // Port B initialization
 // Function: Bit7=In Bit6=In Bit5=In Bit4=In Bit3=In Bit2=In Bit1=In Bit0=In 
@@ -206,14 +210,23 @@ delay_ms(1000);
 //putchar(255);
 PN532_SAM_config();
 PN532_get_firmware();
+//tag_data.length = 16;
+//memcpy(tag_data.buffer, write_data, 16);
+//PN532_write_passive_tag(5, &tag_data);
 
 while (1)
       {
       // Place your code here
-        PN532_read_passive_tag();
-        for(i = 0; i<PN532_msg.buffer[5]; ++i)
+//        PN532_read_passive_tag(4);
+//        for(i = 0; i<tag_data.length; ++i)
+//        {
+//          putchar(tag_data.buffer[i]);
+//        }
+        //PN532_read_uid();
+        PN532_read_passive_tag(4);
+        for(i = 0; i<tag_uid.length; ++i)
         {
-          putchar(PN532_msg.buffer[6+i]);
+          printf("%02x", tag_uid.buffer[i]);
         }
         delay_ms(500);
       }

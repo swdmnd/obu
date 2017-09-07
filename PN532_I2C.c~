@@ -3,6 +3,10 @@
 TWI_BUFFER_STRUCT twi_rx;
 TWI_BUFFER_STRUCT twi_tx;
 TWI_BUFFER_STRUCT PN532_msg;
+TWI_BUFFER_STRUCT tag_uid;
+TWI_BUFFER_STRUCT tag_data;
+
+unsigned char MIFARE_Key_A[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 unsigned char checksum;
 int i;
 
@@ -20,7 +24,7 @@ void TWIStart(void)
     TWCR = (1<<TWINT)|(1<<TWSTA)|(1<<TWEN);
     while ((TWCR & (1<<TWINT)) == 0);   
 }
-//send stop signal
+
 void TWIStop(void)
 {
     TWCR = (1<<TWINT)|(1<<TWSTO)|(1<<TWEN);
@@ -179,7 +183,7 @@ bool PN532_SAM_config()
   else return false;   
 }
 
-bool PN532_read_passive_tag()
+void PN532_read_uid()
 {  
   PN532_msg.buffer[0] = PN532_CMD_INLISTPASSIVETARGET;  
   PN532_msg.buffer[1] = 1;  // max 1 cards at once
@@ -191,17 +195,84 @@ bool PN532_read_passive_tag()
   while(!PN532_wait_for_ack()) delay_ms(20); 
   delay_ms(20);        
   PN532_read(&twi_rx);
-  PN532_get_msg(&twi_rx, &PN532_msg, 1);
-  /* ISO14443A card response should be in the following format:
+  PN532_get_msg(&twi_rx, &PN532_msg, 1);  
+  tag_uid.length = PN532_msg.buffer[5];
+  for(i = 0; i<tag_uid.length; ++i)
+  {
+    tag_uid.buffer[i] = PN532_msg.buffer[6+i];
+  }
+}
 
-    byte            Description
-    -------------   ------------------------------------------
-    b0..6           Frame header and preamble
-    b7              Tags Found
-    b8              Tag Number (only one used in this example)
-    b9..10          SENS_RES
-    b11             SEL_RES
-    b12             NFCID Length
-    b13..NFCIDLen   NFCID                                      */ 
-     
+bool PN532_auth_tag(unsigned char block_number, unsigned char key_select, unsigned char* key_buffer)
+{
+  PN532_read_uid();
+  PN532_msg.buffer[0] = PN532_CMD_INDATAEXCHANGE;
+  PN532_msg.buffer[1] = 1;                              /* Max card numbers */
+  PN532_msg.buffer[2] = (key_select) ? MIFARE_CMD_AUTH_B : MIFARE_CMD_AUTH_A;
+  PN532_msg.buffer[3] = block_number;                    /* Block Number (1K = 0..63, 4K = 0..255 */
+  for (i = 0; i < 6; ++i)
+  {
+    PN532_msg.buffer[4+i] = key_buffer[i];                /* 6 byte auth key */
+  }
+  for (i = 0; i < tag_uid.length; ++i)
+  {
+    PN532_msg.buffer[10+i] = tag_uid.buffer[i];                /* 4 byte card ID */
+  } 
+  PN532_msg.length = 10+tag_uid.length; 
+  
+  PN532_build_msg(&twi_tx, &PN532_msg);
+  PN532_cmd(&twi_tx); 
+  delay_ms(20);
+  while(!PN532_wait_for_ack()) delay_ms(20); 
+  delay_ms(20);        
+  PN532_read(&twi_rx);
+  PN532_get_msg(&twi_rx, &PN532_msg, 1); 
+  if(PN532_msg.buffer[0] != 0x00) return false;
+  return true;
+}
+
+bool PN532_read_passive_tag(unsigned char block_number)
+{
+  if(!PN532_auth_tag(block_number, 0, MIFARE_Key_A)) return false;
+  PN532_msg.buffer[0] = PN532_CMD_INDATAEXCHANGE;
+  PN532_msg.buffer[1] = 1;                              /* Max card numbers */
+  PN532_msg.buffer[2] = MIFARE_CMD_READ;
+  PN532_msg.buffer[3] = block_number;                    /* Block Number (1K = 0..63, 4K = 0..255 */
+  PN532_msg.length = 4;    
+  
+  PN532_build_msg(&twi_tx, &PN532_msg);
+  PN532_cmd(&twi_tx); 
+  delay_ms(20);
+  while(!PN532_wait_for_ack()) delay_ms(20); 
+  delay_ms(20);        
+  PN532_read(&twi_rx);
+  PN532_get_msg(&twi_rx, &PN532_msg, 1); 
+  if(PN532_msg.buffer[0] != 0x00) return false;
+  PN532_get_msg(&twi_rx, &tag_data, 2);  
+  return true;
+}
+
+bool PN532_write_passive_tag(unsigned char block_number, TWI_BUFFER_STRUCT* data)
+{
+  if(!PN532_auth_tag(block_number, 0, MIFARE_Key_A)) return false;
+  PN532_msg.buffer[0] = PN532_CMD_INDATAEXCHANGE;
+  PN532_msg.buffer[1] = 1;                              /* Max card numbers */
+  PN532_msg.buffer[2] = MIFARE_CMD_READ;
+  PN532_msg.buffer[3] = block_number;                    /* Block Number (1K = 0..63, 4K = 0..255 */
+  for (i = 0; i < data->length && i < 16; ++i)
+  {
+    PN532_msg.buffer[4+i] = data->buffer[i];                /* 16 byte data */
+  }
+  PN532_msg.length = 4+i;    
+  
+  PN532_build_msg(&twi_tx, &PN532_msg);
+  PN532_cmd(&twi_tx); 
+  delay_ms(20);
+  while(!PN532_wait_for_ack()) delay_ms(20); 
+  delay_ms(20);        
+  PN532_read(&twi_rx);
+  PN532_get_msg(&twi_rx, &PN532_msg, 1); 
+  if(PN532_msg.buffer[0] != 0x00) return false;
+  PN532_get_msg(&twi_rx, &tag_data, 2);  
+  return true;
 }

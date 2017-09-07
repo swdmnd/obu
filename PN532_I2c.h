@@ -12,7 +12,14 @@
 #define PN532_CMD_GETFIRMWARE             0x02
 #define PN532_CMD_SAMCONFIGURATION        0x14
 #define PN532_CMD_INLISTPASSIVETARGET     0x4A
+#define PN532_CMD_INDATAEXCHANGE          0x40
+
 #define PN532_MIFARE_ISO14443A            0x00
+
+#define MIFARE_CMD_AUTH_A  0x60
+#define MIFARE_CMD_AUTH_B  0x61
+#define MIFARE_CMD_READ    0x30
+#define MIFARE_CMD_WRITE   0xA0
 
 #define PN532_PREAMBLE  0x00
 #define PN532_POSTAMBLE 0x00
@@ -31,10 +38,11 @@ typedef struct{
 extern TWI_BUFFER_STRUCT twi_rx;
 extern TWI_BUFFER_STRUCT twi_tx;
 extern TWI_BUFFER_STRUCT PN532_msg;
+extern TWI_BUFFER_STRUCT tag_uid;
+extern TWI_BUFFER_STRUCT tag_data;
 
 void TWIInit(void);
 void TWIStart(void);
-//send stop signal
 void TWIStop(void);
 void TWIWrite(unsigned char u8data);
 //read byte with ACK (Set TWEA, clear TWEA to send NACK, indicating master receiver has read the last byte)
@@ -47,6 +55,23 @@ void PN532_get_msg(TWI_BUFFER_STRUCT*, TWI_BUFFER_STRUCT*, unsigned char);
 bool PN532_wait_for_ack();
 void PN532_get_firmware();
 bool PN532_SAM_config();
-void PN532_read_passive_tag();
+
+/* 
+    ISO14443A card response should be in the following format:
+
+    byte            Description                                   Description 2
+    -------------   ------------------------------------------    -------------------------
+    b0..6           Frame header and preamble                     twi_rx starts here
+    b7              Tags Found                                    PN532_msg starts here
+    b8              Tag Number (only one used in this example)
+    b9..10          SENS_RES
+    b11             SEL_RES
+    b12             NFCID Length
+    b13..NFCIDLen   NFCID                                      
+*/
+void PN532_read_uid();
+bool PN532_auth_tag(unsigned char, unsigned char, unsigned char*);
+bool PN532_read_passive_tag(unsigned char);
+bool PN532_write_passive_tag(unsigned char, TWI_BUFFER_STRUCT*);
 
 #endif
