@@ -499,114 +499,114 @@
 ; 0001 0073 }
 ;PCODE: $0000016A VOL: 0
 ;
-;void PN532_get_msg(TWI_BUFFER_STRUCT* src, TWI_BUFFER_STRUCT* dest)
+;void PN532_get_msg(TWI_BUFFER_STRUCT* src, TWI_BUFFER_STRUCT* dest, unsigned char offset)
 ; 0001 0076 {
 ;PCODE: $0000016B VOL: 0
 ;PCODE: $0000016C VOL: 0
-; 0001 0077   // exclude TFI from msg, thus -1
-; 0001 0078   dest->length = src->buffer[PN532_LEN]-1;
+; 0001 0077   // exclude TFI from src, thus -1
+; 0001 0078   dest->length = src->buffer[PN532_LEN]-1-offset;
 ;PCODE: $0000016D VOL: 0
-;	*src -> Y+2
-;	*dest -> Y+0
+;	*src -> Y+3
+;	*dest -> Y+1
+;	offset -> Y+0
 ;PCODE: $0000016E VOL: 0
 ;PCODE: $0000016F VOL: 0
 ;PCODE: $00000170 VOL: 0
 ;PCODE: $00000171 VOL: 0
 ;PCODE: $00000172 VOL: 0
 ;PCODE: $00000173 VOL: 0
-; 0001 0079   for(i =0; i < dest->length; ++i)
 ;PCODE: $00000174 VOL: 0
 ;PCODE: $00000175 VOL: 0
 ;PCODE: $00000176 VOL: 0
 ;PCODE: $00000177 VOL: 0
 ;PCODE: $00000178 VOL: 0
+; 0001 0079   for(i=0; i < dest->length; ++i)
 ;PCODE: $00000179 VOL: 0
 ;PCODE: $0000017A VOL: 0
 ;PCODE: $0000017B VOL: 0
 ;PCODE: $0000017C VOL: 0
 ;PCODE: $0000017D VOL: 0
 ;PCODE: $0000017E VOL: 0
-; 0001 007A   {
-; 0001 007B     dest->buffer[i] = src->buffer[PN532_DATA+i];
 ;PCODE: $0000017F VOL: 0
 ;PCODE: $00000180 VOL: 0
 ;PCODE: $00000181 VOL: 0
 ;PCODE: $00000182 VOL: 0
 ;PCODE: $00000183 VOL: 0
+; 0001 007A   {
+; 0001 007B     dest->buffer[i] = src->buffer[PN532_DATA+i+offset];
 ;PCODE: $00000184 VOL: 0
 ;PCODE: $00000185 VOL: 0
 ;PCODE: $00000186 VOL: 0
 ;PCODE: $00000187 VOL: 0
 ;PCODE: $00000188 VOL: 0
 ;PCODE: $00000189 VOL: 0
-; 0001 007C   }
 ;PCODE: $0000018A VOL: 0
 ;PCODE: $0000018B VOL: 0
 ;PCODE: $0000018C VOL: 0
 ;PCODE: $0000018D VOL: 0
 ;PCODE: $0000018E VOL: 0
 ;PCODE: $0000018F VOL: 0
-; 0001 007D }
 ;PCODE: $00000190 VOL: 0
 ;PCODE: $00000191 VOL: 0
+; 0001 007C   }
 ;PCODE: $00000192 VOL: 0
+;PCODE: $00000193 VOL: 0
+;PCODE: $00000194 VOL: 0
+;PCODE: $00000195 VOL: 0
+;PCODE: $00000196 VOL: 0
+;PCODE: $00000197 VOL: 0
+; 0001 007D }
+;PCODE: $00000198 VOL: 0
+;PCODE: $00000199 VOL: 0
+;PCODE: $0000019A VOL: 0
 ;
 ;bool PN532_wait_for_ack(){
 ; 0001 007F _Bool PN532_wait_for_ack(){
-;PCODE: $00000193 VOL: 0
-;PCODE: $00000194 VOL: 0
+;PCODE: $0000019B VOL: 0
+;PCODE: $0000019C VOL: 0
 ; 0001 0080   unsigned char data = 0x00;
 ; 0001 0081   // check ready bit
 ; 0001 0082   while(1){
-;PCODE: $00000195 VOL: 0
-;	data -> R17
-;PCODE: $00000196 VOL: 0
-;PCODE: $00000197 VOL: 0
-;PCODE: $00000198 VOL: 0
-; 0001 0083     TWIStart();
-;PCODE: $00000199 VOL: 0
-; 0001 0084     TWIWrite(PN532_ADD | 1);
-;PCODE: $0000019A VOL: 0
-;PCODE: $0000019B VOL: 0
-; 0001 0085     //TWIStart();
-; 0001 0086     data = TWIRead(1);
-;PCODE: $0000019C VOL: 0
 ;PCODE: $0000019D VOL: 0
+;	data -> R17
 ;PCODE: $0000019E VOL: 0
 ;PCODE: $0000019F VOL: 0
-; 0001 0087     if(data==0x00) TWIStop();
 ;PCODE: $000001A0 VOL: 0
+; 0001 0083     TWIStart();
 ;PCODE: $000001A1 VOL: 0
+; 0001 0084     TWIWrite(PN532_ADD | 1);
 ;PCODE: $000001A2 VOL: 0
-; 0001 0088     else if(data==0x01) break;
 ;PCODE: $000001A3 VOL: 0
+; 0001 0085     //TWIStart();
+; 0001 0086     data = TWIRead(1);
 ;PCODE: $000001A4 VOL: 0
 ;PCODE: $000001A5 VOL: 0
 ;PCODE: $000001A6 VOL: 0
 ;PCODE: $000001A7 VOL: 0
+; 0001 0087     if(data==0x00) TWIStop();
 ;PCODE: $000001A8 VOL: 0
-; 0001 0089   }
 ;PCODE: $000001A9 VOL: 0
 ;PCODE: $000001AA VOL: 0
+; 0001 0088     else if(data==0x01) break;
 ;PCODE: $000001AB VOL: 0
 ;PCODE: $000001AC VOL: 0
-; 0001 008A   // get rid of preamble
-; 0001 008B   TWIRead(1);
 ;PCODE: $000001AD VOL: 0
 ;PCODE: $000001AE VOL: 0
 ;PCODE: $000001AF VOL: 0
-; 0001 008C   //check start of packet
-; 0001 008D   if(TWIRead(1)!=0x00) {TWIStop(); return false;}
 ;PCODE: $000001B0 VOL: 0
+; 0001 0089   }
 ;PCODE: $000001B1 VOL: 0
 ;PCODE: $000001B2 VOL: 0
 ;PCODE: $000001B3 VOL: 0
 ;PCODE: $000001B4 VOL: 0
+; 0001 008A   // get rid of preamble
+; 0001 008B   TWIRead(1);
 ;PCODE: $000001B5 VOL: 0
 ;PCODE: $000001B6 VOL: 0
 ;PCODE: $000001B7 VOL: 0
+; 0001 008C   //check start of packet
+; 0001 008D   if(TWIRead(1)!=0x00) {TWIStop(); return false;}
 ;PCODE: $000001B8 VOL: 0
-; 0001 008E   if(TWIRead(1)!=0xFF) {TWIStop(); return false;}
 ;PCODE: $000001B9 VOL: 0
 ;PCODE: $000001BA VOL: 0
 ;PCODE: $000001BB VOL: 0
@@ -615,11 +615,9 @@
 ;PCODE: $000001BE VOL: 0
 ;PCODE: $000001BF VOL: 0
 ;PCODE: $000001C0 VOL: 0
+; 0001 008E   if(TWIRead(1)!=0xFF) {TWIStop(); return false;}
 ;PCODE: $000001C1 VOL: 0
 ;PCODE: $000001C2 VOL: 0
-; 0001 008F 
-; 0001 0090   //check ack
-; 0001 0091   if(TWIRead(1)!=0x00) {TWIStop(); return false;}
 ;PCODE: $000001C3 VOL: 0
 ;PCODE: $000001C4 VOL: 0
 ;PCODE: $000001C5 VOL: 0
@@ -628,9 +626,11 @@
 ;PCODE: $000001C8 VOL: 0
 ;PCODE: $000001C9 VOL: 0
 ;PCODE: $000001CA VOL: 0
+; 0001 008F 
+; 0001 0090   //check ack
+; 0001 0091   if(TWIRead(1)!=0x00) {TWIStop(); return false;}
 ;PCODE: $000001CB VOL: 0
 ;PCODE: $000001CC VOL: 0
-; 0001 0092   if(TWIRead(0)!=0xFF) {TWIStop(); return false;}
 ;PCODE: $000001CD VOL: 0
 ;PCODE: $000001CE VOL: 0
 ;PCODE: $000001CF VOL: 0
@@ -639,63 +639,218 @@
 ;PCODE: $000001D2 VOL: 0
 ;PCODE: $000001D3 VOL: 0
 ;PCODE: $000001D4 VOL: 0
+; 0001 0092   if(TWIRead(0)!=0xFF) {TWIStop(); return false;}
 ;PCODE: $000001D5 VOL: 0
 ;PCODE: $000001D6 VOL: 0
-; 0001 0093   TWIStop();
 ;PCODE: $000001D7 VOL: 0
 ;PCODE: $000001D8 VOL: 0
-; 0001 0094   return true;
 ;PCODE: $000001D9 VOL: 0
 ;PCODE: $000001DA VOL: 0
 ;PCODE: $000001DB VOL: 0
-; 0001 0095 }
 ;PCODE: $000001DC VOL: 0
-;
-;void PN532_get_firmware()
-; 0001 0098 {
 ;PCODE: $000001DD VOL: 0
 ;PCODE: $000001DE VOL: 0
-; 0001 0099   PN532_msg.buffer[0]=0x02;
+; 0001 0093   TWIStop();
 ;PCODE: $000001DF VOL: 0
 ;PCODE: $000001E0 VOL: 0
-; 0001 009A   PN532_msg.length=1;
+; 0001 0094   return true;
 ;PCODE: $000001E1 VOL: 0
 ;PCODE: $000001E2 VOL: 0
 ;PCODE: $000001E3 VOL: 0
-; 0001 009B   PN532_build_msg(&twi_tx, &PN532_msg);
+; 0001 0095 }
 ;PCODE: $000001E4 VOL: 0
+;
+;void PN532_get_firmware()
+; 0001 0098 {
 ;PCODE: $000001E5 VOL: 0
 ;PCODE: $000001E6 VOL: 0
+; 0001 0099   PN532_msg.buffer[0]=PN532_CMD_GETFIRMWARE;
 ;PCODE: $000001E7 VOL: 0
-; 0001 009C   PN532_cmd(&twi_tx);
 ;PCODE: $000001E8 VOL: 0
+; 0001 009A   PN532_msg.length=1;
 ;PCODE: $000001E9 VOL: 0
-; 0001 009D   delay_ms(20);
 ;PCODE: $000001EA VOL: 0
 ;PCODE: $000001EB VOL: 0
+; 0001 009B   PN532_build_msg(&twi_tx, &PN532_msg);
 ;PCODE: $000001EC VOL: 0
-; 0001 009E   while(!PN532_wait_for_ack()) delay_ms(20);
 ;PCODE: $000001ED VOL: 0
 ;PCODE: $000001EE VOL: 0
 ;PCODE: $000001EF VOL: 0
+; 0001 009C   PN532_cmd(&twi_tx);
 ;PCODE: $000001F0 VOL: 0
 ;PCODE: $000001F1 VOL: 0
+; 0001 009D   delay_ms(20);
 ;PCODE: $000001F2 VOL: 0
 ;PCODE: $000001F3 VOL: 0
 ;PCODE: $000001F4 VOL: 0
+; 0001 009E   while(!PN532_wait_for_ack()) delay_ms(20);
 ;PCODE: $000001F5 VOL: 0
-; 0001 009F delay_ms(20);
 ;PCODE: $000001F6 VOL: 0
 ;PCODE: $000001F7 VOL: 0
 ;PCODE: $000001F8 VOL: 0
-; 0001 00A0   PN532_read(&twi_rx);
 ;PCODE: $000001F9 VOL: 0
 ;PCODE: $000001FA VOL: 0
-; 0001 00A1   PN532_get_msg(&twi_rx, &PN532_msg);
 ;PCODE: $000001FB VOL: 0
 ;PCODE: $000001FC VOL: 0
 ;PCODE: $000001FD VOL: 0
+; 0001 009F delay_ms(20);
 ;PCODE: $000001FE VOL: 0
-; 0001 00A2 }
 ;PCODE: $000001FF VOL: 0
 ;PCODE: $00000200 VOL: 0
+; 0001 00A0   PN532_read(&twi_rx);
+;PCODE: $00000201 VOL: 0
+;PCODE: $00000202 VOL: 0
+; 0001 00A1   PN532_get_msg(&twi_rx, &PN532_msg, 1);
+;PCODE: $00000203 VOL: 0
+;PCODE: $00000204 VOL: 0
+;PCODE: $00000205 VOL: 0
+;PCODE: $00000206 VOL: 0
+;PCODE: $00000207 VOL: 0
+;PCODE: $00000208 VOL: 0
+; 0001 00A2 }
+;PCODE: $00000209 VOL: 0
+;PCODE: $0000020A VOL: 0
+;
+;bool PN532_SAM_config()
+; 0001 00A5 {
+;PCODE: $0000020B VOL: 0
+;PCODE: $0000020C VOL: 0
+; 0001 00A6   PN532_msg.buffer[0] = PN532_CMD_SAMCONFIGURATION;
+;PCODE: $0000020D VOL: 0
+;PCODE: $0000020E VOL: 0
+; 0001 00A7   PN532_msg.buffer[1] = 0x01; // normal mode;
+;PCODE: $0000020F VOL: 0
+;PCODE: $00000210 VOL: 0
+;PCODE: $00000211 VOL: 0
+; 0001 00A8   PN532_msg.buffer[2] = 0x14; // timeout 50ms * 20 = 1 second
+;PCODE: $00000212 VOL: 0
+;PCODE: $00000213 VOL: 0
+;PCODE: $00000214 VOL: 0
+; 0001 00A9   PN532_msg.buffer[3] = 0x00; // not using IRQ pin!
+;PCODE: $00000215 VOL: 0
+;PCODE: $00000216 VOL: 0
+;PCODE: $00000217 VOL: 0
+; 0001 00AA   PN532_msg.length=4;
+;PCODE: $00000218 VOL: 0
+;PCODE: $00000219 VOL: 0
+;PCODE: $0000021A VOL: 0
+; 0001 00AB   PN532_build_msg(&twi_tx, &PN532_msg);
+;PCODE: $0000021B VOL: 0
+;PCODE: $0000021C VOL: 0
+;PCODE: $0000021D VOL: 0
+;PCODE: $0000021E VOL: 0
+; 0001 00AC   PN532_cmd(&twi_tx);
+;PCODE: $0000021F VOL: 0
+;PCODE: $00000220 VOL: 0
+; 0001 00AD   delay_ms(20);
+;PCODE: $00000221 VOL: 0
+;PCODE: $00000222 VOL: 0
+;PCODE: $00000223 VOL: 0
+; 0001 00AE   while(!PN532_wait_for_ack()) delay_ms(20);
+;PCODE: $00000224 VOL: 0
+;PCODE: $00000225 VOL: 0
+;PCODE: $00000226 VOL: 0
+;PCODE: $00000227 VOL: 0
+;PCODE: $00000228 VOL: 0
+;PCODE: $00000229 VOL: 0
+;PCODE: $0000022A VOL: 0
+;PCODE: $0000022B VOL: 0
+;PCODE: $0000022C VOL: 0
+; 0001 00AF delay_ms(20);
+;PCODE: $0000022D VOL: 0
+;PCODE: $0000022E VOL: 0
+;PCODE: $0000022F VOL: 0
+; 0001 00B0   PN532_read(&twi_rx);
+;PCODE: $00000230 VOL: 0
+;PCODE: $00000231 VOL: 0
+; 0001 00B1   PN532_get_msg(&twi_rx, &PN532_msg, 0);
+;PCODE: $00000232 VOL: 0
+;PCODE: $00000233 VOL: 0
+;PCODE: $00000234 VOL: 0
+;PCODE: $00000235 VOL: 0
+;PCODE: $00000236 VOL: 0
+;PCODE: $00000237 VOL: 0
+; 0001 00B2   if(PN532_msg.buffer[0]==0x15) return true;
+;PCODE: $00000238 VOL: 0
+;PCODE: $00000239 VOL: 0
+;PCODE: $0000023A VOL: 0
+;PCODE: $0000023B VOL: 0
+;PCODE: $0000023C VOL: 0
+; 0001 00B3   else return false;
+;PCODE: $0000023D VOL: 0
+;PCODE: $0000023E VOL: 0
+;PCODE: $0000023F VOL: 0
+; 0001 00B4 }
+;PCODE: $00000240 VOL: 0
+;PCODE: $00000241 VOL: 0
+;PCODE: $00000242 VOL: 0
+;
+;void PN532_read_passive_tag()
+; 0001 00B7 {
+;PCODE: $00000243 VOL: 0
+;PCODE: $00000244 VOL: 0
+; 0001 00B8   PN532_msg.buffer[0] = PN532_CMD_INLISTPASSIVETARGET;
+;PCODE: $00000245 VOL: 0
+;PCODE: $00000246 VOL: 0
+; 0001 00B9   PN532_msg.buffer[1] = 1;  // max 1 cards at once
+;PCODE: $00000247 VOL: 0
+;PCODE: $00000248 VOL: 0
+;PCODE: $00000249 VOL: 0
+; 0001 00BA   PN532_msg.buffer[2] = PN532_MIFARE_ISO14443A; //baudrate
+;PCODE: $0000024A VOL: 0
+;PCODE: $0000024B VOL: 0
+;PCODE: $0000024C VOL: 0
+; 0001 00BB   PN532_msg.length=3;
+;PCODE: $0000024D VOL: 0
+;PCODE: $0000024E VOL: 0
+;PCODE: $0000024F VOL: 0
+; 0001 00BC   PN532_build_msg(&twi_tx, &PN532_msg);
+;PCODE: $00000250 VOL: 0
+;PCODE: $00000251 VOL: 0
+;PCODE: $00000252 VOL: 0
+;PCODE: $00000253 VOL: 0
+; 0001 00BD   PN532_cmd(&twi_tx);
+;PCODE: $00000254 VOL: 0
+;PCODE: $00000255 VOL: 0
+; 0001 00BE   delay_ms(20);
+;PCODE: $00000256 VOL: 0
+;PCODE: $00000257 VOL: 0
+;PCODE: $00000258 VOL: 0
+; 0001 00BF   while(!PN532_wait_for_ack()) delay_ms(20);
+;PCODE: $00000259 VOL: 0
+;PCODE: $0000025A VOL: 0
+;PCODE: $0000025B VOL: 0
+;PCODE: $0000025C VOL: 0
+;PCODE: $0000025D VOL: 0
+;PCODE: $0000025E VOL: 0
+;PCODE: $0000025F VOL: 0
+;PCODE: $00000260 VOL: 0
+;PCODE: $00000261 VOL: 0
+; 0001 00C0 delay_ms(20);
+;PCODE: $00000262 VOL: 0
+;PCODE: $00000263 VOL: 0
+;PCODE: $00000264 VOL: 0
+; 0001 00C1   PN532_read(&twi_rx);
+;PCODE: $00000265 VOL: 0
+;PCODE: $00000266 VOL: 0
+; 0001 00C2   PN532_get_msg(&twi_rx, &PN532_msg, 1);
+;PCODE: $00000267 VOL: 0
+;PCODE: $00000268 VOL: 0
+;PCODE: $00000269 VOL: 0
+;PCODE: $0000026A VOL: 0
+;PCODE: $0000026B VOL: 0
+;PCODE: $0000026C VOL: 0
+; 0001 00C3   /* ISO14443A card response should be in the following format:
+; 0001 00C4 
+; 0001 00C5     byte            Description
+; 0001 00C6     -------------   ------------------------------------------
+; 0001 00C7     b0..6           Frame header and preamble
+; 0001 00C8     b7              Tags Found
+; 0001 00C9     b8              Tag Number (only one used in this example)
+; 0001 00CA     b9..10          SENS_RES
+; 0001 00CB     b11             SEL_RES
+; 0001 00CC     b12             NFCID Length
+; 0001 00CD     b13..NFCIDLen   NFCID                                      */
+; 0001 00CE }
+;PCODE: $0000026D VOL: 0
+;PCODE: $0000026E VOL: 0

@@ -1543,39 +1543,43 @@ _main:
 	RCALL _delay_ms
 ; 0000 00CD //PN532_begin();
 ; 0000 00CE //putchar(255);
-; 0000 00CF 
-; 0000 00D0 while (1)
-_0xA:
-; 0000 00D1       {
-; 0000 00D2       // Place your code here
-; 0000 00D3         PN532_get_firmware();
+; 0000 00CF PN532_SAM_config();
+	RCALL _PN532_SAM_config
+; 0000 00D0 PN532_get_firmware();
 	RCALL _PN532_get_firmware
-; 0000 00D4         for(i = 0; i<PN532_msg.length; ++i)
+; 0000 00D1 
+; 0000 00D2 while (1)
+_0xA:
+; 0000 00D3       {
+; 0000 00D4       // Place your code here
+; 0000 00D5         PN532_read_passive_tag();
+	RCALL _PN532_read_passive_tag
+; 0000 00D6         for(i = 0; i<PN532_msg.buffer[5]; ++i)
 	__GETWRN 16,17,0
 _0xE:
-	__GETW1MN _PN532_msg,80
-	CP   R16,R30
-	CPC  R17,R31
+	__GETB1MN _PN532_msg,5
+	MOVW R26,R16
+	LDI  R31,0
+	CP   R26,R30
+	CPC  R27,R31
 	BRGE _0xF
-; 0000 00D5         {
-; 0000 00D6           putchar(PN532_msg.buffer[i]);
-	LDI  R26,LOW(_PN532_msg)
-	LDI  R27,HIGH(_PN532_msg)
-	ADD  R26,R16
-	ADC  R27,R17
-	LD   R26,X
+; 0000 00D7         {
+; 0000 00D8           putchar(PN532_msg.buffer[6+i]);
+	MOVW R30,R16
+	__ADDW1MN _PN532_msg,6
+	LD   R26,Z
 	RCALL _putchar
-; 0000 00D7         }
+; 0000 00D9         }
 	RCALL SUBOPT_0x0
 	RJMP _0xE
 _0xF:
-; 0000 00D8         delay_ms(500);
+; 0000 00DA         delay_ms(500);
 	LDI  R26,LOW(500)
 	LDI  R27,HIGH(500)
 	RCALL _delay_ms
-; 0000 00D9       }
+; 0000 00DB       }
 	RJMP _0xA
-; 0000 00DA }
+; 0000 00DC }
 _0x10:
 	RJMP _0x10
 ; .FEND
@@ -1614,7 +1618,7 @@ _TWIInit:
 ; 0001 000E     //enable TWI
 ; 0001 000F     TWCR = (1<<TWEN);
 	LDI  R30,LOW(4)
-	RJMP _0x2080005
+	RJMP _0x2080006
 ; 0001 0010 }
 ; .FEND
 ;
@@ -1640,7 +1644,7 @@ _TWIStop:
 ; .FSTART _TWIStop
 ; 0001 001A     TWCR = (1<<TWINT)|(1<<TWSTO)|(1<<TWEN);
 	LDI  R30,LOW(148)
-_0x2080005:
+_0x2080006:
 	OUT  0x36,R30
 ; 0001 001B }
 	RET
@@ -1689,7 +1693,7 @@ _0x20009:
 	RJMP _0x20009
 ; 0001 0029     return TWDR;
 	IN   R30,0x3
-	RJMP _0x2080004
+	RJMP _0x2080005
 ; 0001 002A }
 ; .FEND
 ;
@@ -1707,24 +1711,26 @@ _PN532_cmd:
 ; 0001 0030   for(i = 0; i < msg->length; ++i){
 	RCALL SUBOPT_0x2
 _0x2000D:
+	LD   R26,Y
+	LDD  R27,Y+1
 	RCALL SUBOPT_0x3
 	RCALL SUBOPT_0x4
-	RCALL SUBOPT_0x5
 	BRGE _0x2000E
 ; 0001 0031     TWIWrite(msg->buffer[i]);
 	MOVW R30,R8
-	RCALL SUBOPT_0x3
-	RCALL SUBOPT_0x6
+	LD   R26,Y
+	LDD  R27,Y+1
+	RCALL SUBOPT_0x5
 	LD   R26,X
 	RCALL _TWIWrite
 ; 0001 0032   }
-	RCALL SUBOPT_0x7
+	RCALL SUBOPT_0x6
 	RJMP _0x2000D
 _0x2000E:
 ; 0001 0033   TWIStop();
 	RCALL _TWIStop
 ; 0001 0034 }
-_0x2080004:
+_0x2080005:
 	ADIW R28,2
 	RET
 ; .FEND
@@ -1745,59 +1751,59 @@ _PN532_build_msg:
 	MOV  R6,R30
 ; 0001 003A 
 ; 0001 003B   buffer->buffer[PN532_START]=0x00;                     ++msg_length;
-	RCALL SUBOPT_0x8
+	RCALL SUBOPT_0x7
 	LDI  R30,LOW(0)
-	RCALL SUBOPT_0x9
-; 0001 003C   buffer->buffer[PN532_START+1]=0xFF;                   ++msg_length;
 	RCALL SUBOPT_0x8
+; 0001 003C   buffer->buffer[PN532_START+1]=0xFF;                   ++msg_length;
+	RCALL SUBOPT_0x7
 	ADIW R26,1
 	LDI  R30,LOW(255)
-	RCALL SUBOPT_0x9
+	RCALL SUBOPT_0x8
 ; 0001 003D   buffer->buffer[PN532_LEN]=msg->length+1;               ++msg_length;
-	RCALL SUBOPT_0xA
+	RCALL SUBOPT_0x9
 	__PUTB1SNS 4,2
 	RCALL SUBOPT_0x0
 ; 0001 003E   buffer->buffer[PN532_LCS]=(~(msg->length+1))+1;        ++msg_length;
-	RCALL SUBOPT_0xA
+	RCALL SUBOPT_0x9
 	NEG  R30
 	__PUTB1SNS 4,3
 	RCALL SUBOPT_0x0
 ; 0001 003F   buffer->buffer[PN532_TFI]=0xD4;                       ++msg_length;
-	RCALL SUBOPT_0x8
+	RCALL SUBOPT_0x7
 	ADIW R26,4
 	LDI  R30,LOW(212)
-	RCALL SUBOPT_0x9
+	RCALL SUBOPT_0x8
 ; 0001 0040   for(i = 0; i<msg->length; ++i){
 	RCALL SUBOPT_0x2
 _0x20010:
-	RCALL SUBOPT_0xB
+	RCALL SUBOPT_0xA
+	RCALL SUBOPT_0x3
 	RCALL SUBOPT_0x4
-	RCALL SUBOPT_0x5
 	BRGE _0x20011
 ; 0001 0041     buffer->buffer[PN532_DATA+i]=msg->buffer[i];              ++msg_length;
 	MOVW R30,R8
 	ADIW R30,5
-	RCALL SUBOPT_0x8
-	RCALL SUBOPT_0xC
+	RCALL SUBOPT_0x7
+	RCALL SUBOPT_0xB
 	MOVW R0,R30
-	RCALL SUBOPT_0xD
+	RCALL SUBOPT_0xC
 	MOVW R26,R0
-	RCALL SUBOPT_0x9
+	RCALL SUBOPT_0x8
 ; 0001 0042     checksum += msg->buffer[i];
-	RCALL SUBOPT_0xD
+	RCALL SUBOPT_0xC
 	ADD  R6,R30
 ; 0001 0043   }
-	RCALL SUBOPT_0x7
+	RCALL SUBOPT_0x6
 	RJMP _0x20010
 _0x20011:
 ; 0001 0044   buffer->buffer[PN532_DATA+i]= (~(checksum&0xFF))+1;   ++msg_length;
 	MOVW R30,R8
 	ADIW R30,5
-	RCALL SUBOPT_0x8
-	RCALL SUBOPT_0x6
+	RCALL SUBOPT_0x7
+	RCALL SUBOPT_0x5
 	MOV  R30,R6
 	NEG  R30
-	RCALL SUBOPT_0x9
+	RCALL SUBOPT_0x8
 ; 0001 0045   buffer->length = msg_length;
 	MOVW R30,R16
 	__PUTW1SN 4,80
@@ -1824,7 +1830,7 @@ _PN532_read:
 	LDI  R16,0
 _0x20012:
 ; 0001 004E     TWIStart();
-	RCALL SUBOPT_0xE
+	RCALL SUBOPT_0xD
 ; 0001 004F     TWIWrite(PN532_ADD | 1);
 ; 0001 0050     data = TWIRead(1);
 ; 0001 0051     if(data==0x00) TWIStop();
@@ -1841,56 +1847,53 @@ _0x20016:
 _0x20014:
 ; 0001 0054   // get rid of preamble
 ; 0001 0055   TWIRead(1);
-	RCALL SUBOPT_0xF
+	RCALL SUBOPT_0xE
 ; 0001 0056   //check start of packet
 ; 0001 0057   if((data=TWIRead(1))!=0x00) {TWIStop(); return false;}
-	RCALL SUBOPT_0xF
+	RCALL SUBOPT_0xE
 	MOV  R17,R30
 	CPI  R30,0
 	BREQ _0x20018
-	RCALL _TWIStop
-	LDI  R30,LOW(0)
-	RCALL __LOADLOCR2
-	RJMP _0x2080003
+	RCALL SUBOPT_0xF
+	RJMP _0x2080004
 ; 0001 0058   dest->buffer[len++]=data;
 _0x20018:
 	RCALL SUBOPT_0x10
 ; 0001 0059   if((data=TWIRead(1))!=0xFF) {TWIStop(); return false;}
-	RCALL SUBOPT_0xF
+	RCALL SUBOPT_0xE
 	MOV  R17,R30
 	CPI  R30,LOW(0xFF)
 	BREQ _0x20019
-	RCALL SUBOPT_0x11
-	RCALL __LOADLOCR2
-	RJMP _0x2080003
+	RCALL SUBOPT_0xF
+	RJMP _0x2080004
 ; 0001 005A   dest->buffer[len++]=data;
 _0x20019:
 	RCALL SUBOPT_0x10
 ; 0001 005B 
 ; 0001 005C   //get length
 ; 0001 005D   dest->buffer[len++]=TWIRead(1);
-	RCALL SUBOPT_0x12
+	RCALL SUBOPT_0x11
 	PUSH R31
 	PUSH R30
-	RCALL SUBOPT_0xF
+	RCALL SUBOPT_0xE
 	POP  R26
 	POP  R27
 	ST   X,R30
 ; 0001 005E   //get length checksum
 ; 0001 005F   dest->buffer[len++]=TWIRead(1);
-	RCALL SUBOPT_0x12
+	RCALL SUBOPT_0x11
 	PUSH R31
 	PUSH R30
-	RCALL SUBOPT_0xF
+	RCALL SUBOPT_0xE
 	POP  R26
 	POP  R27
 	ST   X,R30
 ; 0001 0060   //get TFI (should be D5)
 ; 0001 0061   dest->buffer[len++]=TWIRead(1);
-	RCALL SUBOPT_0x12
+	RCALL SUBOPT_0x11
 	PUSH R31
 	PUSH R30
-	RCALL SUBOPT_0xF
+	RCALL SUBOPT_0xE
 	POP  R26
 	POP  R27
 	ST   X,R30
@@ -1898,27 +1901,31 @@ _0x20019:
 ; 0001 0063   for(i =0; i < dest->buffer[PN532_LEN]-1; ++i)
 	RCALL SUBOPT_0x2
 _0x2001B:
-	RCALL SUBOPT_0x13
+	LDD  R30,Y+2
+	LDD  R31,Y+2+1
+	LDD  R30,Z+2
+	LDI  R31,0
+	SBIW R30,1
 	CP   R8,R30
 	CPC  R9,R31
 	BRGE _0x2001C
 ; 0001 0064   {
 ; 0001 0065     dest->buffer[len++] = TWIRead(1);
-	RCALL SUBOPT_0x12
+	RCALL SUBOPT_0x11
 	PUSH R31
 	PUSH R30
-	RCALL SUBOPT_0xF
+	RCALL SUBOPT_0xE
 	POP  R26
 	POP  R27
 	ST   X,R30
 ; 0001 0066   }
-	RCALL SUBOPT_0x7
+	RCALL SUBOPT_0x6
 	RJMP _0x2001B
 _0x2001C:
 ; 0001 0067 
 ; 0001 0068   //skip data checksum
 ; 0001 0069   dest->buffer[len++]=TWIRead(0);
-	RCALL SUBOPT_0x12
+	RCALL SUBOPT_0x11
 	PUSH R31
 	PUSH R30
 	LDI  R26,LOW(0)
@@ -1930,8 +1937,8 @@ _0x2001C:
 ; 0001 006A 
 ; 0001 006B   //set buffer length
 ; 0001 006C   dest->length = len;
-	RCALL SUBOPT_0xB
-	RCALL SUBOPT_0x4
+	RCALL SUBOPT_0xA
+	RCALL SUBOPT_0x3
 	MOV  R30,R16
 	LDI  R31,0
 	ST   X+,R30
@@ -1944,49 +1951,67 @@ _0x2001C:
 ; 0001 0071   //return true on success
 ; 0001 0072   return true;
 	LDI  R30,LOW(1)
+_0x2080004:
 	RCALL __LOADLOCR2
-	RJMP _0x2080003
+	ADIW R28,4
+	RET
 ; 0001 0073 }
 ; .FEND
 ;
-;void PN532_get_msg(TWI_BUFFER_STRUCT* src, TWI_BUFFER_STRUCT* dest)
+;void PN532_get_msg(TWI_BUFFER_STRUCT* src, TWI_BUFFER_STRUCT* dest, unsigned char offset)
 ; 0001 0076 {
 _PN532_get_msg:
 ; .FSTART _PN532_get_msg
-; 0001 0077   // exclude TFI from msg, thus -1
-; 0001 0078   dest->length = src->buffer[PN532_LEN]-1;
-	RCALL SUBOPT_0x1
-;	*src -> Y+2
-;	*dest -> Y+0
-	RCALL SUBOPT_0x13
-	__PUTW1SN 0,80
-; 0001 0079   for(i =0; i < dest->length; ++i)
+; 0001 0077   // exclude TFI from src, thus -1
+; 0001 0078   dest->length = src->buffer[PN532_LEN]-1-offset;
+	ST   -Y,R26
+;	*src -> Y+3
+;	*dest -> Y+1
+;	offset -> Y+0
+	LDD  R30,Y+3
+	LDD  R31,Y+3+1
+	LDD  R30,Z+2
+	LDI  R31,0
+	SBIW R30,1
+	MOVW R26,R30
+	LD   R30,Y
+	LDI  R31,0
+	RCALL __SWAPW12
+	SUB  R30,R26
+	SBC  R31,R27
+	__PUTW1SN 1,80
+; 0001 0079   for(i=0; i < dest->length; ++i)
 	RCALL SUBOPT_0x2
 _0x2001E:
+	LDD  R26,Y+1
+	LDD  R27,Y+1+1
 	RCALL SUBOPT_0x3
 	RCALL SUBOPT_0x4
-	RCALL SUBOPT_0x5
 	BRGE _0x2001F
 ; 0001 007A   {
-; 0001 007B     dest->buffer[i] = src->buffer[PN532_DATA+i];
+; 0001 007B     dest->buffer[i] = src->buffer[PN532_DATA+i+offset];
 	MOVW R30,R8
-	RCALL SUBOPT_0x3
-	RCALL SUBOPT_0xC
-	MOVW R0,R30
-	MOVW R30,R8
-	ADIW R30,5
+	LDD  R26,Y+1
+	LDD  R27,Y+1+1
 	RCALL SUBOPT_0xB
-	RCALL SUBOPT_0x6
+	MOVW R0,R30
+	MOVW R26,R8
+	ADIW R26,5
+	LD   R30,Y
+	LDI  R31,0
+	RCALL SUBOPT_0xB
+	LDD  R26,Y+3
+	LDD  R27,Y+3+1
+	RCALL SUBOPT_0x5
 	LD   R30,X
 	MOVW R26,R0
 	ST   X,R30
 ; 0001 007C   }
-	RCALL SUBOPT_0x7
+	RCALL SUBOPT_0x6
 	RJMP _0x2001E
 _0x2001F:
 ; 0001 007D }
-_0x2080003:
-	ADIW R28,4
+	ADIW R28,5
 	RET
 ; .FEND
 ;
@@ -2002,7 +2027,7 @@ _PN532_wait_for_ack:
 	LDI  R17,0
 _0x20020:
 ; 0001 0083     TWIStart();
-	RCALL SUBOPT_0xE
+	RCALL SUBOPT_0xD
 ; 0001 0084     TWIWrite(PN532_ADD | 1);
 ; 0001 0085     //TWIStart();
 ; 0001 0086     data = TWIRead(1);
@@ -2020,30 +2045,30 @@ _0x20024:
 _0x20022:
 ; 0001 008A   // get rid of preamble
 ; 0001 008B   TWIRead(1);
-	RCALL SUBOPT_0xF
+	RCALL SUBOPT_0xE
 ; 0001 008C   //check start of packet
 ; 0001 008D   if(TWIRead(1)!=0x00) {TWIStop(); return false;}
-	RCALL SUBOPT_0xF
+	RCALL SUBOPT_0xE
 	CPI  R30,0
 	BREQ _0x20026
-	RCALL SUBOPT_0x11
-	RJMP _0x2080002
+	RCALL SUBOPT_0xF
+	RJMP _0x2080003
 ; 0001 008E   if(TWIRead(1)!=0xFF) {TWIStop(); return false;}
 _0x20026:
-	RCALL SUBOPT_0xF
+	RCALL SUBOPT_0xE
 	CPI  R30,LOW(0xFF)
 	BREQ _0x20027
-	RCALL SUBOPT_0x11
-	RJMP _0x2080002
+	RCALL SUBOPT_0xF
+	RJMP _0x2080003
 ; 0001 008F 
 ; 0001 0090   //check ack
 ; 0001 0091   if(TWIRead(1)!=0x00) {TWIStop(); return false;}
 _0x20027:
-	RCALL SUBOPT_0xF
+	RCALL SUBOPT_0xE
 	CPI  R30,0
 	BREQ _0x20028
-	RCALL SUBOPT_0x11
-	RJMP _0x2080002
+	RCALL SUBOPT_0xF
+	RJMP _0x2080003
 ; 0001 0092   if(TWIRead(0)!=0xFF) {TWIStop(); return false;}
 _0x20028:
 	LDI  R26,LOW(0)
@@ -2051,14 +2076,14 @@ _0x20028:
 	RCALL _TWIRead
 	CPI  R30,LOW(0xFF)
 	BREQ _0x20029
-	RCALL SUBOPT_0x11
-	RJMP _0x2080002
+	RCALL SUBOPT_0xF
+	RJMP _0x2080003
 ; 0001 0093   TWIStop();
 _0x20029:
 	RCALL _TWIStop
 ; 0001 0094   return true;
 	LDI  R30,LOW(1)
-_0x2080002:
+_0x2080003:
 	LD   R17,Y+
 	RET
 ; 0001 0095 }
@@ -2068,44 +2093,129 @@ _0x2080002:
 ; 0001 0098 {
 _PN532_get_firmware:
 ; .FSTART _PN532_get_firmware
-; 0001 0099   PN532_msg.buffer[0]=0x02;
+; 0001 0099   PN532_msg.buffer[0]=PN532_CMD_GETFIRMWARE;
 	LDI  R30,LOW(2)
 	STS  _PN532_msg,R30
 ; 0001 009A   PN532_msg.length=1;
 	LDI  R30,LOW(1)
 	LDI  R31,HIGH(1)
-	__PUTW1MN _PN532_msg,80
+	RCALL SUBOPT_0x12
 ; 0001 009B   PN532_build_msg(&twi_tx, &PN532_msg);
-	LDI  R30,LOW(_twi_tx)
-	LDI  R31,HIGH(_twi_tx)
-	RCALL SUBOPT_0x14
-	RCALL _PN532_build_msg
 ; 0001 009C   PN532_cmd(&twi_tx);
-	LDI  R26,LOW(_twi_tx)
-	LDI  R27,HIGH(_twi_tx)
-	RCALL _PN532_cmd
 ; 0001 009D   delay_ms(20);
-	RCALL SUBOPT_0x15
 ; 0001 009E   while(!PN532_wait_for_ack()) delay_ms(20);
 _0x2002A:
 	RCALL _PN532_wait_for_ack
 	CPI  R30,0
 	BRNE _0x2002C
-	RCALL SUBOPT_0x15
+	RCALL SUBOPT_0x13
 	RJMP _0x2002A
 _0x2002C:
 ; 0001 009F delay_ms(20);
-	RCALL SUBOPT_0x15
+	RJMP _0x2080002
 ; 0001 00A0   PN532_read(&twi_rx);
-	LDI  R26,LOW(_twi_rx)
-	LDI  R27,HIGH(_twi_rx)
-	RCALL _PN532_read
-; 0001 00A1   PN532_get_msg(&twi_rx, &PN532_msg);
-	LDI  R30,LOW(_twi_rx)
-	LDI  R31,HIGH(_twi_rx)
-	RCALL SUBOPT_0x14
-	RCALL _PN532_get_msg
+; 0001 00A1   PN532_get_msg(&twi_rx, &PN532_msg, 1);
 ; 0001 00A2 }
+; .FEND
+;
+;bool PN532_SAM_config()
+; 0001 00A5 {
+_PN532_SAM_config:
+; .FSTART _PN532_SAM_config
+; 0001 00A6   PN532_msg.buffer[0] = PN532_CMD_SAMCONFIGURATION;
+	LDI  R30,LOW(20)
+	RCALL SUBOPT_0x14
+; 0001 00A7   PN532_msg.buffer[1] = 0x01; // normal mode;
+; 0001 00A8   PN532_msg.buffer[2] = 0x14; // timeout 50ms * 20 = 1 second
+	LDI  R30,LOW(20)
+	__PUTB1MN _PN532_msg,2
+; 0001 00A9   PN532_msg.buffer[3] = 0x00; // not using IRQ pin!
+	LDI  R30,LOW(0)
+	__PUTB1MN _PN532_msg,3
+; 0001 00AA   PN532_msg.length=4;
+	LDI  R30,LOW(4)
+	LDI  R31,HIGH(4)
+	RCALL SUBOPT_0x12
+; 0001 00AB   PN532_build_msg(&twi_tx, &PN532_msg);
+; 0001 00AC   PN532_cmd(&twi_tx);
+; 0001 00AD   delay_ms(20);
+; 0001 00AE   while(!PN532_wait_for_ack()) delay_ms(20);
+_0x2002D:
+	RCALL _PN532_wait_for_ack
+	CPI  R30,0
+	BRNE _0x2002F
+	RCALL SUBOPT_0x13
+	RJMP _0x2002D
+_0x2002F:
+; 0001 00AF delay_ms(20);
+	RCALL SUBOPT_0x13
+; 0001 00B0   PN532_read(&twi_rx);
+	RCALL SUBOPT_0x15
+; 0001 00B1   PN532_get_msg(&twi_rx, &PN532_msg, 0);
+	LDI  R26,LOW(0)
+	RCALL _PN532_get_msg
+; 0001 00B2   if(PN532_msg.buffer[0]==0x15) return true;
+	LDS  R26,_PN532_msg
+	CPI  R26,LOW(0x15)
+	BRNE _0x20030
+	LDI  R30,LOW(1)
+	RET
+; 0001 00B3   else return false;
+_0x20030:
+	LDI  R30,LOW(0)
+	RET
+; 0001 00B4 }
+	RET
+; .FEND
+;
+;void PN532_read_passive_tag()
+; 0001 00B7 {
+_PN532_read_passive_tag:
+; .FSTART _PN532_read_passive_tag
+; 0001 00B8   PN532_msg.buffer[0] = PN532_CMD_INLISTPASSIVETARGET;
+	LDI  R30,LOW(74)
+	RCALL SUBOPT_0x14
+; 0001 00B9   PN532_msg.buffer[1] = 1;  // max 1 cards at once
+; 0001 00BA   PN532_msg.buffer[2] = PN532_MIFARE_ISO14443A; //baudrate
+	LDI  R30,LOW(0)
+	__PUTB1MN _PN532_msg,2
+; 0001 00BB   PN532_msg.length=3;
+	LDI  R30,LOW(3)
+	LDI  R31,HIGH(3)
+	RCALL SUBOPT_0x12
+; 0001 00BC   PN532_build_msg(&twi_tx, &PN532_msg);
+; 0001 00BD   PN532_cmd(&twi_tx);
+; 0001 00BE   delay_ms(20);
+; 0001 00BF   while(!PN532_wait_for_ack()) delay_ms(20);
+_0x20032:
+	RCALL _PN532_wait_for_ack
+	CPI  R30,0
+	BRNE _0x20034
+	RCALL SUBOPT_0x13
+	RJMP _0x20032
+_0x20034:
+; 0001 00C0 delay_ms(20);
+_0x2080002:
+	LDI  R26,LOW(20)
+	LDI  R27,0
+	RCALL _delay_ms
+; 0001 00C1   PN532_read(&twi_rx);
+	RCALL SUBOPT_0x15
+; 0001 00C2   PN532_get_msg(&twi_rx, &PN532_msg, 1);
+	LDI  R26,LOW(1)
+	RCALL _PN532_get_msg
+; 0001 00C3   /* ISO14443A card response should be in the following format:
+; 0001 00C4 
+; 0001 00C5     byte            Description
+; 0001 00C6     -------------   ------------------------------------------
+; 0001 00C7     b0..6           Frame header and preamble
+; 0001 00C8     b7              Tags Found
+; 0001 00C9     b8              Tag Number (only one used in this example)
+; 0001 00CA     b9..10          SENS_RES
+; 0001 00CB     b11             SEL_RES
+; 0001 00CC     b12             NFCID Length
+; 0001 00CD     b13..NFCIDLen   NFCID                                      */
+; 0001 00CE }
 	RET
 ; .FEND
 
@@ -2213,7 +2323,7 @@ _lcd_init:
 	LD   R30,Y
 	SUBI R30,-LOW(192)
 	__PUTB1MN __base_y_G101,3
-	RCALL SUBOPT_0x15
+	RCALL SUBOPT_0x13
 	RCALL SUBOPT_0x18
 	RCALL SUBOPT_0x18
 	RCALL SUBOPT_0x18
@@ -2277,7 +2387,7 @@ SUBOPT_0x0:
 	__ADDWRN 16,17,1
 	RET
 
-;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:2 WORDS
+;OPTIMIZER ADDED SUBROUTINE, CALLED 4 TIMES, CODE SIZE REDUCTION:1 WORDS
 SUBOPT_0x1:
 	ST   -Y,R27
 	ST   -Y,R26
@@ -2289,80 +2399,74 @@ SUBOPT_0x2:
 	CLR  R9
 	RET
 
-;OPTIMIZER ADDED SUBROUTINE, CALLED 4 TIMES, CODE SIZE REDUCTION:1 WORDS
-SUBOPT_0x3:
-	LD   R26,Y
-	LDD  R27,Y+1
-	RET
-
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 6 TIMES, CODE SIZE REDUCTION:3 WORDS
-SUBOPT_0x4:
+SUBOPT_0x3:
 	SUBI R26,LOW(-80)
 	SBCI R27,HIGH(-80)
 	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:2 WORDS
-SUBOPT_0x5:
+SUBOPT_0x4:
 	RCALL __GETW1P
 	CP   R8,R30
 	CPC  R9,R31
 	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:2 WORDS
-SUBOPT_0x6:
+SUBOPT_0x5:
 	ADD  R26,R30
 	ADC  R27,R31
 	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 4 TIMES, CODE SIZE REDUCTION:4 WORDS
-SUBOPT_0x7:
+SUBOPT_0x6:
 	MOVW R30,R8
 	ADIW R30,1
 	MOVW R8,R30
 	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:2 WORDS
-SUBOPT_0x8:
+SUBOPT_0x7:
 	LDD  R26,Y+4
 	LDD  R27,Y+4+1
 	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:2 WORDS
-SUBOPT_0x9:
+SUBOPT_0x8:
 	ST   X,R30
 	RJMP SUBOPT_0x0
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
-SUBOPT_0xA:
+SUBOPT_0x9:
 	LDD  R26,Y+2
 	LDD  R27,Y+2+1
-	RCALL SUBOPT_0x4
+	RCALL SUBOPT_0x3
 	LD   R30,X
 	SUBI R30,-LOW(1)
 	RET
 
-;OPTIMIZER ADDED SUBROUTINE, CALLED 12 TIMES, CODE SIZE REDUCTION:9 WORDS
-SUBOPT_0xB:
+;OPTIMIZER ADDED SUBROUTINE, CALLED 11 TIMES, CODE SIZE REDUCTION:8 WORDS
+SUBOPT_0xA:
 	LDD  R26,Y+2
 	LDD  R27,Y+2+1
 	RET
 
-;OPTIMIZER ADDED SUBROUTINE, CALLED 9 TIMES, CODE SIZE REDUCTION:6 WORDS
-SUBOPT_0xC:
+;OPTIMIZER ADDED SUBROUTINE, CALLED 10 TIMES, CODE SIZE REDUCTION:7 WORDS
+SUBOPT_0xB:
 	ADD  R30,R26
 	ADC  R31,R27
 	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:1 WORDS
-SUBOPT_0xD:
+SUBOPT_0xC:
 	MOVW R30,R8
-	RCALL SUBOPT_0xB
-	RCALL SUBOPT_0x6
+	RCALL SUBOPT_0xA
+	RCALL SUBOPT_0x5
 	LD   R30,X
 	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:5 WORDS
-SUBOPT_0xE:
+SUBOPT_0xD:
 	RCALL _TWIStart
 	LDI  R26,LOW(73)
 	RCALL _TWIWrite
@@ -2374,57 +2478,79 @@ SUBOPT_0xE:
 	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 11 TIMES, CODE SIZE REDUCTION:18 WORDS
-SUBOPT_0xF:
+SUBOPT_0xE:
 	LDI  R26,LOW(1)
 	LDI  R27,0
 	RJMP _TWIRead
+
+;OPTIMIZER ADDED SUBROUTINE, CALLED 6 TIMES, CODE SIZE REDUCTION:3 WORDS
+SUBOPT_0xF:
+	RCALL _TWIStop
+	LDI  R30,LOW(0)
+	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:3 WORDS
 SUBOPT_0x10:
 	MOV  R30,R16
 	SUBI R16,-1
-	RCALL SUBOPT_0xB
+	RCALL SUBOPT_0xA
 	LDI  R31,0
-	RCALL SUBOPT_0xC
+	RCALL SUBOPT_0xB
 	ST   Z,R17
 	RET
 
-;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:2 WORDS
-SUBOPT_0x11:
-	RCALL _TWIStop
-	LDI  R30,LOW(0)
-	RET
-
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:14 WORDS
-SUBOPT_0x12:
+SUBOPT_0x11:
 	MOV  R30,R16
 	SUBI R16,-1
-	RCALL SUBOPT_0xB
+	RCALL SUBOPT_0xA
 	LDI  R31,0
-	RJMP SUBOPT_0xC
+	RJMP SUBOPT_0xB
 
-;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
-SUBOPT_0x13:
-	LDD  R30,Y+2
-	LDD  R31,Y+2+1
-	LDD  R30,Z+2
-	LDI  R31,0
-	SBIW R30,1
-	RET
-
-;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:1 WORDS
-SUBOPT_0x14:
+;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:30 WORDS
+SUBOPT_0x12:
+	__PUTW1MN _PN532_msg,80
+	LDI  R30,LOW(_twi_tx)
+	LDI  R31,HIGH(_twi_tx)
 	ST   -Y,R31
 	ST   -Y,R30
 	LDI  R26,LOW(_PN532_msg)
 	LDI  R27,HIGH(_PN532_msg)
-	RET
-
-;OPTIMIZER ADDED SUBROUTINE, CALLED 4 TIMES, CODE SIZE REDUCTION:4 WORDS
-SUBOPT_0x15:
+	RCALL _PN532_build_msg
+	LDI  R26,LOW(_twi_tx)
+	LDI  R27,HIGH(_twi_tx)
+	RCALL _PN532_cmd
 	LDI  R26,LOW(20)
 	LDI  R27,0
 	RJMP _delay_ms
+
+;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:6 WORDS
+SUBOPT_0x13:
+	LDI  R26,LOW(20)
+	LDI  R27,0
+	RJMP _delay_ms
+
+;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
+SUBOPT_0x14:
+	STS  _PN532_msg,R30
+	LDI  R30,LOW(1)
+	__PUTB1MN _PN532_msg,1
+	RET
+
+;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:8 WORDS
+SUBOPT_0x15:
+	LDI  R26,LOW(_twi_rx)
+	LDI  R27,HIGH(_twi_rx)
+	RCALL _PN532_read
+	LDI  R30,LOW(_twi_rx)
+	LDI  R31,HIGH(_twi_rx)
+	ST   -Y,R31
+	ST   -Y,R30
+	LDI  R30,LOW(_PN532_msg)
+	LDI  R31,HIGH(_PN532_msg)
+	ST   -Y,R31
+	ST   -Y,R30
+	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:2 WORDS
 SUBOPT_0x16:
@@ -2462,6 +2588,17 @@ __GETW1P:
 	LD   R30,X+
 	LD   R31,X
 	SBIW R26,1
+	RET
+
+__SWAPW12:
+	MOV  R1,R27
+	MOV  R27,R31
+	MOV  R31,R1
+
+__SWAPB12:
+	MOV  R1,R26
+	MOV  R26,R30
+	MOV  R30,R1
 	RET
 
 __SAVELOCR2:

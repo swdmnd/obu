@@ -372,16 +372,18 @@
 ;PCODE: $00000093 VOL: 0
 ; 0000 00CD //PN532_begin();
 ; 0000 00CE //putchar(255);
-; 0000 00CF 
-; 0000 00D0 while (1)
+; 0000 00CF PN532_SAM_config();
 ;PCODE: $00000094 VOL: 0
-; 0000 00D1       {
-; 0000 00D2       // Place your code here
-; 0000 00D3         PN532_get_firmware();
+; 0000 00D0 PN532_get_firmware();
 ;PCODE: $00000095 VOL: 0
-; 0000 00D4         for(i = 0; i<PN532_msg.length; ++i)
+; 0000 00D1 
+; 0000 00D2 while (1)
 ;PCODE: $00000096 VOL: 0
+; 0000 00D3       {
+; 0000 00D4       // Place your code here
+; 0000 00D5         PN532_read_passive_tag();
 ;PCODE: $00000097 VOL: 0
+; 0000 00D6         for(i = 0; i<PN532_msg.buffer[5]; ++i)
 ;PCODE: $00000098 VOL: 0
 ;PCODE: $00000099 VOL: 0
 ;PCODE: $0000009A VOL: 0
@@ -390,25 +392,30 @@
 ;PCODE: $0000009D VOL: 0
 ;PCODE: $0000009E VOL: 0
 ;PCODE: $0000009F VOL: 0
-; 0000 00D5         {
-; 0000 00D6           putchar(PN532_msg.buffer[i]);
 ;PCODE: $000000A0 VOL: 0
 ;PCODE: $000000A1 VOL: 0
 ;PCODE: $000000A2 VOL: 0
 ;PCODE: $000000A3 VOL: 0
-; 0000 00D7         }
+; 0000 00D7         {
+; 0000 00D8           putchar(PN532_msg.buffer[6+i]);
 ;PCODE: $000000A4 VOL: 0
 ;PCODE: $000000A5 VOL: 0
 ;PCODE: $000000A6 VOL: 0
 ;PCODE: $000000A7 VOL: 0
 ;PCODE: $000000A8 VOL: 0
-; 0000 00D8         delay_ms(500);
+; 0000 00D9         }
 ;PCODE: $000000A9 VOL: 0
 ;PCODE: $000000AA VOL: 0
-; 0000 00D9       }
 ;PCODE: $000000AB VOL: 0
 ;PCODE: $000000AC VOL: 0
-; 0000 00DA }
 ;PCODE: $000000AD VOL: 0
+; 0000 00DA         delay_ms(500);
 ;PCODE: $000000AE VOL: 0
 ;PCODE: $000000AF VOL: 0
+; 0000 00DB       }
+;PCODE: $000000B0 VOL: 0
+;PCODE: $000000B1 VOL: 0
+; 0000 00DC }
+;PCODE: $000000B2 VOL: 0
+;PCODE: $000000B3 VOL: 0
+;PCODE: $000000B4 VOL: 0

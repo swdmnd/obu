@@ -204,14 +204,16 @@ lcd_init(16);
 delay_ms(1000);
 //PN532_begin();
 //putchar(255);
+PN532_SAM_config();
+PN532_get_firmware();
 
 while (1)
       {
       // Place your code here
-        read_rfid();
-        for(i = 0; i<PN532_msg.length; ++i)
+        PN532_read_passive_tag();
+        for(i = 0; i<PN532_msg.buffer[12]; ++i)
         {
-          putchar(PN532_msg.buffer[i]);
+          putchar(PN532_msg.buffer[13+i]);
         }
         delay_ms(500);
       }

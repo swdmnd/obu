@@ -114,13 +114,13 @@ bool PN532_read(TWI_BUFFER_STRUCT* dest)
   return true;
 }
 
-void PN532_get_msg(TWI_BUFFER_STRUCT* src, TWI_BUFFER_STRUCT* dest)
+void PN532_get_msg(TWI_BUFFER_STRUCT* src, TWI_BUFFER_STRUCT* dest, unsigned char offset)
 { 
-  // exclude TFI from msg, thus -1
-  dest->length = src->buffer[PN532_LEN]-1;
-  for(i =0; i < dest->length; ++i)
+  // exclude TFI from src, thus -1
+  dest->length = src->buffer[PN532_LEN]-1-offset;
+  for(i=0; i < dest->length; ++i)
   {
-    dest->buffer[i] = src->buffer[PN532_DATA+i];
+    dest->buffer[i] = src->buffer[PN532_DATA+i+offset];
   }
 }
 
@@ -148,9 +148,9 @@ bool PN532_wait_for_ack(){
   return true;
 }
 
-void read_rfid()
+void PN532_get_firmware()
 {  
-  PN532_msg.buffer[0]=0x02; 
+  PN532_msg.buffer[0]=PN532_CMD_GETFIRMWARE; 
   PN532_msg.length=1;
   PN532_build_msg(&twi_tx, &PN532_msg);
   PN532_cmd(&twi_tx); 
@@ -158,5 +158,50 @@ void read_rfid()
   while(!PN532_wait_for_ack()) delay_ms(20); 
   delay_ms(20);        
   PN532_read(&twi_rx);
-  PN532_get_msg(&twi_rx, &PN532_msg);
+  PN532_get_msg(&twi_rx, &PN532_msg, 1);
+}
+
+bool PN532_SAM_config()
+{  
+  PN532_msg.buffer[0] = PN532_CMD_SAMCONFIGURATION;  
+  PN532_msg.buffer[1] = 0x01; // normal mode;
+  PN532_msg.buffer[2] = 0x14; // timeout 50ms * 20 = 1 second
+  PN532_msg.buffer[3] = 0x00; // not using IRQ pin!
+  PN532_msg.length=4;
+  PN532_build_msg(&twi_tx, &PN532_msg);
+  PN532_cmd(&twi_tx); 
+  delay_ms(20);
+  while(!PN532_wait_for_ack()) delay_ms(20); 
+  delay_ms(20);        
+  PN532_read(&twi_rx);
+  PN532_get_msg(&twi_rx, &PN532_msg, 0); 
+  if(PN532_msg.buffer[0]==0x15) return true;
+  else return false;   
+}
+
+bool PN532_read_passive_tag()
+{  
+  PN532_msg.buffer[0] = PN532_CMD_INLISTPASSIVETARGET;  
+  PN532_msg.buffer[1] = 1;  // max 1 cards at once
+  PN532_msg.buffer[2] = PN532_MIFARE_ISO14443A; //baudrate
+  PN532_msg.length=3;
+  PN532_build_msg(&twi_tx, &PN532_msg);
+  PN532_cmd(&twi_tx); 
+  delay_ms(20);
+  while(!PN532_wait_for_ack()) delay_ms(20); 
+  delay_ms(20);        
+  PN532_read(&twi_rx);
+  PN532_get_msg(&twi_rx, &PN532_msg, 1);
+  /* ISO14443A card response should be in the following format:
+
+    byte            Description
+    -------------   ------------------------------------------
+    b0..6           Frame header and preamble
+    b7              Tags Found
+    b8              Tag Number (only one used in this example)
+    b9..10          SENS_RES
+    b11             SEL_RES
+    b12             NFCID Length
+    b13..NFCIDLen   NFCID                                      */ 
+     
 }
