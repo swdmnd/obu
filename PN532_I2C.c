@@ -1,4 +1,5 @@
 #include "PN532_I2C.h"
+#include <mega8.h>
 
 TWI_BUFFER_STRUCT twi_rx;
 TWI_BUFFER_STRUCT twi_tx;
@@ -12,7 +13,7 @@ int i;
 
 void TWIInit(void)
 {
-    //set SCL to 100kHz
+    //set SCL to 100kHz        
     TWSR = 0x00;
     TWBR = 7;   //347,826
     //enable TWI
@@ -22,12 +23,15 @@ void TWIInit(void)
 void TWIStart(void)
 {
     TWCR = (1<<TWINT)|(1<<TWSTA)|(1<<TWEN);
-    while ((TWCR & (1<<TWINT)) == 0);   
+    while ((TWCR & (1<<TWINT)) == 0) ;   
 }
 
 void TWIStop(void)
 {
-    TWCR = (1<<TWINT)|(1<<TWSTO)|(1<<TWEN);
+    //TWCR = (1<<TWINT)|(1<<TWSTO)|(1<<TWEN);
+    DDRC.4 = DDRC.5 = 0;  
+    delay_ms(2);
+    DDRC.4=1;                     
 }
 
 void TWIWrite(unsigned char u8data)
@@ -41,7 +45,7 @@ void TWIWrite(unsigned char u8data)
 unsigned char TWIRead(int ack)
 {
     TWCR = (1<<TWINT)|(1<<TWEN)|(ack<<TWEA);
-    while ((TWCR & (1<<TWINT)) == 0);   
+    while ((TWCR & (1<<TWINT)) == 0) ;   
     return TWDR;
 }
 
@@ -51,8 +55,8 @@ void PN532_cmd(TWI_BUFFER_STRUCT* msg)
   TWIWrite(PN532_ADD);
   for(i = 0; i < msg->length; ++i){
     TWIWrite(msg->buffer[i]);
-  }     
-  TWIStop();  
+  }            
+  TWIStop();     
 }
 
 void PN532_build_msg(TWI_BUFFER_STRUCT* buffer, TWI_BUFFER_STRUCT* msg)
@@ -129,11 +133,14 @@ void PN532_get_msg(TWI_BUFFER_STRUCT* src, TWI_BUFFER_STRUCT* dest, unsigned cha
 }
 
 bool PN532_wait_for_ack(){
-  unsigned char data = 0x00;       
+  unsigned char data = 0x00;  
   // check ready bit
-  while(1){
+  while(1){   
     TWIStart();
     TWIWrite(PN532_ADD | 1); 
+    
+    // if NACK received, repeat data request
+    if(TWSR == 0x48) continue;
     //TWIStart();
     data = TWIRead(1);
     if(data==0x00) TWIStop();
@@ -157,9 +164,10 @@ void PN532_get_firmware()
   PN532_msg.buffer[0]=PN532_CMD_GETFIRMWARE; 
   PN532_msg.length=1;
   PN532_build_msg(&twi_tx, &PN532_msg);
-  PN532_cmd(&twi_tx); 
+  PN532_cmd(&twi_tx);
+  TWIInit();
   delay_ms(20);
-  while(!PN532_wait_for_ack()) delay_ms(20); 
+  while(!PN532_wait_for_ack()) delay_ms(20);
   delay_ms(20);        
   PN532_read(&twi_rx);
   PN532_get_msg(&twi_rx, &PN532_msg, 1);

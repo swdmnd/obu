@@ -4,6 +4,7 @@
 #include <mega8.h>
 #include <delay.h>
 #include <stdbool.h>
+#include <mega8.h>
 
 #define PN532_ADD (0x48)
 #define TWI_BUFFER_SIZE 80
@@ -19,7 +20,7 @@
 #define MIFARE_CMD_AUTH_A  0x60
 #define MIFARE_CMD_AUTH_B  0x61
 #define MIFARE_CMD_READ    0x30
-#define MIFARE_CMD_READ    0x30
+#define MIFARE_CMD_WRITE   0xA0
 
 #define PN532_PREAMBLE  0x00
 #define PN532_POSTAMBLE 0x00
