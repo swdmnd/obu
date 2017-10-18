@@ -14,6 +14,9 @@
 #define PARITY_ERROR        (1<<UPE)
 #define DATA_OVERRUN        (1<<DOR)
 
+unsigned char GTC_Buffer[64];
+unsigned char GTC_Gate_ID[2] = {0x00, 0x00};
+
 // USART Receiver buffer
 #define RX_BUFFER_SIZE 8
 char rx_buffer[RX_BUFFER_SIZE];
@@ -84,7 +87,8 @@ return data;
 void main(void)
 {
 // Declare your local variables here
-int i;
+int i, len;
+char ch;
 //unsigned char write_data[] = {'M', '.', ' ', 'A', 'R', 'I', 'E', 'F', ' ', 'F', '.', '.', '.', '.', '.', '.'};
 
 // Input/Output Ports initialization
@@ -160,8 +164,8 @@ MCUCR=(0<<ISC11) | (0<<ISC10) | (0<<ISC01) | (0<<ISC00);
 // USART Mode: Asynchronous
 // USART Baud Rate: 9600
 UCSRA=(0<<RXC) | (0<<TXC) | (0<<UDRE) | (0<<FE) | (0<<DOR) | (0<<UPE) | (0<<U2X) | (0<<MPCM);
-//UCSRB=(1<<RXCIE) | (0<<TXCIE) | (0<<UDRIE) | (1<<RXEN) | (1<<TXEN) | (0<<UCSZ2) | (0<<RXB8) | (0<<TXB8);
-UCSRB=(0<<RXCIE) | (0<<TXCIE) | (0<<UDRIE) | (1<<RXEN) | (1<<TXEN) | (0<<UCSZ2) | (0<<RXB8) | (0<<TXB8);
+UCSRB=(1<<RXCIE) | (0<<TXCIE) | (0<<UDRIE) | (1<<RXEN) | (1<<TXEN) | (0<<UCSZ2) | (0<<RXB8) | (0<<TXB8);
+//UCSRB=(0<<RXCIE) | (0<<TXCIE) | (0<<UDRIE) | (1<<RXEN) | (1<<TXEN) | (0<<UCSZ2) | (0<<RXB8) | (0<<TXB8);
 UCSRC=(1<<URSEL) | (0<<UMSEL) | (0<<UPM1) | (0<<UPM0) | (0<<USBS) | (1<<UCSZ1) | (1<<UCSZ0) | (0<<UCPOL);
 UBRRH=0x00;
 UBRRL=0x4D;
@@ -207,7 +211,7 @@ lcd_init(16);
 //printf("starting");
 delay_ms(1000);
 //PN532_begin();
-putchar('a');
+//putchar('a');
 PN532_SAM_config();
 PN532_get_firmware();
 //tag_data.length = 16;
@@ -222,12 +226,40 @@ while (1)
 //        {
 //          putchar(tag_data.buffer[i]);
 //        }
-        //PN532_read_uid();
-        PN532_read_passive_tag(4);
-        for(i = 0; i<tag_data.length; ++i)
-        {
-          printf("%02x", tag_data.buffer[i]);
+//        PN532_read_uid();
+//        //PN532_read_passive_tag(4);
+//        for(i = 0; i<tag_uid.length; ++i)
+//        {
+//          printf("%02x", tag_uid.buffer[i]);
+//        }                                     
+//        printf("\r\n");
+//        delay_ms(500); 
+        ch = getchar();
+        if(ch == 0x00){ 
+          ch = getchar();
+          if(ch == 0xFF){
+            len = getchar();
+            for(i = 0; i < len; ++i){
+              ch = getchar();
+              GTC_Buffer[i] = ch;
+            }        
+            if(GTC_Buffer[0] == 0x01){        
+              if(GTC_Gate_ID[0] != GTC_Buffer[1] || GTC_Gate_ID[1] != GTC_Buffer[2]){
+                GTC_Gate_ID[0] = GTC_Buffer[1];
+                GTC_Gate_ID[1] = GTC_Buffer[2];
+                PN532_read_uid();
+                //PN532_read_passive_tag(4);
+                for(i = 0; i<tag_uid.length; ++i)
+                {
+                  //printf("%02x", tag_uid.buffer[i]); 
+                  putchar(tag_uid.buffer[i]);
+                }                                     
+                delay_ms(500);
+              }
+            } 
+          } 
+          //putchar(ch);        
+          //printf("%02x", ch);
         }
-        delay_ms(500);
       }
 }

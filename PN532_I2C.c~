@@ -1,6 +1,6 @@
 #include "PN532_I2C.h"
-#include <stdio.h>
 #include <mega8.h>
+#include <stdio.h>
 
 TWI_BUFFER_STRUCT twi_rx;
 TWI_BUFFER_STRUCT twi_tx;
@@ -23,20 +23,16 @@ void TWIInit(void)
 
 void TWIStart(void)
 {
-    TWCR = (1<<TWSTA)|(1<<TWEN); 
-    while (TWSR != 0x08);       
-    TWCR = (1<<TWINT);
-    while ((TWCR & (1<<TWINT)) == 0) printf("%02x", TWSR) ;   
+    TWCR = (1<<TWINT)|(1<<TWSTA)|(1<<TWEN);
+    while ((TWCR & (1<<TWINT)) == 0) ;   
 }
 
 void TWIStop(void)
 {
-    TWCR = (1<<TWINT)|(1<<TWSTO)|(1<<TWEN);
-//    DDRC.4 = DDRC.5 = 0;  
-//    delay_ms(2);
-//    DDRC.4=1;
-    delay_ms(20);
-    printf("%02x", TWSR);                     
+    //TWCR = (1<<TWINT)|(1<<TWSTO)|(1<<TWEN);
+    DDRC.4 = DDRC.5 = 0;  
+    delay_ms(2);
+    DDRC.4=1;                     
 }
 
 void TWIWrite(unsigned char u8data)
@@ -56,12 +52,22 @@ unsigned char TWIRead(int ack)
 
 void PN532_cmd(TWI_BUFFER_STRUCT* msg)
 {
-  TWIStart();
-  TWIWrite(PN532_ADD);
+  while(1){    
+    putchar('c');
+    TWIStart();
+    putchar('d');
+    TWIWrite(PN532_ADD);  
+    putchar('e');
+    if(TWSR == 0x48) continue;
+    else break;
+  }
   for(i = 0; i < msg->length; ++i){
+    putchar('e');
     TWIWrite(msg->buffer[i]);
-  }            
-  TWIStop();     
+  }           
+  putchar('f'); 
+  TWIStop();
+  putchar('g');     
 }
 
 void PN532_build_msg(TWI_BUFFER_STRUCT* buffer, TWI_BUFFER_STRUCT* msg)
@@ -89,7 +95,8 @@ bool PN532_read(TWI_BUFFER_STRUCT* dest)
   // check ready bit
   while(1){
     TWIStart();
-    TWIWrite(PN532_ADD | 1); 
+    TWIWrite(PN532_ADD | 1);   
+    if(TWSR == 0x48) continue;
     data = TWIRead(1);
     if(data==0x00) TWIStop();
     else if(data==0x01) break;
@@ -138,12 +145,10 @@ void PN532_get_msg(TWI_BUFFER_STRUCT* src, TWI_BUFFER_STRUCT* dest, unsigned cha
 }
 
 bool PN532_wait_for_ack(){
-  unsigned char data = 0x00;    
-  printf("%02x", TWSR);  
+  unsigned char data = 0x00;  
   // check ready bit
   while(1){   
-    TWIStart();   
-    printf("%02x", TWSR);  
+    TWIStart();
     TWIWrite(PN532_ADD | 1); 
     
     // if NACK received, repeat data request
@@ -187,12 +192,16 @@ bool PN532_SAM_config()
   PN532_msg.buffer[2] = 0x14; // timeout 50ms * 20 = 1 second
   PN532_msg.buffer[3] = 0x00; // not using IRQ pin!
   PN532_msg.length=4;
-  PN532_build_msg(&twi_tx, &PN532_msg);
-  PN532_cmd(&twi_tx); 
+  PN532_build_msg(&twi_tx, &PN532_msg);     
+  putchar('b');
+  PN532_cmd(&twi_tx);       
+  putchar('b');
   delay_ms(20);
-  while(!PN532_wait_for_ack()) delay_ms(20); 
+  while(!PN532_wait_for_ack()) delay_ms(20);  
+  putchar('b');
   delay_ms(20);        
-  PN532_read(&twi_rx);
+  PN532_read(&twi_rx);  
+  putchar('b');
   PN532_get_msg(&twi_rx, &PN532_msg, 0); 
   if(PN532_msg.buffer[0]==0x15) return true;
   else return false;   

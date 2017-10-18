@@ -84,7 +84,8 @@ bool PN532_read(TWI_BUFFER_STRUCT* dest)
   // check ready bit
   while(1){
     TWIStart();
-    TWIWrite(PN532_ADD | 1); 
+    TWIWrite(PN532_ADD | 1);   
+    if(TWSR == 0x48) continue;
     data = TWIRead(1);
     if(data==0x00) TWIStop();
     else if(data==0x01) break;
