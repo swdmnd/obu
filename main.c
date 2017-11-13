@@ -18,7 +18,7 @@ unsigned char GTC_Buffer[64];
 unsigned char GTC_Gate_ID[2] = {0x00, 0x00};
 
 // USART Receiver buffer
-#define RX_BUFFER_SIZE 8
+#define RX_BUFFER_SIZE 128
 char rx_buffer[RX_BUFFER_SIZE];
 
 #if RX_BUFFER_SIZE <= 256
@@ -32,6 +32,12 @@ unsigned char rx_counter=0;
 #else
 unsigned int rx_counter=0;
 #endif
+
+void clear_buffer(){
+  rx_wr_index=0;
+  rx_rd_index=0;
+  rx_counter=0;
+}
 
 // This flag is set on USART Receiver buffer overflow
 bit rx_buffer_overflow;
@@ -79,8 +85,30 @@ return data;
 #pragma used-
 #endif
 
+#define GTC_ACK_TIMEOUT        1000
+#define GTC_STATE_WAIT_ENTRY   0
+#define GTC_STATE_WAIT_ACK     1
+#define GTC_STATE_WAIT_EXIT    2
+
+volatile int gtc_timeout=0;
+char gtc_state = GTC_STATE_WAIT_ENTRY, gtc_last_state = GTC_STATE_WAIT_ENTRY;
+
+void reset_gtc_timeout(){
+  gtc_timeout = GTC_ACK_TIMEOUT;
+}
+
 // Standard Input/Output functions
 #include <stdio.h>
+
+// Timer1 overflow interrupt service routine
+interrupt [TIM1_OVF] void timer1_ovf_isr(void)
+{
+// Reinitialize Timer1 value
+TCNT1H=0xD1;
+TCNT1L=0x20;
+// Place your code here
+if(gtc_timeout>0) --gtc_timeout;
+}
 
 // Global variables
 
@@ -88,7 +116,7 @@ void main(void)
 {
 // Declare your local variables here
 int i, len;
-char ch;
+unsigned char ch, checksum;
 //unsigned char write_data[] = {'M', '.', ' ', 'A', 'R', 'I', 'E', 'F', ' ', 'F', '.', '.', '.', '.', '.', '.'};
 
 // Input/Output Ports initialization
@@ -106,7 +134,7 @@ PORTC=(0<<PORTC6) | (0<<PORTC5) | (0<<PORTC4) | (0<<PORTC3) | (0<<PORTC2) | (0<<
 
 // Port D initialization
 // Function: Bit7=In Bit6=In Bit5=In Bit4=In Bit3=Out Bit2=In Bit1=In Bit0=In 
-DDRD=(0<<DDD7) | (0<<DDD6) | (0<<DDD5) | (0<<DDD4) | (1<<DDD3) | (1<<DDD2) | (0<<DDD1) | (0<<DDD0);
+DDRD=(0<<DDD7) | (0<<DDD6) | (1<<DDD5) | (1<<DDD4) | (1<<DDD3) | (1<<DDD2) | (0<<DDD1) | (0<<DDD0);
 // State: Bit7=T Bit6=T Bit5=T Bit4=T Bit3=1 Bit2=T Bit1=T Bit0=T 
 PORTD=(0<<PORTD7) | (0<<PORTD6) | (0<<PORTD5) | (0<<PORTD4) | (1<<PORTD3) | (1<<PORTD2) | (0<<PORTD1) | (0<<PORTD0);
 
@@ -118,20 +146,21 @@ TCNT0=0x00;
 
 // Timer/Counter 1 initialization
 // Clock source: System Clock
-// Clock value: Timer1 Stopped
+// Clock value: 12000.000 kHz
 // Mode: Normal top=0xFFFF
 // OC1A output: Disconnected
 // OC1B output: Disconnected
 // Noise Canceler: Off
 // Input Capture on Falling Edge
-// Timer1 Overflow Interrupt: Off
+// Timer Period: 1 ms
+// Timer1 Overflow Interrupt: On
 // Input Capture Interrupt: Off
 // Compare A Match Interrupt: Off
 // Compare B Match Interrupt: Off
 TCCR1A=(0<<COM1A1) | (0<<COM1A0) | (0<<COM1B1) | (0<<COM1B0) | (0<<WGM11) | (0<<WGM10);
-TCCR1B=(0<<ICNC1) | (0<<ICES1) | (0<<WGM13) | (0<<WGM12) | (0<<CS12) | (0<<CS11) | (0<<CS10);
-TCNT1H=0x00;
-TCNT1L=0x00;
+TCCR1B=(0<<ICNC1) | (0<<ICES1) | (0<<WGM13) | (0<<WGM12) | (0<<CS12) | (0<<CS11) | (1<<CS10);
+TCNT1H=0xD1;
+TCNT1L=0x20;
 ICR1H=0x00;
 ICR1L=0x00;
 OCR1AH=0x00;
@@ -150,7 +179,7 @@ TCNT2=0x00;
 OCR2=0x00;
 
 // Timer(s)/Counter(s) Interrupt(s) initialization
-TIMSK=(0<<OCIE2) | (0<<TOIE2) | (0<<TICIE1) | (0<<OCIE1A) | (0<<OCIE1B) | (0<<TOIE1) | (0<<TOIE0);
+TIMSK=(0<<OCIE2) | (0<<TOIE2) | (0<<TICIE1) | (0<<OCIE1A) | (0<<OCIE1B) | (1<<TOIE1) | (0<<TOIE0);
 
 // External Interrupt(s) initialization
 // INT0: Off
@@ -234,32 +263,123 @@ while (1)
 //        }                                     
 //        printf("\r\n");
 //        delay_ms(500); 
-        ch = getchar();
-        if(ch == 0x00){ 
-          ch = getchar();
-          if(ch == 0xFF){
-            len = getchar();
-            for(i = 0; i < len; ++i){
-              ch = getchar();
-              GTC_Buffer[i] = ch;
-            }        
-            if(GTC_Buffer[0] == 0x01){        
-              if(GTC_Gate_ID[0] != GTC_Buffer[1] || GTC_Gate_ID[1] != GTC_Buffer[2]){
-                GTC_Gate_ID[0] = GTC_Buffer[1];
-                GTC_Gate_ID[1] = GTC_Buffer[2];
-                PN532_read_uid();
-                //PN532_read_passive_tag(4);
-                for(i = 0; i<tag_uid.length; ++i)
-                {
-                  //printf("%02x", tag_uid.buffer[i]); 
-                  putchar(tag_uid.buffer[i]);
-                }                                     
-                delay_ms(500);
-              }
-            } 
-          } 
-          //putchar(ch);        
-          //printf("%02x", ch);
+//        putchar(getchar());
+//        continue;
+        switch(gtc_state){
+            case GTC_STATE_WAIT_ENTRY:  
+                if(gtc_last_state == GTC_STATE_WAIT_ENTRY) ch = getchar(); 
+                gtc_last_state = GTC_STATE_WAIT_ENTRY;
+                if(ch == 0x00){ 
+                  ch = getchar();
+                  if(ch == 0xFF){  
+                    checksum = 0;
+                    len = getchar();
+                    for(i = 0; i < len; ++i){
+                      ch = getchar();
+                      GTC_Buffer[i] = ch;
+                      checksum += ch;
+                    }  
+                    ch = getchar();
+                    if((checksum+ch) != 0) break;
+                    if(GTC_Buffer[0] == 0xA1){       
+                        if(GTC_Buffer[1] == 0x01){  
+                            GTC_Gate_ID[0] = GTC_Buffer[2];
+                            GTC_Gate_ID[1] = GTC_Buffer[3];
+                            PN532_read_uid();
+                            //PN532_read_passive_tag(4);
+                            checksum = 0;
+                            putchar(0x00);
+                            putchar(0xFF); 
+                            putchar(tag_uid.length+2);  
+                            putchar(0xA2);                 checksum += 0xA2;
+                            putchar(tag_uid.length);       checksum += tag_uid.length;
+                            for(i = 0; i<tag_uid.length; ++i)
+                            {
+                              //printf("%02x", tag_uid.buffer[i]); 
+                              putchar(tag_uid.buffer[i]);  checksum += tag_uid.buffer[i];
+                            }
+                            putchar((~checksum)+1);                                     
+                            gtc_state = GTC_STATE_WAIT_ACK;
+                            reset_gtc_timeout();
+                            clear_buffer();
+                        }   
+                    }
+                  } 
+                }
+                break;
+            case GTC_STATE_WAIT_ACK:
+                ch = getchar();
+                if(gtc_timeout == 0) {
+                  GTC_Gate_ID[0] = 0;
+                  GTC_Gate_ID[1] = 0; 
+                  gtc_state = GTC_STATE_WAIT_ENTRY;  
+                  gtc_last_state = GTC_STATE_WAIT_ACK;
+                  reset_gtc_timeout();
+                  break;
+                }
+                if(ch == 0x00){ 
+                  ch = getchar();
+                  if(ch == 0xFF){
+                    checksum = 0;
+                    len = getchar();
+                    for(i = 0; i < len; ++i){
+                      ch = getchar();
+                      GTC_Buffer[i] = ch;
+                      checksum += ch;
+                    }         
+                    ch = getchar();
+                    if((checksum+ch) != 0) break;
+                    if(GTC_Buffer[0] == 0xA1){   
+                        if(GTC_Buffer[1] == 0xFF){
+                            for(i = 0; i<GTC_Buffer[2]; ++i)
+                            {
+                              if(GTC_Buffer[i+3] == tag_uid.buffer[i]) gtc_state = GTC_STATE_WAIT_EXIT; 
+                              else {gtc_state = GTC_STATE_WAIT_ENTRY; break;}
+                            }                                     
+                            reset_gtc_timeout();
+                            clear_buffer();
+                        } 
+                    }
+                  } 
+                }
+                break;
+            case GTC_STATE_WAIT_EXIT:   
+                ch = getchar();
+                if(gtc_timeout == 0) {
+                  GTC_Gate_ID[0] = 0;
+                  GTC_Gate_ID[1] = 0; 
+                  gtc_state = GTC_STATE_WAIT_ENTRY;
+                  gtc_last_state = GTC_STATE_WAIT_EXIT;
+                  reset_gtc_timeout();
+                  break;
+                } 
+                if(ch == 0x00){    
+                  checksum = 0;
+                  ch = getchar();
+                  if(ch == 0xFF){
+                    len = getchar();
+                    for(i = 0; i < len; ++i){
+                      ch = getchar();
+                      GTC_Buffer[i] = ch;  
+                      checksum += ch;
+                    }      
+                    ch = getchar();
+                    if((checksum+ch) != 0) break;
+                    if(GTC_Buffer[0] == 0xA1){     
+                        if(GTC_Buffer[1] == 0x01){        
+                          if(GTC_Gate_ID[0] == GTC_Buffer[2] && GTC_Gate_ID[1] == GTC_Buffer[3]){
+                            reset_gtc_timeout();
+                            clear_buffer();
+                          }
+                        }                     
+                    }
+                  } else {
+                    clear_buffer();
+                  }
+                } else {
+                  clear_buffer();
+                }
+                break;
         }
       }
 }

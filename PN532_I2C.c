@@ -13,7 +13,7 @@ int i;
 
 void TWIInit(void)
 {
-    //set SCL to 100kHz        
+    //set SCL to 400kHz        
     TWSR = 0x00;
     TWBR = 7;   //347,826
     //enable TWI
@@ -29,9 +29,13 @@ void TWIStart(void)
 void TWIStop(void)
 {
     //TWCR = (1<<TWINT)|(1<<TWSTO)|(1<<TWEN);
-    DDRC.4 = DDRC.5 = 0;  
+//    DDRC.4 = DDRC.5 = 0;  
+//    delay_ms(2);
+//    DDRC.4=1;
+    DDRC.4=DDRC.5=1;
+    PORTC.4=0;PORTC.5=1;
     delay_ms(2);
-    DDRC.4=1;                     
+    PORTC.4=1;                     
 }
 
 void TWIWrite(unsigned char u8data)

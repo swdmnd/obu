@@ -1,15 +1,16 @@
 
-AVRASM ver. 2.1.30  D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm Wed Oct 18 15:29:13 2017
+AVRASM ver. 2.1.30  D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm Mon Nov 13 06:36:48 2017
 
 D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1086): warning: Register r5 already defined by the .DEF directive
 D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1087): warning: Register r4 already defined by the .DEF directive
 D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1088): warning: Register r7 already defined by the .DEF directive
 D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1089): warning: Register r6 already defined by the .DEF directive
-D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1090): warning: Register r8 already defined by the .DEF directive
-D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1091): warning: Register r9 already defined by the .DEF directive
-D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1092): warning: Register r11 already defined by the .DEF directive
-D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1093): warning: Register r10 already defined by the .DEF directive
+D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1090): warning: Register r9 already defined by the .DEF directive
+D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1091): warning: Register r8 already defined by the .DEF directive
+D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1092): warning: Register r10 already defined by the .DEF directive
+D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1093): warning: Register r11 already defined by the .DEF directive
 D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1094): warning: Register r13 already defined by the .DEF directive
+D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1095): warning: Register r12 already defined by the .DEF directive
                  
                  
                  ;CodeVisionAVR C Compiler V3.12 Advanced
@@ -27,7 +28,7 @@ D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1094): warning: Register
                  ;External RAM size      : 0
                  ;Data Stack size        : 256 byte(s)
                  ;Heap size              : 0 byte(s)
-                 ;Promote 'char' to 'int': Yes
+                 ;Promote 'char' to 'int': No
                  ;'char' is unsigned     : Yes
                  ;8 bit enums            : Yes
                  ;Global 'const' stored in FLASH: Yes
@@ -1099,12 +1100,13 @@ D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1094): warning: Register
                  	.DEF _rx_wr_index=R5
                  	.DEF _rx_rd_index=R4
                  	.DEF _rx_counter=R7
-                 	.DEF _checksum=R6
-                 	.DEF _i=R8
-                 	.DEF _i_msb=R9
-                 	.DEF __lcd_x=R11
-                 	.DEF __lcd_y=R10
-                 	.DEF __lcd_maxx=R13
+                 	.DEF _gtc_state=R6
+                 	.DEF _gtc_last_state=R9
+                 	.DEF _checksum=R8
+                 	.DEF _i=R10
+                 	.DEF _i_msb=R11
+                 	.DEF __lcd_x=R13
+                 	.DEF __lcd_y=R12
                  
                  	.CSEG
                  	.ORG 0x00
@@ -1113,7 +1115,7 @@ D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1094): warning: Register
                  __START_OF_CODE:
                  
                  ;INTERRUPT VECTORS
-000000 c02f      	RJMP __RESET
+000000 c030      	RJMP __RESET
 000001 cffe      	RJMP 0x00
 000002 cffd      	RJMP 0x00
 000003 cffc      	RJMP 0x00
@@ -1121,10 +1123,10 @@ D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1094): warning: Register
 000005 cffa      	RJMP 0x00
 000006 cff9      	RJMP 0x00
 000007 cff8      	RJMP 0x00
-000008 cff7      	RJMP 0x00
+000008 c093      	RJMP _timer1_ovf_isr
 000009 cff6      	RJMP 0x00
 00000a cff5      	RJMP 0x00
-00000b c050      	RJMP _usart_rx_isr
+00000b c055      	RJMP _usart_rx_isr
 00000c cff3      	RJMP 0x00
 00000d cff2      	RJMP 0x00
 00000e cff1      	RJMP 0x00
@@ -1153,100 +1155,101 @@ D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1094): warning: Register
                  __REG_VARS:
 00001d 0000
 00001e 0000      	.DB  0x0,0x0,0x0,0x0
+00001f 0000      	.DB  0x0,0x0
                  
                  _0x20003:
-00001f ffff
 000020 ffff
-000021 ffff      	.DB  0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+000021 ffff
+000022 ffff      	.DB  0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
                  _0x2020003:
-000022 c080      	.DB  0x80,0xC0
+000023 c080      	.DB  0x80,0xC0
                  
                  __GLOBAL_INI_TBL:
-000023 0001      	.DW  0x01
-000024 0002      	.DW  0x02
-000025 0038      	.DW  __REG_BIT_VARS*2
+000024 0001      	.DW  0x01
+000025 0002      	.DW  0x02
+000026 0038      	.DW  __REG_BIT_VARS*2
                  
-000026 0004      	.DW  0x04
-000027 0004      	.DW  0x04
-000028 003a      	.DW  __REG_VARS*2
+000027 0006      	.DW  0x06
+000028 0004      	.DW  0x04
+000029 003a      	.DW  __REG_VARS*2
                  
-000029 0006      	.DW  0x06
-00002a 0344      	.DW  _MIFARE_Key_A
-00002b 003e      	.DW  _0x20003*2
+00002a 0006      	.DW  0x06
+00002b 03be      	.DW  _MIFARE_Key_A
+00002c 0040      	.DW  _0x20003*2
                  
-00002c 0002      	.DW  0x02
-00002d 034a      	.DW  __base_y_G101
-00002e 0044      	.DW  _0x2020003*2
+00002d 0002      	.DW  0x02
+00002e 03c4      	.DW  __base_y_G101
+00002f 0046      	.DW  _0x2020003*2
                  
                  _0xFFFFFFFF:
-00002f 0000      	.DW  0
+000030 0000      	.DW  0
                  
                  #define __GLOBAL_INI_TBL_PRESENT 1
                  
                  __RESET:
-000030 94f8      	CLI
-000031 27ee      	CLR  R30
-000032 bbec      	OUT  EECR,R30
+000031 94f8      	CLI
+000032 27ee      	CLR  R30
+000033 bbec      	OUT  EECR,R30
                  
                  ;INTERRUPT VECTORS ARE PLACED
                  ;AT THE START OF FLASH
-000033 e0f1      	LDI  R31,1
-000034 bffb      	OUT  GICR,R31
-000035 bfeb      	OUT  GICR,R30
-000036 bfe5      	OUT  MCUCR,R30
+000034 e0f1      	LDI  R31,1
+000035 bffb      	OUT  GICR,R31
+000036 bfeb      	OUT  GICR,R30
+000037 bfe5      	OUT  MCUCR,R30
                  
                  ;CLEAR R2-R14
-000037 e08d      	LDI  R24,(14-2)+1
-000038 e0a2      	LDI  R26,2
-000039 27bb      	CLR  R27
+000038 e08d      	LDI  R24,(14-2)+1
+000039 e0a2      	LDI  R26,2
+00003a 27bb      	CLR  R27
                  __CLEAR_REG:
-00003a 93ed      	ST   X+,R30
-00003b 958a      	DEC  R24
-00003c f7e9      	BRNE __CLEAR_REG
+00003b 93ed      	ST   X+,R30
+00003c 958a      	DEC  R24
+00003d f7e9      	BRNE __CLEAR_REG
                  
                  ;CLEAR SRAM
-00003d e080      	LDI  R24,LOW(__CLEAR_SRAM_SIZE)
-00003e e094      	LDI  R25,HIGH(__CLEAR_SRAM_SIZE)
-00003f e6a0      	LDI  R26,__SRAM_START
+00003e e080      	LDI  R24,LOW(__CLEAR_SRAM_SIZE)
+00003f e094      	LDI  R25,HIGH(__CLEAR_SRAM_SIZE)
+000040 e6a0      	LDI  R26,__SRAM_START
                  __CLEAR_SRAM:
-000040 93ed      	ST   X+,R30
-000041 9701      	SBIW R24,1
-000042 f7e9      	BRNE __CLEAR_SRAM
+000041 93ed      	ST   X+,R30
+000042 9701      	SBIW R24,1
+000043 f7e9      	BRNE __CLEAR_SRAM
                  
                  ;GLOBAL VARIABLES INITIALIZATION
-000043 e4e6      	LDI  R30,LOW(__GLOBAL_INI_TBL*2)
-000044 e0f0      	LDI  R31,HIGH(__GLOBAL_INI_TBL*2)
+000044 e4e8      	LDI  R30,LOW(__GLOBAL_INI_TBL*2)
+000045 e0f0      	LDI  R31,HIGH(__GLOBAL_INI_TBL*2)
                  __GLOBAL_INI_NEXT:
-000045 9185      	LPM  R24,Z+
-000046 9195      	LPM  R25,Z+
-000047 9700      	SBIW R24,0
-000048 f061      	BREQ __GLOBAL_INI_END
-000049 91a5      	LPM  R26,Z+
-00004a 91b5      	LPM  R27,Z+
-00004b 9005      	LPM  R0,Z+
-00004c 9015      	LPM  R1,Z+
-00004d 01bf      	MOVW R22,R30
-00004e 01f0      	MOVW R30,R0
+000046 9185      	LPM  R24,Z+
+000047 9195      	LPM  R25,Z+
+000048 9700      	SBIW R24,0
+000049 f061      	BREQ __GLOBAL_INI_END
+00004a 91a5      	LPM  R26,Z+
+00004b 91b5      	LPM  R27,Z+
+00004c 9005      	LPM  R0,Z+
+00004d 9015      	LPM  R1,Z+
+00004e 01bf      	MOVW R22,R30
+00004f 01f0      	MOVW R30,R0
                  __GLOBAL_INI_LOOP:
-00004f 9005      	LPM  R0,Z+
-000050 920d      	ST   X+,R0
-000051 9701      	SBIW R24,1
-000052 f7e1      	BRNE __GLOBAL_INI_LOOP
-000053 01fb      	MOVW R30,R22
-000054 cff0      	RJMP __GLOBAL_INI_NEXT
+000050 9005      	LPM  R0,Z+
+000051 920d      	ST   X+,R0
+000052 9701      	SBIW R24,1
+000053 f7e1      	BRNE __GLOBAL_INI_LOOP
+000054 01fb      	MOVW R30,R22
+000055 cff0      	RJMP __GLOBAL_INI_NEXT
                  __GLOBAL_INI_END:
                  
                  ;HARDWARE STACK POINTER INITIALIZATION
-000055 e5ef      	LDI  R30,LOW(__SRAM_END-__HEAP_SIZE)
-000056 bfed      	OUT  SPL,R30
-000057 e0e4      	LDI  R30,HIGH(__SRAM_END-__HEAP_SIZE)
-000058 bfee      	OUT  SPH,R30
+000056 e5ef      	LDI  R30,LOW(__SRAM_END-__HEAP_SIZE)
+000057 bfed      	OUT  SPL,R30
+000058 e0e4      	LDI  R30,HIGH(__SRAM_END-__HEAP_SIZE)
+000059 bfee      	OUT  SPH,R30
                  
                  ;DATA STACK POINTER INITIALIZATION
-000059 e6c0      	LDI  R28,LOW(__SRAM_START+__DSTACK_SIZE)
-00005a e0d1      	LDI  R29,HIGH(__SRAM_START+__DSTACK_SIZE)
+00005a e6c0      	LDI  R28,LOW(__SRAM_START+__DSTACK_SIZE)
+00005b e0d1      	LDI  R29,HIGH(__SRAM_START+__DSTACK_SIZE)
                  
-00005b c034      	RJMP _main
+00005c c05c      	RJMP _main
                  
                  	.ESEG
                  	.ORG 0
@@ -1286,7 +1289,7 @@ D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1094): warning: Register
                  ;unsigned char GTC_Gate_ID[2] = {0x00, 0x00};
                  ;
                  ;// USART Receiver buffer
-                 ;#define RX_BUFFER_SIZE 8
+                 ;#define RX_BUFFER_SIZE 128
                  ;char rx_buffer[RX_BUFFER_SIZE];
                  ;
                  ;#if RX_BUFFER_SIZE <= 256
@@ -1301,74 +1304,88 @@ D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1094): warning: Register
                  ;unsigned int rx_counter=0;
                  ;#endif
                  ;
+                 ;void clear_buffer(){
+                 ; 0000 0024 void clear_buffer(){
+                 
+                 	.CSEG
+                 _clear_buffer:
+                 ; .FSTART _clear_buffer
+                 ; 0000 0025   rx_wr_index=0;
+00005d 2455      	CLR  R5
+                 ; 0000 0026   rx_rd_index=0;
+00005e 2444      	CLR  R4
+                 ; 0000 0027   rx_counter=0;
+00005f 2477      	CLR  R7
+                 ; 0000 0028 }
+000060 9508      	RET
+                 ; .FEND
+                 ;
                  ;// This flag is set on USART Receiver buffer overflow
                  ;bit rx_buffer_overflow;
                  ;
                  ;// USART Receiver interrupt service routine
                  ;interrupt [USART_RXC] void usart_rx_isr(void)
-                 ; 0000 0029 {
-                 
-                 	.CSEG
+                 ; 0000 002F {
                  _usart_rx_isr:
                  ; .FSTART _usart_rx_isr
-00005c 93ea      	ST   -Y,R30
-00005d 93fa      	ST   -Y,R31
-00005e b7ef      	IN   R30,SREG
-00005f 93ea      	ST   -Y,R30
-                 ; 0000 002A char status,data;
-                 ; 0000 002B status=UCSRA;
-000060 d323      	RCALL __SAVELOCR2
+000061 93ea      	ST   -Y,R30
+000062 93fa      	ST   -Y,R31
+000063 b7ef      	IN   R30,SREG
+000064 93ea      	ST   -Y,R30
+                 ; 0000 0030 char status,data;
+                 ; 0000 0031 status=UCSRA;
+000065 d3f9      	RCALL __SAVELOCR2
                  ;	status -> R17
                  ;	data -> R16
-000061 b11b      	IN   R17,11
-                 ; 0000 002C data=UDR;
-000062 b10c      	IN   R16,12
-                 ; 0000 002D if ((status & (FRAMING_ERROR | PARITY_ERROR | DATA_OVERRUN))==0)
-000063 2fe1      	MOV  R30,R17
-000064 71ec      	ANDI R30,LOW(0x1C)
-000065 f489      	BRNE _0x3
-                 ; 0000 002E    {
-                 ; 0000 002F    rx_buffer[rx_wr_index++]=data;
-000066 2de5      	MOV  R30,R5
-000067 9453      	INC  R5
-000068 e0f0      	LDI  R31,0
-000069 5ce4      	SUBI R30,LOW(-_rx_buffer)
-00006a 4ffc      	SBCI R31,HIGH(-_rx_buffer)
-00006b 8300      	ST   Z,R16
-                 ; 0000 0030 #if RX_BUFFER_SIZE == 256
-                 ; 0000 0031    // special case for receiver buffer size=256
-                 ; 0000 0032    if (++rx_counter == 0) rx_buffer_overflow=1;
-                 ; 0000 0033 #else
-                 ; 0000 0034    if (rx_wr_index == RX_BUFFER_SIZE) rx_wr_index=0;
-00006c e0e8      	LDI  R30,LOW(8)
-00006d 15e5      	CP   R30,R5
-00006e f409      	BRNE _0x4
-00006f 2455      	CLR  R5
-                 ; 0000 0035    if (++rx_counter == RX_BUFFER_SIZE)
+000066 b11b      	IN   R17,11
+                 ; 0000 0032 data=UDR;
+000067 b10c      	IN   R16,12
+                 ; 0000 0033 if ((status & (FRAMING_ERROR | PARITY_ERROR | DATA_OVERRUN))==0)
+000068 2fe1      	MOV  R30,R17
+000069 71ec      	ANDI R30,LOW(0x1C)
+00006a f489      	BRNE _0x3
+                 ; 0000 0034    {
+                 ; 0000 0035    rx_buffer[rx_wr_index++]=data;
+00006b 2de5      	MOV  R30,R5
+00006c 9453      	INC  R5
+00006d e0f0      	LDI  R31,0
+00006e 5ce4      	SUBI R30,LOW(-_rx_buffer)
+00006f 4ffc      	SBCI R31,HIGH(-_rx_buffer)
+000070 8300      	ST   Z,R16
+                 ; 0000 0036 #if RX_BUFFER_SIZE == 256
+                 ; 0000 0037    // special case for receiver buffer size=256
+                 ; 0000 0038    if (++rx_counter == 0) rx_buffer_overflow=1;
+                 ; 0000 0039 #else
+                 ; 0000 003A    if (rx_wr_index == RX_BUFFER_SIZE) rx_wr_index=0;
+000071 e8e0      	LDI  R30,LOW(128)
+000072 15e5      	CP   R30,R5
+000073 f409      	BRNE _0x4
+000074 2455      	CLR  R5
+                 ; 0000 003B    if (++rx_counter == RX_BUFFER_SIZE)
                  _0x4:
-000070 9473      	INC  R7
-000071 e0e8      	LDI  R30,LOW(8)
-000072 15e7      	CP   R30,R7
-000073 f419      	BRNE _0x5
-                 ; 0000 0036       {
-                 ; 0000 0037       rx_counter=0;
-000074 2477      	CLR  R7
-                 ; 0000 0038       rx_buffer_overflow=1;
-000075 9468      	SET
-000076 f820      	BLD  R2,0
-                 ; 0000 0039       }
-                 ; 0000 003A #endif
-                 ; 0000 003B    }
+000075 9473      	INC  R7
+000076 e8e0      	LDI  R30,LOW(128)
+000077 15e7      	CP   R30,R7
+000078 f419      	BRNE _0x5
+                 ; 0000 003C       {
+                 ; 0000 003D       rx_counter=0;
+000079 2477      	CLR  R7
+                 ; 0000 003E       rx_buffer_overflow=1;
+00007a 9468      	SET
+00007b f820      	BLD  R2,0
+                 ; 0000 003F       }
+                 ; 0000 0040 #endif
+                 ; 0000 0041    }
                  _0x5:
-                 ; 0000 003C }
+                 ; 0000 0042 }
                  _0x3:
-000077 9109      	LD   R16,Y+
-000078 9119      	LD   R17,Y+
-000079 91e9      	LD   R30,Y+
-00007a bfef      	OUT  SREG,R30
-00007b 91f9      	LD   R31,Y+
-00007c 91e9      	LD   R30,Y+
-00007d 9518      	RETI
+00007c 9109      	LD   R16,Y+
+00007d 9119      	LD   R17,Y+
+00007e 91e9      	LD   R30,Y+
+00007f bfef      	OUT  SREG,R30
+000080 91f9      	LD   R31,Y+
+000081 91e9      	LD   R30,Y+
+000082 9518      	RETI
                  ; .FEND
                  ;
                  ;#ifndef _DEBUG_TERMINAL_IO_
@@ -1376,376 +1393,705 @@ D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1094): warning: Register
                  ;#define _ALTERNATE_GETCHAR_
                  ;#pragma used+
                  ;char getchar(void)
-                 ; 0000 0043 {
+                 ; 0000 0049 {
                  _getchar:
                  ; .FSTART _getchar
-                 ; 0000 0044 char data;
-                 ; 0000 0045 while (rx_counter==0);
-00007e 931a      	ST   -Y,R17
+                 ; 0000 004A char data;
+                 ; 0000 004B while (rx_counter==0);
+000083 931a      	ST   -Y,R17
                  ;	data -> R17
                  _0x6:
-00007f 2077      	TST  R7
-000080 f3f1      	BREQ _0x6
-                 ; 0000 0046 data=rx_buffer[rx_rd_index++];
-000081 2de4      	MOV  R30,R4
-000082 9443      	INC  R4
-000083 e0f0      	LDI  R31,0
-000084 5ce4      	SUBI R30,LOW(-_rx_buffer)
-000085 4ffc      	SBCI R31,HIGH(-_rx_buffer)
-000086 8110      	LD   R17,Z
-                 ; 0000 0047 #if RX_BUFFER_SIZE != 256
-                 ; 0000 0048 if (rx_rd_index == RX_BUFFER_SIZE) rx_rd_index=0;
-000087 e0e8      	LDI  R30,LOW(8)
-000088 15e4      	CP   R30,R4
-000089 f409      	BRNE _0x9
-00008a 2444      	CLR  R4
-                 ; 0000 0049 #endif
-                 ; 0000 004A #asm("cli")
+000084 2077      	TST  R7
+000085 f3f1      	BREQ _0x6
+                 ; 0000 004C data=rx_buffer[rx_rd_index++];
+000086 2de4      	MOV  R30,R4
+000087 9443      	INC  R4
+000088 e0f0      	LDI  R31,0
+000089 5ce4      	SUBI R30,LOW(-_rx_buffer)
+00008a 4ffc      	SBCI R31,HIGH(-_rx_buffer)
+00008b 8110      	LD   R17,Z
+                 ; 0000 004D #if RX_BUFFER_SIZE != 256
+                 ; 0000 004E if (rx_rd_index == RX_BUFFER_SIZE) rx_rd_index=0;
+00008c e8e0      	LDI  R30,LOW(128)
+00008d 15e4      	CP   R30,R4
+00008e f409      	BRNE _0x9
+00008f 2444      	CLR  R4
+                 ; 0000 004F #endif
+                 ; 0000 0050 #asm("cli")
                  _0x9:
-00008b 94f8      	cli
-                 ; 0000 004B --rx_counter;
-00008c 947a      	DEC  R7
-                 ; 0000 004C #asm("sei")
-00008d 9478      	sei
-                 ; 0000 004D return data;
-00008e 2fe1      	MOV  R30,R17
-00008f c1a3      	RJMP _0x2080002
-                 ; 0000 004E }
+000090 94f8      	cli
+                 ; 0000 0051 --rx_counter;
+000091 947a      	DEC  R7
+                 ; 0000 0052 #asm("sei")
+000092 9478      	sei
+                 ; 0000 0053 return data;
+000093 2fe1      	MOV  R30,R17
+000094 c24b      	RJMP _0x2080002
+                 ; 0000 0054 }
                  ; .FEND
                  ;#pragma used-
                  ;#endif
                  ;
+                 ;#define GTC_ACK_TIMEOUT        1000
+                 ;#define GTC_STATE_WAIT_ENTRY   0
+                 ;#define GTC_STATE_WAIT_ACK     1
+                 ;#define GTC_STATE_WAIT_EXIT    2
+                 ;
+                 ;volatile int gtc_timeout=0;
+                 ;char gtc_state = GTC_STATE_WAIT_ENTRY, gtc_last_state = GTC_STATE_WAIT_ENTRY;
+                 ;
+                 ;void reset_gtc_timeout(){
+                 ; 0000 0060 void reset_gtc_timeout(){
+                 _reset_gtc_timeout:
+                 ; .FSTART _reset_gtc_timeout
+                 ; 0000 0061   gtc_timeout = GTC_ACK_TIMEOUT;
+000095 eee8      	LDI  R30,LOW(1000)
+000096 e0f3      	LDI  R31,HIGH(1000)
+000097 93e0 03bc 	STS  _gtc_timeout,R30
+000099 93f0 03bd 	STS  _gtc_timeout+1,R31
+                 ; 0000 0062 }
+00009b 9508      	RET
+                 ; .FEND
+                 ;
                  ;// Standard Input/Output functions
                  ;#include <stdio.h>
+                 ;
+                 ;// Timer1 overflow interrupt service routine
+                 ;interrupt [TIM1_OVF] void timer1_ovf_isr(void)
+                 ; 0000 0069 {
+                 _timer1_ovf_isr:
+                 ; .FSTART _timer1_ovf_isr
+00009c 920a      	ST   -Y,R0
+00009d 93aa      	ST   -Y,R26
+00009e 93ba      	ST   -Y,R27
+00009f 93ea      	ST   -Y,R30
+0000a0 93fa      	ST   -Y,R31
+0000a1 b7ef      	IN   R30,SREG
+0000a2 93ea      	ST   -Y,R30
+                 ; 0000 006A // Reinitialize Timer1 value
+                 ; 0000 006B TCNT1H=0xD1;
+0000a3 d2fe      	RCALL SUBOPT_0x0
+                 ; 0000 006C TCNT1L=0x20;
+                 ; 0000 006D // Place your code here
+                 ; 0000 006E if(gtc_timeout>0) --gtc_timeout;
+0000a4 91a0 03bc 	LDS  R26,_gtc_timeout
+0000a6 91b0 03bd 	LDS  R27,_gtc_timeout+1
+0000a8 d3b2      	RCALL __CPW02
+0000a9 f43c      	BRGE _0xA
+0000aa ebac      	LDI  R26,LOW(_gtc_timeout)
+0000ab e0b3      	LDI  R27,HIGH(_gtc_timeout)
+0000ac 91ed      	LD   R30,X+
+0000ad 91fd      	LD   R31,X+
+0000ae 9731      	SBIW R30,1
+0000af 93fe      	ST   -X,R31
+0000b0 93ee      	ST   -X,R30
+                 ; 0000 006F }
+                 _0xA:
+0000b1 91e9      	LD   R30,Y+
+0000b2 bfef      	OUT  SREG,R30
+0000b3 91f9      	LD   R31,Y+
+0000b4 91e9      	LD   R30,Y+
+0000b5 91b9      	LD   R27,Y+
+0000b6 91a9      	LD   R26,Y+
+0000b7 9009      	LD   R0,Y+
+0000b8 9518      	RETI
+                 ; .FEND
                  ;
                  ;// Global variables
                  ;
                  ;void main(void)
-                 ; 0000 0058 {
+                 ; 0000 0074 {
                  _main:
                  ; .FSTART _main
-                 ; 0000 0059 // Declare your local variables here
-                 ; 0000 005A int i, len;
-                 ; 0000 005B char ch;
-                 ; 0000 005C //unsigned char write_data[] = {'M', '.', ' ', 'A', 'R', 'I', 'E', 'F', ' ', 'F', '.', '.', '.', '.', '.', '.'};
-                 ; 0000 005D 
-                 ; 0000 005E // Input/Output Ports initialization
-                 ; 0000 005F // Port B initialization
-                 ; 0000 0060 // Function: Bit7=In Bit6=In Bit5=In Bit4=In Bit3=In Bit2=In Bit1=In Bit0=In
-                 ; 0000 0061 DDRB=(0<<DDB7) | (0<<DDB6) | (0<<DDB5) | (0<<DDB4) | (0<<DDB3) | (0<<DDB2) | (0<<DDB1) | (0<<DDB0);
+                 ; 0000 0075 // Declare your local variables here
+                 ; 0000 0076 int i, len;
+                 ; 0000 0077 unsigned char ch, checksum;
+                 ; 0000 0078 //unsigned char write_data[] = {'M', '.', ' ', 'A', 'R', 'I', 'E', 'F', ' ', 'F', '.', '.', '.', '.', '.', '.'};
+                 ; 0000 0079 
+                 ; 0000 007A // Input/Output Ports initialization
+                 ; 0000 007B // Port B initialization
+                 ; 0000 007C // Function: Bit7=In Bit6=In Bit5=In Bit4=In Bit3=In Bit2=In Bit1=In Bit0=In
+                 ; 0000 007D DDRB=(0<<DDB7) | (0<<DDB6) | (0<<DDB5) | (0<<DDB4) | (0<<DDB3) | (0<<DDB2) | (0<<DDB1) | (0<<DDB0);
                  ;	i -> R16,R17
                  ;	len -> R18,R19
                  ;	ch -> R21
-000090 e0e0      	LDI  R30,LOW(0)
-000091 bbe7      	OUT  0x17,R30
-                 ; 0000 0062 // State: Bit7=T Bit6=T Bit5=T Bit4=T Bit3=T Bit2=T Bit1=T Bit0=T
-                 ; 0000 0063 PORTB=(0<<PORTB7) | (0<<PORTB6) | (0<<PORTB5) | (0<<PORTB4) | (0<<PORTB3) | (0<<PORTB2) | (1<<PORTB1) | (0<<PORTB0);
-000092 e0e2      	LDI  R30,LOW(2)
-000093 bbe8      	OUT  0x18,R30
-                 ; 0000 0064 
-                 ; 0000 0065 // Port C initialization
-                 ; 0000 0066 // Function: Bit6=In Bit5=In Bit4=In Bit3=In Bit2=In Bit1=In Bit0=In
-                 ; 0000 0067 DDRC=(0<<DDC6) | (0<<DDC5) | (0<<DDC4) | (0<<DDC3) | (0<<DDC2) | (0<<DDC1) | (0<<DDC0);
-000094 e0e0      	LDI  R30,LOW(0)
-000095 bbe4      	OUT  0x14,R30
-                 ; 0000 0068 // State: Bit6=T Bit5=T Bit4=T Bit3=T Bit2=T Bit1=T Bit0=T
-                 ; 0000 0069 PORTC=(0<<PORTC6) | (0<<PORTC5) | (0<<PORTC4) | (0<<PORTC3) | (0<<PORTC2) | (0<<PORTC1) | (0<<PORTC0);
-000096 bbe5      	OUT  0x15,R30
-                 ; 0000 006A 
-                 ; 0000 006B // Port D initialization
-                 ; 0000 006C // Function: Bit7=In Bit6=In Bit5=In Bit4=In Bit3=Out Bit2=In Bit1=In Bit0=In
-                 ; 0000 006D DDRD=(0<<DDD7) | (0<<DDD6) | (0<<DDD5) | (0<<DDD4) | (1<<DDD3) | (1<<DDD2) | (0<<DDD1) | (0<<DDD0);
-000097 e0ec      	LDI  R30,LOW(12)
-000098 bbe1      	OUT  0x11,R30
-                 ; 0000 006E // State: Bit7=T Bit6=T Bit5=T Bit4=T Bit3=1 Bit2=T Bit1=T Bit0=T
-                 ; 0000 006F PORTD=(0<<PORTD7) | (0<<PORTD6) | (0<<PORTD5) | (0<<PORTD4) | (1<<PORTD3) | (1<<PORTD2) | (0<<PORTD1) | (0<<PORTD0);
-000099 bbe2      	OUT  0x12,R30
-                 ; 0000 0070 
-                 ; 0000 0071 // Timer/Counter 0 initialization
-                 ; 0000 0072 // Clock source: System Clock
-                 ; 0000 0073 // Clock value: Timer 0 Stopped
-                 ; 0000 0074 TCCR0=(0<<CS02) | (0<<CS01) | (0<<CS00);
-00009a e0e0      	LDI  R30,LOW(0)
-00009b bfe3      	OUT  0x33,R30
-                 ; 0000 0075 TCNT0=0x00;
-00009c bfe2      	OUT  0x32,R30
-                 ; 0000 0076 
-                 ; 0000 0077 // Timer/Counter 1 initialization
-                 ; 0000 0078 // Clock source: System Clock
-                 ; 0000 0079 // Clock value: Timer1 Stopped
-                 ; 0000 007A // Mode: Normal top=0xFFFF
-                 ; 0000 007B // OC1A output: Disconnected
-                 ; 0000 007C // OC1B output: Disconnected
-                 ; 0000 007D // Noise Canceler: Off
-                 ; 0000 007E // Input Capture on Falling Edge
-                 ; 0000 007F // Timer1 Overflow Interrupt: Off
-                 ; 0000 0080 // Input Capture Interrupt: Off
-                 ; 0000 0081 // Compare A Match Interrupt: Off
-                 ; 0000 0082 // Compare B Match Interrupt: Off
-                 ; 0000 0083 TCCR1A=(0<<COM1A1) | (0<<COM1A0) | (0<<COM1B1) | (0<<COM1B0) | (0<<WGM11) | (0<<WGM10);
-00009d bdef      	OUT  0x2F,R30
-                 ; 0000 0084 TCCR1B=(0<<ICNC1) | (0<<ICES1) | (0<<WGM13) | (0<<WGM12) | (0<<CS12) | (0<<CS11) | (0<<CS10);
-00009e bdee      	OUT  0x2E,R30
-                 ; 0000 0085 TCNT1H=0x00;
-00009f bded      	OUT  0x2D,R30
-                 ; 0000 0086 TCNT1L=0x00;
-0000a0 bdec      	OUT  0x2C,R30
-                 ; 0000 0087 ICR1H=0x00;
-0000a1 bde7      	OUT  0x27,R30
-                 ; 0000 0088 ICR1L=0x00;
-0000a2 bde6      	OUT  0x26,R30
-                 ; 0000 0089 OCR1AH=0x00;
-0000a3 bdeb      	OUT  0x2B,R30
-                 ; 0000 008A OCR1AL=0x00;
-0000a4 bdea      	OUT  0x2A,R30
-                 ; 0000 008B OCR1BH=0x00;
-0000a5 bde9      	OUT  0x29,R30
-                 ; 0000 008C OCR1BL=0x00;
-0000a6 bde8      	OUT  0x28,R30
-                 ; 0000 008D 
-                 ; 0000 008E // Timer/Counter 2 initialization
-                 ; 0000 008F // Clock source: System Clock
-                 ; 0000 0090 // Clock value: Timer2 Stopped
-                 ; 0000 0091 // Mode: Normal top=0xFF
-                 ; 0000 0092 // OC2 output: Disconnected
-                 ; 0000 0093 ASSR=0<<AS2;
-0000a7 bde2      	OUT  0x22,R30
-                 ; 0000 0094 TCCR2=(0<<PWM2) | (0<<COM21) | (0<<COM20) | (0<<CTC2) | (0<<CS22) | (0<<CS21) | (0<<CS20);
-0000a8 bde5      	OUT  0x25,R30
-                 ; 0000 0095 TCNT2=0x00;
-0000a9 bde4      	OUT  0x24,R30
-                 ; 0000 0096 OCR2=0x00;
-0000aa bde3      	OUT  0x23,R30
-                 ; 0000 0097 
-                 ; 0000 0098 // Timer(s)/Counter(s) Interrupt(s) initialization
-                 ; 0000 0099 TIMSK=(0<<OCIE2) | (0<<TOIE2) | (0<<TICIE1) | (0<<OCIE1A) | (0<<OCIE1B) | (0<<TOIE1) | (0<<TOIE0);
-0000ab bfe9      	OUT  0x39,R30
-                 ; 0000 009A 
-                 ; 0000 009B // External Interrupt(s) initialization
-                 ; 0000 009C // INT0: Off
-                 ; 0000 009D // INT1: Off
-                 ; 0000 009E MCUCR=(0<<ISC11) | (0<<ISC10) | (0<<ISC01) | (0<<ISC00);
-0000ac bfe5      	OUT  0x35,R30
-                 ; 0000 009F 
-                 ; 0000 00A0 // USART initialization
-                 ; 0000 00A1 // Communication Parameters: 8 Data, 1 Stop, No Parity
-                 ; 0000 00A2 // USART Receiver: On
-                 ; 0000 00A3 // USART Transmitter: On
-                 ; 0000 00A4 // USART Mode: Asynchronous
-                 ; 0000 00A5 // USART Baud Rate: 9600
-                 ; 0000 00A6 UCSRA=(0<<RXC) | (0<<TXC) | (0<<UDRE) | (0<<FE) | (0<<DOR) | (0<<UPE) | (0<<U2X) | (0<<MPCM);
-0000ad b9eb      	OUT  0xB,R30
-                 ; 0000 00A7 UCSRB=(1<<RXCIE) | (0<<TXCIE) | (0<<UDRIE) | (1<<RXEN) | (1<<TXEN) | (0<<UCSZ2) | (0<<RXB8) | (0<<TXB8);
-0000ae e9e8      	LDI  R30,LOW(152)
-0000af b9ea      	OUT  0xA,R30
-                 ; 0000 00A8 //UCSRB=(0<<RXCIE) | (0<<TXCIE) | (0<<UDRIE) | (1<<RXEN) | (1<<TXEN) | (0<<UCSZ2) | (0<<RXB8) | (0<<TXB8);
-                 ; 0000 00A9 UCSRC=(1<<URSEL) | (0<<UMSEL) | (0<<UPM1) | (0<<UPM0) | (0<<USBS) | (1<<UCSZ1) | (1<<UCSZ0) | (0<<UCPOL);
-0000b0 e8e6      	LDI  R30,LOW(134)
-0000b1 bde0      	OUT  0x20,R30
-                 ; 0000 00AA UBRRH=0x00;
-0000b2 e0e0      	LDI  R30,LOW(0)
-0000b3 bde0      	OUT  0x20,R30
-                 ; 0000 00AB UBRRL=0x4D;
-0000b4 e4ed      	LDI  R30,LOW(77)
-0000b5 b9e9      	OUT  0x9,R30
-                 ; 0000 00AC 
-                 ; 0000 00AD // Analog Comparator initialization
-                 ; 0000 00AE // Analog Comparator: Off
-                 ; 0000 00AF // The Analog Comparator's positive input is
-                 ; 0000 00B0 // connected to the AIN0 pin
-                 ; 0000 00B1 // The Analog Comparator's negative input is
-                 ; 0000 00B2 // connected to the AIN1 pin
-                 ; 0000 00B3 ACSR=(1<<ACD) | (0<<ACBG) | (0<<ACO) | (0<<ACI) | (0<<ACIE) | (0<<ACIC) | (0<<ACIS1) | (0<<ACIS0);
-0000b6 e8e0      	LDI  R30,LOW(128)
-0000b7 b9e8      	OUT  0x8,R30
-                 ; 0000 00B4 SFIOR=(0<<ACME);
-0000b8 e0e0      	LDI  R30,LOW(0)
-0000b9 bfe0      	OUT  0x30,R30
-                 ; 0000 00B5 
-                 ; 0000 00B6 // ADC initialization
-                 ; 0000 00B7 // ADC disabled
-                 ; 0000 00B8 ADCSRA=(0<<ADEN) | (0<<ADSC) | (0<<ADFR) | (0<<ADIF) | (0<<ADIE) | (0<<ADPS2) | (0<<ADPS1) | (0<<ADPS0);
-0000ba b9e6      	OUT  0x6,R30
-                 ; 0000 00B9 
-                 ; 0000 00BA // SPI initialization
-                 ; 0000 00BB // SPI disabled
-                 ; 0000 00BC SPCR=(0<<SPIE) | (0<<SPE) | (0<<DORD) | (0<<MSTR) | (0<<CPOL) | (0<<CPHA) | (0<<SPR1) | (0<<SPR0);
-0000bb b9ed      	OUT  0xD,R30
-                 ; 0000 00BD 
-                 ; 0000 00BE // TWI initialization
-                 ; 0000 00BF // Mode: TWI Master
-                 ; 0000 00C0 // Bit Rate: 400 kHz
-                 ; 0000 00C1 //twi_master_init(400);
-                 ; 0000 00C2 TWIInit();
-0000bc d04d      	RCALL _TWIInit
-                 ; 0000 00C3 
-                 ; 0000 00C4 // Alphanumeric LCD initialization
-                 ; 0000 00C5 // Connections are specified in the
-                 ; 0000 00C6 // Project|Configure|C Compiler|Libraries|Alphanumeric LCD menu:
-                 ; 0000 00C7 // RS - PORTD Bit 6
-                 ; 0000 00C8 // RD - PORTD Bit 5
-                 ; 0000 00C9 // EN - PORTD Bit 4
-                 ; 0000 00CA // D4 - PORTC Bit 3
-                 ; 0000 00CB // D5 - PORTC Bit 2
-                 ; 0000 00CC // D6 - PORTC Bit 1
-                 ; 0000 00CD // D7 - PORTC Bit 0
-                 ; 0000 00CE // Characters/line: 16
-                 ; 0000 00CF lcd_init(16);
-0000bd e1a0      	LDI  R26,LOW(16)
-0000be d208      	RCALL _lcd_init
-                 ; 0000 00D0 
-                 ; 0000 00D1 // Global enable interrupts
-                 ; 0000 00D2 #asm("sei")
-0000bf 9478      	sei
-                 ; 0000 00D3 //printf("starting");
-                 ; 0000 00D4 delay_ms(1000);
-0000c0 eea8      	LDI  R26,LOW(1000)
-0000c1 e0b3      	LDI  R27,HIGH(1000)
-0000c2 d2ac      	RCALL _delay_ms
-                 ; 0000 00D5 //PN532_begin();
-                 ; 0000 00D6 //putchar('a');
-                 ; 0000 00D7 PN532_SAM_config();
-0000c3 d183      	RCALL _PN532_SAM_config
-                 ; 0000 00D8 PN532_get_firmware();
-0000c4 d170      	RCALL _PN532_get_firmware
-                 ; 0000 00D9 //tag_data.length = 16;
-                 ; 0000 00DA //memcpy(tag_data.buffer, write_data, 16);
-                 ; 0000 00DB //PN532_write_passive_tag(5, &tag_data);
-                 ; 0000 00DC 
-                 ; 0000 00DD while (1)
-                 _0xA:
-                 ; 0000 00DE       {
-                 ; 0000 00DF       // Place your code here
-                 ; 0000 00E0 //        PN532_read_passive_tag(4);
-                 ; 0000 00E1 //        for(i = 0; i<tag_data.length; ++i)
-                 ; 0000 00E2 //        {
-                 ; 0000 00E3 //          putchar(tag_data.buffer[i]);
-                 ; 0000 00E4 //        }
-                 ; 0000 00E5 //        PN532_read_uid();
-                 ; 0000 00E6 //        //PN532_read_passive_tag(4);
-                 ; 0000 00E7 //        for(i = 0; i<tag_uid.length; ++i)
-                 ; 0000 00E8 //        {
-                 ; 0000 00E9 //          printf("%02x", tag_uid.buffer[i]);
-                 ; 0000 00EA //        }
-                 ; 0000 00EB //        printf("\r\n");
-                 ; 0000 00EC //        delay_ms(500);
-                 ; 0000 00ED         ch = getchar();
-0000c5 dfb8      	RCALL _getchar
-0000c6 2f5e      	MOV  R21,R30
-                 ; 0000 00EE         if(ch == 0x00){
-0000c7 3050      	CPI  R21,0
-0000c8 f009      	BREQ PC+2
-0000c9 c03e      	RJMP _0xD
-                 ; 0000 00EF           ch = getchar();
-0000ca dfb3      	RCALL _getchar
-0000cb 2f5e      	MOV  R21,R30
-                 ; 0000 00F0           if(ch == 0xFF){
-0000cc 3f5f      	CPI  R21,255
-0000cd f5d1      	BRNE _0xE
-                 ; 0000 00F1             len = getchar();
-0000ce dfaf      	RCALL _getchar
-0000cf 2f2e      	MOV  R18,R30
-0000d0 2733      	CLR  R19
-                 ; 0000 00F2             for(i = 0; i < len; ++i){
+                 ;	checksum -> R20
+0000b9 e0e0      	LDI  R30,LOW(0)
+0000ba bbe7      	OUT  0x17,R30
+                 ; 0000 007E // State: Bit7=T Bit6=T Bit5=T Bit4=T Bit3=T Bit2=T Bit1=T Bit0=T
+                 ; 0000 007F PORTB=(0<<PORTB7) | (0<<PORTB6) | (0<<PORTB5) | (0<<PORTB4) | (0<<PORTB3) | (0<<PORTB2) | (1<<PORTB1) | (0<<PORTB0);
+0000bb e0e2      	LDI  R30,LOW(2)
+0000bc bbe8      	OUT  0x18,R30
+                 ; 0000 0080 
+                 ; 0000 0081 // Port C initialization
+                 ; 0000 0082 // Function: Bit6=In Bit5=In Bit4=In Bit3=In Bit2=In Bit1=In Bit0=In
+                 ; 0000 0083 DDRC=(0<<DDC6) | (0<<DDC5) | (0<<DDC4) | (0<<DDC3) | (0<<DDC2) | (0<<DDC1) | (0<<DDC0);
+0000bd e0e0      	LDI  R30,LOW(0)
+0000be bbe4      	OUT  0x14,R30
+                 ; 0000 0084 // State: Bit6=T Bit5=T Bit4=T Bit3=T Bit2=T Bit1=T Bit0=T
+                 ; 0000 0085 PORTC=(0<<PORTC6) | (0<<PORTC5) | (0<<PORTC4) | (0<<PORTC3) | (0<<PORTC2) | (0<<PORTC1) | (0<<PORTC0);
+0000bf bbe5      	OUT  0x15,R30
+                 ; 0000 0086 
+                 ; 0000 0087 // Port D initialization
+                 ; 0000 0088 // Function: Bit7=In Bit6=In Bit5=In Bit4=In Bit3=Out Bit2=In Bit1=In Bit0=In
+                 ; 0000 0089 DDRD=(0<<DDD7) | (0<<DDD6) | (1<<DDD5) | (1<<DDD4) | (1<<DDD3) | (1<<DDD2) | (0<<DDD1) | (0<<DDD0);
+0000c0 e3ec      	LDI  R30,LOW(60)
+0000c1 bbe1      	OUT  0x11,R30
+                 ; 0000 008A // State: Bit7=T Bit6=T Bit5=T Bit4=T Bit3=1 Bit2=T Bit1=T Bit0=T
+                 ; 0000 008B PORTD=(0<<PORTD7) | (0<<PORTD6) | (0<<PORTD5) | (0<<PORTD4) | (1<<PORTD3) | (1<<PORTD2) | (0<<PORTD1) | (0<<PORTD0);
+0000c2 e0ec      	LDI  R30,LOW(12)
+0000c3 bbe2      	OUT  0x12,R30
+                 ; 0000 008C 
+                 ; 0000 008D // Timer/Counter 0 initialization
+                 ; 0000 008E // Clock source: System Clock
+                 ; 0000 008F // Clock value: Timer 0 Stopped
+                 ; 0000 0090 TCCR0=(0<<CS02) | (0<<CS01) | (0<<CS00);
+0000c4 e0e0      	LDI  R30,LOW(0)
+0000c5 bfe3      	OUT  0x33,R30
+                 ; 0000 0091 TCNT0=0x00;
+0000c6 bfe2      	OUT  0x32,R30
+                 ; 0000 0092 
+                 ; 0000 0093 // Timer/Counter 1 initialization
+                 ; 0000 0094 // Clock source: System Clock
+                 ; 0000 0095 // Clock value: 12000.000 kHz
+                 ; 0000 0096 // Mode: Normal top=0xFFFF
+                 ; 0000 0097 // OC1A output: Disconnected
+                 ; 0000 0098 // OC1B output: Disconnected
+                 ; 0000 0099 // Noise Canceler: Off
+                 ; 0000 009A // Input Capture on Falling Edge
+                 ; 0000 009B // Timer Period: 1 ms
+                 ; 0000 009C // Timer1 Overflow Interrupt: On
+                 ; 0000 009D // Input Capture Interrupt: Off
+                 ; 0000 009E // Compare A Match Interrupt: Off
+                 ; 0000 009F // Compare B Match Interrupt: Off
+                 ; 0000 00A0 TCCR1A=(0<<COM1A1) | (0<<COM1A0) | (0<<COM1B1) | (0<<COM1B0) | (0<<WGM11) | (0<<WGM10);
+0000c7 bdef      	OUT  0x2F,R30
+                 ; 0000 00A1 TCCR1B=(0<<ICNC1) | (0<<ICES1) | (0<<WGM13) | (0<<WGM12) | (0<<CS12) | (0<<CS11) | (1<<CS10);
+0000c8 e0e1      	LDI  R30,LOW(1)
+0000c9 bdee      	OUT  0x2E,R30
+                 ; 0000 00A2 TCNT1H=0xD1;
+0000ca d2d7      	RCALL SUBOPT_0x0
+                 ; 0000 00A3 TCNT1L=0x20;
+                 ; 0000 00A4 ICR1H=0x00;
+0000cb e0e0      	LDI  R30,LOW(0)
+0000cc bde7      	OUT  0x27,R30
+                 ; 0000 00A5 ICR1L=0x00;
+0000cd bde6      	OUT  0x26,R30
+                 ; 0000 00A6 OCR1AH=0x00;
+0000ce bdeb      	OUT  0x2B,R30
+                 ; 0000 00A7 OCR1AL=0x00;
+0000cf bdea      	OUT  0x2A,R30
+                 ; 0000 00A8 OCR1BH=0x00;
+0000d0 bde9      	OUT  0x29,R30
+                 ; 0000 00A9 OCR1BL=0x00;
+0000d1 bde8      	OUT  0x28,R30
+                 ; 0000 00AA 
+                 ; 0000 00AB // Timer/Counter 2 initialization
+                 ; 0000 00AC // Clock source: System Clock
+                 ; 0000 00AD // Clock value: Timer2 Stopped
+                 ; 0000 00AE // Mode: Normal top=0xFF
+                 ; 0000 00AF // OC2 output: Disconnected
+                 ; 0000 00B0 ASSR=0<<AS2;
+0000d2 bde2      	OUT  0x22,R30
+                 ; 0000 00B1 TCCR2=(0<<PWM2) | (0<<COM21) | (0<<COM20) | (0<<CTC2) | (0<<CS22) | (0<<CS21) | (0<<CS20);
+0000d3 bde5      	OUT  0x25,R30
+                 ; 0000 00B2 TCNT2=0x00;
+0000d4 bde4      	OUT  0x24,R30
+                 ; 0000 00B3 OCR2=0x00;
+0000d5 bde3      	OUT  0x23,R30
+                 ; 0000 00B4 
+                 ; 0000 00B5 // Timer(s)/Counter(s) Interrupt(s) initialization
+                 ; 0000 00B6 TIMSK=(0<<OCIE2) | (0<<TOIE2) | (0<<TICIE1) | (0<<OCIE1A) | (0<<OCIE1B) | (1<<TOIE1) | (0<<TOIE0);
+0000d6 e0e4      	LDI  R30,LOW(4)
+0000d7 bfe9      	OUT  0x39,R30
+                 ; 0000 00B7 
+                 ; 0000 00B8 // External Interrupt(s) initialization
+                 ; 0000 00B9 // INT0: Off
+                 ; 0000 00BA // INT1: Off
+                 ; 0000 00BB MCUCR=(0<<ISC11) | (0<<ISC10) | (0<<ISC01) | (0<<ISC00);
+0000d8 e0e0      	LDI  R30,LOW(0)
+0000d9 bfe5      	OUT  0x35,R30
+                 ; 0000 00BC 
+                 ; 0000 00BD // USART initialization
+                 ; 0000 00BE // Communication Parameters: 8 Data, 1 Stop, No Parity
+                 ; 0000 00BF // USART Receiver: On
+                 ; 0000 00C0 // USART Transmitter: On
+                 ; 0000 00C1 // USART Mode: Asynchronous
+                 ; 0000 00C2 // USART Baud Rate: 9600
+                 ; 0000 00C3 UCSRA=(0<<RXC) | (0<<TXC) | (0<<UDRE) | (0<<FE) | (0<<DOR) | (0<<UPE) | (0<<U2X) | (0<<MPCM);
+0000da b9eb      	OUT  0xB,R30
+                 ; 0000 00C4 UCSRB=(1<<RXCIE) | (0<<TXCIE) | (0<<UDRIE) | (1<<RXEN) | (1<<TXEN) | (0<<UCSZ2) | (0<<RXB8) | (0<<TXB8);
+0000db e9e8      	LDI  R30,LOW(152)
+0000dc b9ea      	OUT  0xA,R30
+                 ; 0000 00C5 //UCSRB=(0<<RXCIE) | (0<<TXCIE) | (0<<UDRIE) | (1<<RXEN) | (1<<TXEN) | (0<<UCSZ2) | (0<<RXB8) | (0<<TXB8);
+                 ; 0000 00C6 UCSRC=(1<<URSEL) | (0<<UMSEL) | (0<<UPM1) | (0<<UPM0) | (0<<USBS) | (1<<UCSZ1) | (1<<UCSZ0) | (0<<UCPOL);
+0000dd e8e6      	LDI  R30,LOW(134)
+0000de bde0      	OUT  0x20,R30
+                 ; 0000 00C7 UBRRH=0x00;
+0000df e0e0      	LDI  R30,LOW(0)
+0000e0 bde0      	OUT  0x20,R30
+                 ; 0000 00C8 UBRRL=0x4D;
+0000e1 e4ed      	LDI  R30,LOW(77)
+0000e2 b9e9      	OUT  0x9,R30
+                 ; 0000 00C9 
+                 ; 0000 00CA // Analog Comparator initialization
+                 ; 0000 00CB // Analog Comparator: Off
+                 ; 0000 00CC // The Analog Comparator's positive input is
+                 ; 0000 00CD // connected to the AIN0 pin
+                 ; 0000 00CE // The Analog Comparator's negative input is
+                 ; 0000 00CF // connected to the AIN1 pin
+                 ; 0000 00D0 ACSR=(1<<ACD) | (0<<ACBG) | (0<<ACO) | (0<<ACI) | (0<<ACIE) | (0<<ACIC) | (0<<ACIS1) | (0<<ACIS0);
+0000e3 e8e0      	LDI  R30,LOW(128)
+0000e4 b9e8      	OUT  0x8,R30
+                 ; 0000 00D1 SFIOR=(0<<ACME);
+0000e5 e0e0      	LDI  R30,LOW(0)
+0000e6 bfe0      	OUT  0x30,R30
+                 ; 0000 00D2 
+                 ; 0000 00D3 // ADC initialization
+                 ; 0000 00D4 // ADC disabled
+                 ; 0000 00D5 ADCSRA=(0<<ADEN) | (0<<ADSC) | (0<<ADFR) | (0<<ADIF) | (0<<ADIE) | (0<<ADPS2) | (0<<ADPS1) | (0<<ADPS0);
+0000e7 b9e6      	OUT  0x6,R30
+                 ; 0000 00D6 
+                 ; 0000 00D7 // SPI initialization
+                 ; 0000 00D8 // SPI disabled
+                 ; 0000 00D9 SPCR=(0<<SPIE) | (0<<SPE) | (0<<DORD) | (0<<MSTR) | (0<<CPOL) | (0<<CPHA) | (0<<SPR1) | (0<<SPR0);
+0000e8 b9ed      	OUT  0xD,R30
+                 ; 0000 00DA 
+                 ; 0000 00DB // TWI initialization
+                 ; 0000 00DC // Mode: TWI Master
+                 ; 0000 00DD // Bit Rate: 400 kHz
+                 ; 0000 00DE //twi_master_init(400);
+                 ; 0000 00DF TWIInit();
+0000e9 d0d1      	RCALL _TWIInit
+                 ; 0000 00E0 
+                 ; 0000 00E1 // Alphanumeric LCD initialization
+                 ; 0000 00E2 // Connections are specified in the
+                 ; 0000 00E3 // Project|Configure|C Compiler|Libraries|Alphanumeric LCD menu:
+                 ; 0000 00E4 // RS - PORTD Bit 6
+                 ; 0000 00E5 // RD - PORTD Bit 5
+                 ; 0000 00E6 // EN - PORTD Bit 4
+                 ; 0000 00E7 // D4 - PORTC Bit 3
+                 ; 0000 00E8 // D5 - PORTC Bit 2
+                 ; 0000 00E9 // D6 - PORTC Bit 1
+                 ; 0000 00EA // D7 - PORTC Bit 0
+                 ; 0000 00EB // Characters/line: 16
+                 ; 0000 00EC lcd_init(16);
+0000ea e1a0      	LDI  R26,LOW(16)
+0000eb d286      	RCALL _lcd_init
+                 ; 0000 00ED 
+                 ; 0000 00EE // Global enable interrupts
+                 ; 0000 00EF #asm("sei")
+0000ec 9478      	sei
+                 ; 0000 00F0 //printf("starting");
+                 ; 0000 00F1 delay_ms(1000);
+0000ed eea8      	LDI  R26,LOW(1000)
+0000ee e0b3      	LDI  R27,HIGH(1000)
+0000ef d35d      	RCALL _delay_ms
+                 ; 0000 00F2 //PN532_begin();
+                 ; 0000 00F3 //putchar('a');
+                 ; 0000 00F4 PN532_SAM_config();
+0000f0 d203      	RCALL _PN532_SAM_config
+                 ; 0000 00F5 PN532_get_firmware();
+0000f1 d1f0      	RCALL _PN532_get_firmware
+                 ; 0000 00F6 //tag_data.length = 16;
+                 ; 0000 00F7 //memcpy(tag_data.buffer, write_data, 16);
+                 ; 0000 00F8 //PN532_write_passive_tag(5, &tag_data);
+                 ; 0000 00F9 
+                 ; 0000 00FA while (1)
+                 _0xB:
+                 ; 0000 00FB       {
+                 ; 0000 00FC       // Place your code here
+                 ; 0000 00FD //        PN532_read_passive_tag(4);
+                 ; 0000 00FE //        for(i = 0; i<tag_data.length; ++i)
+                 ; 0000 00FF //        {
+                 ; 0000 0100 //          putchar(tag_data.buffer[i]);
+                 ; 0000 0101 //        }
+                 ; 0000 0102 //        PN532_read_uid();
+                 ; 0000 0103 //        //PN532_read_passive_tag(4);
+                 ; 0000 0104 //        for(i = 0; i<tag_uid.length; ++i)
+                 ; 0000 0105 //        {
+                 ; 0000 0106 //          printf("%02x", tag_uid.buffer[i]);
+                 ; 0000 0107 //        }
+                 ; 0000 0108 //        printf("\r\n");
+                 ; 0000 0109 //        delay_ms(500);
+                 ; 0000 010A //        putchar(getchar());
+                 ; 0000 010B //        continue;
+                 ; 0000 010C         switch(gtc_state){
+0000f2 2de6      	MOV  R30,R6
+                 ; 0000 010D             case GTC_STATE_WAIT_ENTRY:
+0000f3 30e0      	CPI  R30,0
+0000f4 f009      	BREQ PC+2
+0000f5 c04f      	RJMP _0x11
+                 ; 0000 010E                 if(gtc_last_state == GTC_STATE_WAIT_ENTRY) ch = getchar();
+0000f6 2099      	TST  R9
+0000f7 f409      	BRNE _0x12
+0000f8 d2ae      	RCALL SUBOPT_0x1
+                 ; 0000 010F                 gtc_last_state = GTC_STATE_WAIT_ENTRY;
+                 _0x12:
+0000f9 2499      	CLR  R9
+                 ; 0000 0110                 if(ch == 0x00){
+0000fa 3050      	CPI  R21,0
+0000fb f009      	BREQ PC+2
+0000fc c047      	RJMP _0x13
+                 ; 0000 0111                   ch = getchar();
+0000fd d2a9      	RCALL SUBOPT_0x1
+                 ; 0000 0112                   if(ch == 0xFF){
+0000fe 3f5f      	CPI  R21,255
+0000ff f009      	BREQ PC+2
+000100 c043      	RJMP _0x14
+                 ; 0000 0113                     checksum = 0;
+000101 d2a8      	RCALL SUBOPT_0x2
+                 ; 0000 0114                     len = getchar();
+                 ; 0000 0115                     for(i = 0; i < len; ++i){
+                 _0x16:
                 +
-0000d1 e000     +LDI R16 , LOW ( 0 )
-0000d2 e010     +LDI R17 , HIGH ( 0 )
-                 	__GETWRN 16,17,0
-                 _0x10:
-                +
-0000d3 1702     +CP R16 , R18
-0000d4 0713     +CPC R17 , R19
+000102 1702     +CP R16 , R18
+000103 0713     +CPC R17 , R19
                  	__CPWRR 16,17,18,19
-0000d5 f444      	BRGE _0x11
-                 ; 0000 00F3               ch = getchar();
-0000d6 dfa7      	RCALL _getchar
-0000d7 2f5e      	MOV  R21,R30
-                 ; 0000 00F4               GTC_Buffer[i] = ch;
-0000d8 01f8      	MOVW R30,R16
-0000d9 50e6      	SUBI R30,LOW(-_GTC_Buffer)
-0000da 4ffd      	SBCI R31,HIGH(-_GTC_Buffer)
-0000db 8350      	ST   Z,R21
-                 ; 0000 00F5             }
-0000dc d219      	RCALL SUBOPT_0x0
-0000dd cff5      	RJMP _0x10
+000104 f424      	BRGE _0x17
+                 ; 0000 0116                       ch = getchar();
+000105 d2a1      	RCALL SUBOPT_0x1
+                 ; 0000 0117                       GTC_Buffer[i] = ch;
+000106 d2aa      	RCALL SUBOPT_0x3
+                 ; 0000 0118                       checksum += ch;
+                 ; 0000 0119                     }
+000107 d2af      	RCALL SUBOPT_0x4
+000108 cff9      	RJMP _0x16
+                 _0x17:
+                 ; 0000 011A                     ch = getchar();
+000109 d29d      	RCALL SUBOPT_0x1
+                 ; 0000 011B                     if((checksum+ch) != 0) break;
+00010a 2fe5      	MOV  R30,R21
+00010b 0fe4      	ADD  R30,R20
+00010c f009      	BREQ _0x18
+00010d c0ab      	RJMP _0x10
+                 ; 0000 011C                     if(GTC_Buffer[0] == 0xA1){
+                 _0x18:
+00010e d2ab      	RCALL SUBOPT_0x5
+00010f f5a1      	BRNE _0x19
+                 ; 0000 011D                         if(GTC_Buffer[1] == 0x01){
+                +
+000110 91a0 02fb+LDS R26 , _GTC_Buffer + ( 1 )
+                 	__GETB2MN _GTC_Buffer,1
+000112 30a1      	CPI  R26,LOW(0x1)
+000113 f581      	BRNE _0x1A
+                 ; 0000 011E                             GTC_Gate_ID[0] = GTC_Buffer[2];
+                +
+000114 91e0 02fc+LDS R30 , _GTC_Buffer + ( 2 )
+                 	__GETB1MN _GTC_Buffer,2
+000116 93e0 033a 	STS  _GTC_Gate_ID,R30
+                 ; 0000 011F                             GTC_Gate_ID[1] = GTC_Buffer[3];
+                +
+000118 91e0 02fd+LDS R30 , _GTC_Buffer + ( 3 )
+                 	__GETB1MN _GTC_Buffer,3
+                +
+00011a 93e0 033b+STS _GTC_Gate_ID + ( 1 ) , R30
+                 	__PUTB1MN _GTC_Gate_ID,1
+                 ; 0000 0120                             PN532_read_uid();
+00011c d1f5      	RCALL _PN532_read_uid
+                 ; 0000 0121                             //PN532_read_passive_tag(4);
+                 ; 0000 0122                             checksum = 0;
+00011d e040      	LDI  R20,LOW(0)
+                 ; 0000 0123                             putchar(0x00);
+00011e e0a0      	LDI  R26,LOW(0)
+00011f d27b      	RCALL _putchar
+                 ; 0000 0124                             putchar(0xFF);
+000120 efaf      	LDI  R26,LOW(255)
+000121 d279      	RCALL _putchar
+                 ; 0000 0125                             putchar(tag_uid.length+2);
+                +
+000122 91a0 02a6+LDS R26 , _tag_uid + ( 80 )
+                 	__GETB2MN _tag_uid,80
+000124 5fae      	SUBI R26,-LOW(2)
+000125 d275      	RCALL _putchar
+                 ; 0000 0126                             putchar(0xA2);                 checksum += 0xA2;
+000126 eaa2      	LDI  R26,LOW(162)
+000127 d273      	RCALL _putchar
+000128 554e      	SUBI R20,-LOW(162)
+                 ; 0000 0127                             putchar(tag_uid.length);       checksum += tag_uid.length;
+                +
+000129 91a0 02a6+LDS R26 , _tag_uid + ( 80 )
+                 	__GETB2MN _tag_uid,80
+00012b d26f      	RCALL _putchar
+                +
+00012c 91e0 02a6+LDS R30 , _tag_uid + ( 80 )
+                 	__GETB1MN _tag_uid,80
+00012e 0f4e      	ADD  R20,R30
+                 ; 0000 0128                             for(i = 0; i<tag_uid.length; ++i)
+00012f d28e      	RCALL SUBOPT_0x6
+                 _0x1C:
+000130 d290      	RCALL SUBOPT_0x7
+000131 170e      	CP   R16,R30
+000132 071f      	CPC  R17,R31
+000133 f444      	BRGE _0x1D
+                 ; 0000 0129                             {
+                 ; 0000 012A                               //printf("%02x", tag_uid.buffer[i]);
+                 ; 0000 012B                               putchar(tag_uid.buffer[i]);  checksum += tag_uid.buffer[i];
+000134 d291      	RCALL SUBOPT_0x8
+000135 91ac      	LD   R26,X
+000136 d264      	RCALL _putchar
+000137 d28e      	RCALL SUBOPT_0x8
+000138 91ec      	LD   R30,X
+000139 0f4e      	ADD  R20,R30
+                 ; 0000 012C                             }
+00013a d27c      	RCALL SUBOPT_0x4
+00013b cff4      	RJMP _0x1C
+                 _0x1D:
+                 ; 0000 012D                             putchar((~checksum)+1);
+00013c 2fe4      	MOV  R30,R20
+00013d 95e1      	NEG  R30
+00013e 2fae      	MOV  R26,R30
+00013f d25b      	RCALL _putchar
+                 ; 0000 012E                             gtc_state = GTC_STATE_WAIT_ACK;
+000140 e0e1      	LDI  R30,LOW(1)
+000141 2e6e      	MOV  R6,R30
+                 ; 0000 012F                             reset_gtc_timeout();
+000142 df52      	RCALL _reset_gtc_timeout
+                 ; 0000 0130                             clear_buffer();
+000143 df19      	RCALL _clear_buffer
+                 ; 0000 0131                         }
+                 ; 0000 0132                     }
+                 _0x1A:
+                 ; 0000 0133                   }
+                 _0x19:
+                 ; 0000 0134                 }
+                 _0x14:
+                 ; 0000 0135                 break;
+                 _0x13:
+000144 c074      	RJMP _0x10
+                 ; 0000 0136             case GTC_STATE_WAIT_ACK:
                  _0x11:
-                 ; 0000 00F6             if(GTC_Buffer[0] == 0x01){
-0000de 91a0 02fa 	LDS  R26,_GTC_Buffer
-0000e0 30a1      	CPI  R26,LOW(0x1)
-0000e1 f531      	BRNE _0x12
-                 ; 0000 00F7               if(GTC_Gate_ID[0] != GTC_Buffer[1] || GTC_Gate_ID[1] != GTC_Buffer[2]){
+000145 30e1      	CPI  R30,LOW(0x1)
+000146 f5d1      	BRNE _0x1E
+                 ; 0000 0137                 ch = getchar();
+000147 d25f      	RCALL SUBOPT_0x1
+                 ; 0000 0138                 if(gtc_timeout == 0) {
+000148 d282      	RCALL SUBOPT_0x9
+000149 f429      	BRNE _0x1F
+                 ; 0000 0139                   GTC_Gate_ID[0] = 0;
+00014a d286      	RCALL SUBOPT_0xA
+                 ; 0000 013A                   GTC_Gate_ID[1] = 0;
+                 ; 0000 013B                   gtc_state = GTC_STATE_WAIT_ENTRY;
+                 ; 0000 013C                   gtc_last_state = GTC_STATE_WAIT_ACK;
+00014b e0e1      	LDI  R30,LOW(1)
+00014c 2e9e      	MOV  R9,R30
+                 ; 0000 013D                   reset_gtc_timeout();
+00014d df47      	RCALL _reset_gtc_timeout
+                 ; 0000 013E                   break;
+00014e c06a      	RJMP _0x10
+                 ; 0000 013F                 }
+                 ; 0000 0140                 if(ch == 0x00){
+                 _0x1F:
+00014f 3050      	CPI  R21,0
+000150 f579      	BRNE _0x20
+                 ; 0000 0141                   ch = getchar();
+000151 d255      	RCALL SUBOPT_0x1
+                 ; 0000 0142                   if(ch == 0xFF){
+000152 3f5f      	CPI  R21,255
+000153 f561      	BRNE _0x21
+                 ; 0000 0143                     checksum = 0;
+000154 d255      	RCALL SUBOPT_0x2
+                 ; 0000 0144                     len = getchar();
+                 ; 0000 0145                     for(i = 0; i < len; ++i){
+                 _0x23:
                 +
-0000e2 91e0 02fb+LDS R30 , _GTC_Buffer + ( 1 )
-                 	__GETB1MN _GTC_Buffer,1
-0000e4 91a0 033a 	LDS  R26,_GTC_Gate_ID
-0000e6 17ea      	CP   R30,R26
-0000e7 f431      	BRNE _0x14
+000155 1702     +CP R16 , R18
+000156 0713     +CPC R17 , R19
+                 	__CPWRR 16,17,18,19
+000157 f424      	BRGE _0x24
+                 ; 0000 0146                       ch = getchar();
+000158 d24e      	RCALL SUBOPT_0x1
+                 ; 0000 0147                       GTC_Buffer[i] = ch;
+000159 d257      	RCALL SUBOPT_0x3
+                 ; 0000 0148                       checksum += ch;
+                 ; 0000 0149                     }
+00015a d25c      	RCALL SUBOPT_0x4
+00015b cff9      	RJMP _0x23
+                 _0x24:
+                 ; 0000 014A                     ch = getchar();
+00015c d24a      	RCALL SUBOPT_0x1
+                 ; 0000 014B                     if((checksum+ch) != 0) break;
+00015d 2fe5      	MOV  R30,R21
+00015e 0fe4      	ADD  R30,R20
+00015f f009      	BREQ _0x25
+000160 c058      	RJMP _0x10
+                 ; 0000 014C                     if(GTC_Buffer[0] == 0xA1){
+                 _0x25:
+000161 d258      	RCALL SUBOPT_0x5
+000162 f4e9      	BRNE _0x26
+                 ; 0000 014D                         if(GTC_Buffer[1] == 0xFF){
                 +
-0000e8 91a0 033b+LDS R26 , _GTC_Gate_ID + ( 1 )
+000163 91a0 02fb+LDS R26 , _GTC_Buffer + ( 1 )
+                 	__GETB2MN _GTC_Buffer,1
+000165 3faf      	CPI  R26,LOW(0xFF)
+000166 f4c9      	BRNE _0x27
+                 ; 0000 014E                             for(i = 0; i<GTC_Buffer[2]; ++i)
+000167 d256      	RCALL SUBOPT_0x6
+                 _0x29:
+                +
+000168 91e0 02fc+LDS R30 , _GTC_Buffer + ( 2 )
+                 	__GETB1MN _GTC_Buffer,2
+00016a 01d8      	MOVW R26,R16
+00016b e0f0      	LDI  R31,0
+00016c 17ae      	CP   R26,R30
+00016d 07bf      	CPC  R27,R31
+00016e f47c      	BRGE _0x2A
+                 ; 0000 014F                             {
+                 ; 0000 0150                               if(GTC_Buffer[i+3] == tag_uid.buffer[i]) gtc_state = GTC_STATE_WAIT_EXIT;
+00016f 01f8      	MOVW R30,R16
+                +
+000170 50e3     +SUBI R30 , LOW ( - _GTC_Buffer - ( 3 ) )
+000171 4ffd     +SBCI R31 , HIGH ( - _GTC_Buffer - ( 3 ) )
+                 	__ADDW1MN _GTC_Buffer,3
+000172 8000      	LD   R0,Z
+000173 d252      	RCALL SUBOPT_0x8
+000174 91ec      	LD   R30,X
+000175 15e0      	CP   R30,R0
+000176 f419      	BRNE _0x2B
+000177 e0e2      	LDI  R30,LOW(2)
+000178 2e6e      	MOV  R6,R30
+                 ; 0000 0151                               else {gtc_state = GTC_STATE_WAIT_ENTRY; break;}
+000179 c002      	RJMP _0x2C
+                 _0x2B:
+00017a 2466      	CLR  R6
+00017b c002      	RJMP _0x2A
+                 _0x2C:
+                 ; 0000 0152                             }
+00017c d23a      	RCALL SUBOPT_0x4
+00017d cfea      	RJMP _0x29
+                 _0x2A:
+                 ; 0000 0153                             reset_gtc_timeout();
+00017e df16      	RCALL _reset_gtc_timeout
+                 ; 0000 0154                             clear_buffer();
+00017f dedd      	RCALL _clear_buffer
+                 ; 0000 0155                         }
+                 ; 0000 0156                     }
+                 _0x27:
+                 ; 0000 0157                   }
+                 _0x26:
+                 ; 0000 0158                 }
+                 _0x21:
+                 ; 0000 0159                 break;
+                 _0x20:
+000180 c038      	RJMP _0x10
+                 ; 0000 015A             case GTC_STATE_WAIT_EXIT:
+                 _0x1E:
+000181 30e2      	CPI  R30,LOW(0x2)
+000182 f5b1      	BRNE _0x10
+                 ; 0000 015B                 ch = getchar();
+000183 d223      	RCALL SUBOPT_0x1
+                 ; 0000 015C                 if(gtc_timeout == 0) {
+000184 d246      	RCALL SUBOPT_0x9
+000185 f429      	BRNE _0x2E
+                 ; 0000 015D                   GTC_Gate_ID[0] = 0;
+000186 d24a      	RCALL SUBOPT_0xA
+                 ; 0000 015E                   GTC_Gate_ID[1] = 0;
+                 ; 0000 015F                   gtc_state = GTC_STATE_WAIT_ENTRY;
+                 ; 0000 0160                   gtc_last_state = GTC_STATE_WAIT_EXIT;
+000187 e0e2      	LDI  R30,LOW(2)
+000188 2e9e      	MOV  R9,R30
+                 ; 0000 0161                   reset_gtc_timeout();
+000189 df0b      	RCALL _reset_gtc_timeout
+                 ; 0000 0162                   break;
+00018a c02e      	RJMP _0x10
+                 ; 0000 0163                 }
+                 ; 0000 0164                 if(ch == 0x00){
+                 _0x2E:
+00018b 3050      	CPI  R21,0
+00018c f559      	BRNE _0x2F
+                 ; 0000 0165                   checksum = 0;
+00018d e040      	LDI  R20,LOW(0)
+                 ; 0000 0166                   ch = getchar();
+00018e d218      	RCALL SUBOPT_0x1
+                 ; 0000 0167                   if(ch == 0xFF){
+00018f 3f5f      	CPI  R21,255
+000190 f529      	BRNE _0x30
+                 ; 0000 0168                     len = getchar();
+000191 def1      	RCALL _getchar
+000192 2f2e      	MOV  R18,R30
+000193 2733      	CLR  R19
+                 ; 0000 0169                     for(i = 0; i < len; ++i){
+000194 d229      	RCALL SUBOPT_0x6
+                 _0x32:
+                +
+000195 1702     +CP R16 , R18
+000196 0713     +CPC R17 , R19
+                 	__CPWRR 16,17,18,19
+000197 f424      	BRGE _0x33
+                 ; 0000 016A                       ch = getchar();
+000198 d20e      	RCALL SUBOPT_0x1
+                 ; 0000 016B                       GTC_Buffer[i] = ch;
+000199 d217      	RCALL SUBOPT_0x3
+                 ; 0000 016C                       checksum += ch;
+                 ; 0000 016D                     }
+00019a d21c      	RCALL SUBOPT_0x4
+00019b cff9      	RJMP _0x32
+                 _0x33:
+                 ; 0000 016E                     ch = getchar();
+00019c d20a      	RCALL SUBOPT_0x1
+                 ; 0000 016F                     if((checksum+ch) != 0) break;
+00019d 2fe5      	MOV  R30,R21
+00019e 0fe4      	ADD  R30,R20
+00019f f4c9      	BRNE _0x10
+                 ; 0000 0170                     if(GTC_Buffer[0] == 0xA1){
+0001a0 d219      	RCALL SUBOPT_0x5
+0001a1 f499      	BRNE _0x35
+                 ; 0000 0171                         if(GTC_Buffer[1] == 0x01){
+                +
+0001a2 91a0 02fb+LDS R26 , _GTC_Buffer + ( 1 )
+                 	__GETB2MN _GTC_Buffer,1
+0001a4 30a1      	CPI  R26,LOW(0x1)
+0001a5 f479      	BRNE _0x36
+                 ; 0000 0172                           if(GTC_Gate_ID[0] == GTC_Buffer[2] && GTC_Gate_ID[1] == GTC_Buffer[3]){
+                +
+0001a6 91e0 02fc+LDS R30 , _GTC_Buffer + ( 2 )
+                 	__GETB1MN _GTC_Buffer,2
+0001a8 91a0 033a 	LDS  R26,_GTC_Gate_ID
+0001aa 17ea      	CP   R30,R26
+0001ab f431      	BRNE _0x38
+                +
+0001ac 91a0 033b+LDS R26 , _GTC_Gate_ID + ( 1 )
                  	__GETB2MN _GTC_Gate_ID,1
                 +
-0000ea 91e0 02fc+LDS R30 , _GTC_Buffer + ( 2 )
-                 	__GETB1MN _GTC_Buffer,2
-0000ec 17ea      	CP   R30,R26
-0000ed f0d1      	BREQ _0x13
-                 _0x14:
-                 ; 0000 00F8                 GTC_Gate_ID[0] = GTC_Buffer[1];
-                +
-0000ee 91e0 02fb+LDS R30 , _GTC_Buffer + ( 1 )
-                 	__GETB1MN _GTC_Buffer,1
-0000f0 93e0 033a 	STS  _GTC_Gate_ID,R30
-                 ; 0000 00F9                 GTC_Gate_ID[1] = GTC_Buffer[2];
-                +
-0000f2 91e0 02fc+LDS R30 , _GTC_Buffer + ( 2 )
-                 	__GETB1MN _GTC_Buffer,2
-                +
-0000f4 93e0 033b+STS _GTC_Gate_ID + ( 1 ) , R30
-                 	__PUTB1MN _GTC_Gate_ID,1
-                 ; 0000 00FA                 PN532_read_uid();
-0000f6 d16e      	RCALL _PN532_read_uid
-                 ; 0000 00FB                 //PN532_read_passive_tag(4);
-                 ; 0000 00FC                 for(i = 0; i<tag_uid.length; ++i)
-                +
-0000f7 e000     +LDI R16 , LOW ( 0 )
-0000f8 e010     +LDI R17 , HIGH ( 0 )
-                 	__GETWRN 16,17,0
-                 _0x17:
-0000f9 d1ff      	RCALL SUBOPT_0x1
-0000fa 170e      	CP   R16,R30
-0000fb 071f      	CPC  R17,R31
-0000fc f444      	BRGE _0x18
-                 ; 0000 00FD                 {
-                 ; 0000 00FE                   //printf("%02x", tag_uid.buffer[i]);
-                 ; 0000 00FF                   putchar(tag_uid.buffer[i]);
-0000fd e5a6      	LDI  R26,LOW(_tag_uid)
-0000fe e0b2      	LDI  R27,HIGH(_tag_uid)
-0000ff 0fa0      	ADD  R26,R16
-000100 1fb1      	ADC  R27,R17
-000101 91ac      	LD   R26,X
-000102 d1ec      	RCALL _putchar
-                 ; 0000 0100                 }
-000103 d1f2      	RCALL SUBOPT_0x0
-000104 cff4      	RJMP _0x17
-                 _0x18:
-                 ; 0000 0101                 delay_ms(500);
-000105 efa4      	LDI  R26,LOW(500)
-000106 e0b1      	LDI  R27,HIGH(500)
-000107 d267      	RCALL _delay_ms
-                 ; 0000 0102               }
-                 ; 0000 0103             }
-                 _0x13:
-                 ; 0000 0104           }
-                 _0x12:
-                 ; 0000 0105           //putchar(ch);
-                 ; 0000 0106           //printf("%02x", ch);
-                 ; 0000 0107         }
-                 _0xE:
-                 ; 0000 0108       }
-                 _0xD:
-000108 cfbc      	RJMP _0xA
-                 ; 0000 0109 }
-                 _0x19:
-000109 cfff      	RJMP _0x19
+0001ae 91e0 02fd+LDS R30 , _GTC_Buffer + ( 3 )
+                 	__GETB1MN _GTC_Buffer,3
+0001b0 17ea      	CP   R30,R26
+0001b1 f009      	BREQ _0x39
+                 _0x38:
+0001b2 c002      	RJMP _0x37
+                 _0x39:
+                 ; 0000 0173                             reset_gtc_timeout();
+0001b3 dee1      	RCALL _reset_gtc_timeout
+                 ; 0000 0174                             clear_buffer();
+0001b4 dea8      	RCALL _clear_buffer
+                 ; 0000 0175                           }
+                 ; 0000 0176                         }
+                 _0x37:
+                 ; 0000 0177                     }
+                 _0x36:
+                 ; 0000 0178                   } else {
+                 _0x35:
+0001b5 c001      	RJMP _0x3A
+                 _0x30:
+                 ; 0000 0179                     clear_buffer();
+0001b6 dea6      	RCALL _clear_buffer
+                 ; 0000 017A                   }
+                 _0x3A:
+                 ; 0000 017B                 } else {
+0001b7 c001      	RJMP _0x3B
+                 _0x2F:
+                 ; 0000 017C                   clear_buffer();
+0001b8 dea4      	RCALL _clear_buffer
+                 ; 0000 017D                 }
+                 _0x3B:
+                 ; 0000 017E                 break;
+                 ; 0000 017F         }
+                 _0x10:
+                 ; 0000 0180       }
+0001b9 cf38      	RJMP _0xB
+                 ; 0000 0181 }
+                 _0x3C:
+0001ba cfff      	RJMP _0x3C
                  ; .FEND
                  ;#include "PN532_I2C.h"
                  	#ifndef __SLEEP_DEFINED__
@@ -1770,19 +2116,19 @@ D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1094): warning: Register
                  	.CSEG
                  _TWIInit:
                  ; .FSTART _TWIInit
-                 ; 0001 0010     //set SCL to 100kHz
+                 ; 0001 0010     //set SCL to 400kHz
                  ; 0001 0011     TWSR = 0x00;
-00010a e0e0      	LDI  R30,LOW(0)
-00010b b9e1      	OUT  0x1,R30
+0001bb e0e0      	LDI  R30,LOW(0)
+0001bc b9e1      	OUT  0x1,R30
                  ; 0001 0012     TWBR = 7;   //347,826
-00010c e0e7      	LDI  R30,LOW(7)
-00010d b9e0      	OUT  0x0,R30
+0001bd e0e7      	LDI  R30,LOW(7)
+0001be b9e0      	OUT  0x0,R30
                  ; 0001 0013     //enable TWI
                  ; 0001 0014     TWCR = (1<<TWEN);
-00010e e0e4      	LDI  R30,LOW(4)
-00010f bfe6      	OUT  0x36,R30
+0001bf e0e4      	LDI  R30,LOW(4)
+0001c0 bfe6      	OUT  0x36,R30
                  ; 0001 0015 }
-000110 9508      	RET
+0001c1 9508      	RET
                  ; .FEND
                  ;
                  ;void TWIStart(void)
@@ -1790,15 +2136,15 @@ D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1094): warning: Register
                  _TWIStart:
                  ; .FSTART _TWIStart
                  ; 0001 0019     TWCR = (1<<TWINT)|(1<<TWSTA)|(1<<TWEN);
-000111 eae4      	LDI  R30,LOW(164)
-000112 bfe6      	OUT  0x36,R30
+0001c2 eae4      	LDI  R30,LOW(164)
+0001c3 bfe6      	OUT  0x36,R30
                  ; 0001 001A     while ((TWCR & (1<<TWINT)) == 0) ;
                  _0x20004:
-000113 b7e6      	IN   R30,0x36
-000114 ffe7      	SBRS R30,7
-000115 cffd      	RJMP _0x20004
+0001c4 b7e6      	IN   R30,0x36
+0001c5 ffe7      	SBRS R30,7
+0001c6 cffd      	RJMP _0x20004
                  ; 0001 001B }
-000116 9508      	RET
+0001c7 9508      	RET
                  ; .FEND
                  ;
                  ;void TWIStop(void)
@@ -1806,740 +2152,734 @@ D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1094): warning: Register
                  _TWIStop:
                  ; .FSTART _TWIStop
                  ; 0001 001F     //TWCR = (1<<TWINT)|(1<<TWSTO)|(1<<TWEN);
-                 ; 0001 0020     DDRC.4 = DDRC.5 = 0;
-000117 98a5      	CBI  0x14,5
-000118 98a4      	CBI  0x14,4
-                 ; 0001 0021     delay_ms(2);
-000119 e0a2      	LDI  R26,LOW(2)
-00011a d1e3      	RCALL SUBOPT_0x2
-                 ; 0001 0022     DDRC.4=1;
-00011b 9aa4      	SBI  0x14,4
-                 ; 0001 0023 }
-00011c 9508      	RET
+                 ; 0001 0020 //    DDRC.4 = DDRC.5 = 0;
+                 ; 0001 0021 //    delay_ms(2);
+                 ; 0001 0022 //    DDRC.4=1;
+                 ; 0001 0023     DDRC.4=DDRC.5=1;
+0001c8 9aa5      	SBI  0x14,5
+0001c9 9aa4      	SBI  0x14,4
+                 ; 0001 0024     PORTC.4=0;PORTC.5=1;
+0001ca 98ac      	CBI  0x15,4
+0001cb 9aad      	SBI  0x15,5
+                 ; 0001 0025     delay_ms(2);
+0001cc e0a2      	LDI  R26,LOW(2)
+0001cd d20a      	RCALL SUBOPT_0xB
+                 ; 0001 0026     PORTC.4=1;
+0001ce 9aac      	SBI  0x15,4
+                 ; 0001 0027 }
+0001cf 9508      	RET
                  ; .FEND
                  ;
                  ;void TWIWrite(unsigned char u8data)
-                 ; 0001 0026 {
+                 ; 0001 002A {
                  _TWIWrite:
                  ; .FSTART _TWIWrite
-                 ; 0001 0027     TWDR = u8data;
-00011d 93aa      	ST   -Y,R26
+                 ; 0001 002B     TWDR = u8data;
+0001d0 93aa      	ST   -Y,R26
                  ;	u8data -> Y+0
-00011e 81e8      	LD   R30,Y
-00011f b9e3      	OUT  0x3,R30
-                 ; 0001 0028     TWCR = (1<<TWINT)|(1<<TWEN);
-000120 e8e4      	LDI  R30,LOW(132)
-000121 bfe6      	OUT  0x36,R30
-                 ; 0001 0029     while ((TWCR & (1<<TWINT)) == 0);
-                 _0x2000D:
-000122 b7e6      	IN   R30,0x36
-000123 ffe7      	SBRS R30,7
-000124 cffd      	RJMP _0x2000D
-                 ; 0001 002A }
-000125 c1ce      	RJMP _0x2080001
+0001d1 81e8      	LD   R30,Y
+0001d2 b9e3      	OUT  0x3,R30
+                 ; 0001 002C     TWCR = (1<<TWINT)|(1<<TWEN);
+0001d3 e8e4      	LDI  R30,LOW(132)
+0001d4 bfe6      	OUT  0x36,R30
+                 ; 0001 002D     while ((TWCR & (1<<TWINT)) == 0);
+                 _0x20011:
+0001d5 b7e6      	IN   R30,0x36
+0001d6 ffe7      	SBRS R30,7
+0001d7 cffd      	RJMP _0x20011
+                 ; 0001 002E }
+0001d8 c1c7      	RJMP _0x2080001
                  ; .FEND
                  ;
                  ;//read byte with ACK (Set TWEA, clear TWEA to send NACK, indicating master receiver has read the last byte)
                  ;unsigned char TWIRead(int ack)
-                 ; 0001 002E {
+                 ; 0001 0032 {
                  _TWIRead:
                  ; .FSTART _TWIRead
-                 ; 0001 002F     TWCR = (1<<TWINT)|(1<<TWEN)|(ack<<TWEA);
-000126 d1d9      	RCALL SUBOPT_0x3
+                 ; 0001 0033     TWCR = (1<<TWINT)|(1<<TWEN)|(ack<<TWEA);
+0001d9 d200      	RCALL SUBOPT_0xC
                  ;	ack -> Y+0
-000127 81e8      	LD   R30,Y
-000128 95e2      	SWAP R30
-000129 7fe0      	ANDI R30,0xF0
-00012a 0fee      	LSL  R30
-00012b 0fee      	LSL  R30
-00012c 68e4      	ORI  R30,LOW(0x84)
-00012d bfe6      	OUT  0x36,R30
-                 ; 0001 0030     while ((TWCR & (1<<TWINT)) == 0) ;
-                 _0x20010:
-00012e b7e6      	IN   R30,0x36
-00012f ffe7      	SBRS R30,7
-000130 cffd      	RJMP _0x20010
-                 ; 0001 0031     return TWDR;
-000131 b1e3      	IN   R30,0x3
-000132 c013      	RJMP _0x2080004
-                 ; 0001 0032 }
+0001da 81e8      	LD   R30,Y
+0001db 95e2      	SWAP R30
+0001dc 7fe0      	ANDI R30,0xF0
+0001dd 0fee      	LSL  R30
+0001de 0fee      	LSL  R30
+0001df 68e4      	ORI  R30,LOW(0x84)
+0001e0 bfe6      	OUT  0x36,R30
+                 ; 0001 0034     while ((TWCR & (1<<TWINT)) == 0) ;
+                 _0x20014:
+0001e1 b7e6      	IN   R30,0x36
+0001e2 ffe7      	SBRS R30,7
+0001e3 cffd      	RJMP _0x20014
+                 ; 0001 0035     return TWDR;
+0001e4 b1e3      	IN   R30,0x3
+0001e5 c013      	RJMP _0x2080004
+                 ; 0001 0036 }
                  ; .FEND
                  ;
                  ;void PN532_cmd(TWI_BUFFER_STRUCT* msg)
-                 ; 0001 0035 {
+                 ; 0001 0039 {
                  _PN532_cmd:
                  ; .FSTART _PN532_cmd
-                 ; 0001 0036   TWIStart();
-000133 d1cc      	RCALL SUBOPT_0x3
+                 ; 0001 003A   TWIStart();
+0001e6 d1f3      	RCALL SUBOPT_0xC
                  ;	*msg -> Y+0
-000134 dfdc      	RCALL _TWIStart
-                 ; 0001 0037   TWIWrite(PN532_ADD);
-000135 e4a8      	LDI  R26,LOW(72)
-000136 dfe6      	RCALL _TWIWrite
-                 ; 0001 0038   for(i = 0; i < msg->length; ++i){
-000137 d1cb      	RCALL SUBOPT_0x4
-                 _0x20014:
-000138 81a8      	LD   R26,Y
-000139 81b9      	LDD  R27,Y+1
-00013a d1cb      	RCALL SUBOPT_0x5
-00013b d1cd      	RCALL SUBOPT_0x6
-00013c f444      	BRGE _0x20015
-                 ; 0001 0039     TWIWrite(msg->buffer[i]);
-00013d 01f4      	MOVW R30,R8
-00013e 81a8      	LD   R26,Y
-00013f 81b9      	LDD  R27,Y+1
-000140 d1cc      	RCALL SUBOPT_0x7
-000141 91ac      	LD   R26,X
-000142 dfda      	RCALL _TWIWrite
-                 ; 0001 003A   }
-000143 d1cc      	RCALL SUBOPT_0x8
-000144 cff3      	RJMP _0x20014
-                 _0x20015:
-                 ; 0001 003B   TWIStop();
-000145 dfd1      	RCALL _TWIStop
-                 ; 0001 003C }
+0001e7 dfda      	RCALL _TWIStart
+                 ; 0001 003B   TWIWrite(PN532_ADD);
+0001e8 e4a8      	LDI  R26,LOW(72)
+0001e9 dfe6      	RCALL _TWIWrite
+                 ; 0001 003C   for(i = 0; i < msg->length; ++i){
+0001ea d1f2      	RCALL SUBOPT_0xD
+                 _0x20018:
+0001eb 81a8      	LD   R26,Y
+0001ec 81b9      	LDD  R27,Y+1
+0001ed d1f2      	RCALL SUBOPT_0xE
+0001ee d1f4      	RCALL SUBOPT_0xF
+0001ef f444      	BRGE _0x20019
+                 ; 0001 003D     TWIWrite(msg->buffer[i]);
+0001f0 01f5      	MOVW R30,R10
+0001f1 81a8      	LD   R26,Y
+0001f2 81b9      	LDD  R27,Y+1
+0001f3 d1f3      	RCALL SUBOPT_0x10
+0001f4 91ac      	LD   R26,X
+0001f5 dfda      	RCALL _TWIWrite
+                 ; 0001 003E   }
+0001f6 d1f3      	RCALL SUBOPT_0x11
+0001f7 cff3      	RJMP _0x20018
+                 _0x20019:
+                 ; 0001 003F   TWIStop();
+0001f8 dfcf      	RCALL _TWIStop
+                 ; 0001 0040 }
                  _0x2080004:
-000146 9622      	ADIW R28,2
-000147 9508      	RET
+0001f9 9622      	ADIW R28,2
+0001fa 9508      	RET
                  ; .FEND
                  ;
                  ;void PN532_build_msg(TWI_BUFFER_STRUCT* buffer, TWI_BUFFER_STRUCT* msg)
-                 ; 0001 003F {
+                 ; 0001 0043 {
                  _PN532_build_msg:
                  ; .FSTART _PN532_build_msg
-                 ; 0001 0040   int msg_length = 0;
-                 ; 0001 0041   checksum = 0xD4;
-000148 d1b7      	RCALL SUBOPT_0x3
-000149 d23a      	RCALL __SAVELOCR2
+                 ; 0001 0044   int msg_length = 0;
+                 ; 0001 0045   checksum = 0xD4;
+0001fb d1de      	RCALL SUBOPT_0xC
+0001fc d262      	RCALL __SAVELOCR2
                  ;	*buffer -> Y+4
                  ;	*msg -> Y+2
                  ;	msg_length -> R16,R17
+0001fd d1c0      	RCALL SUBOPT_0x6
+0001fe ede4      	LDI  R30,LOW(212)
+0001ff 2e8e      	MOV  R8,R30
+                 ; 0001 0046 
+                 ; 0001 0047   buffer->buffer[PN532_START]=0x00;                     ++msg_length;
+000200 d1ed      	RCALL SUBOPT_0x12
+000201 e0e0      	LDI  R30,LOW(0)
+000202 d1ee      	RCALL SUBOPT_0x13
+                 ; 0001 0048   buffer->buffer[PN532_START+1]=0xFF;                   ++msg_length;
+000203 d1ea      	RCALL SUBOPT_0x12
+000204 9611      	ADIW R26,1
+000205 efef      	LDI  R30,LOW(255)
+000206 d1ea      	RCALL SUBOPT_0x13
+                 ; 0001 0049   buffer->buffer[PN532_LEN]=msg->length+1;               ++msg_length;
+000207 d1eb      	RCALL SUBOPT_0x14
                 +
-00014a e000     +LDI R16 , LOW ( 0 )
-00014b e010     +LDI R17 , HIGH ( 0 )
-                 	__GETWRN 16,17,0
-00014c ede4      	LDI  R30,LOW(212)
-00014d 2e6e      	MOV  R6,R30
-                 ; 0001 0042 
-                 ; 0001 0043   buffer->buffer[PN532_START]=0x00;                     ++msg_length;
-00014e d1c5      	RCALL SUBOPT_0x9
-00014f e0e0      	LDI  R30,LOW(0)
-000150 d1c6      	RCALL SUBOPT_0xA
-                 ; 0001 0044   buffer->buffer[PN532_START+1]=0xFF;                   ++msg_length;
-000151 d1c2      	RCALL SUBOPT_0x9
-000152 9611      	ADIW R26,1
-000153 efef      	LDI  R30,LOW(255)
-000154 d1c2      	RCALL SUBOPT_0xA
-                 ; 0001 0045   buffer->buffer[PN532_LEN]=msg->length+1;               ++msg_length;
-000155 d1c3      	RCALL SUBOPT_0xB
-                +
-000156 81ac     +LDD R26 , Y + 4
-000157 81bd     +LDD R27 , Y + 4 + 1
-000158 9612     +ADIW R26 , 2
-000159 93ec     +ST X , R30
+000208 81ac     +LDD R26 , Y + 4
+000209 81bd     +LDD R27 , Y + 4 + 1
+00020a 9612     +ADIW R26 , 2
+00020b 93ec     +ST X , R30
                  	__PUTB1SNS 4,2
-00015a d19b      	RCALL SUBOPT_0x0
-                 ; 0001 0046   buffer->buffer[PN532_LCS]=(~(msg->length+1))+1;        ++msg_length;
-00015b d1bd      	RCALL SUBOPT_0xB
-00015c 95e1      	NEG  R30
+00020c d1aa      	RCALL SUBOPT_0x4
+                 ; 0001 004A   buffer->buffer[PN532_LCS]=(~(msg->length+1))+1;        ++msg_length;
+00020d d1e5      	RCALL SUBOPT_0x14
+00020e 95e1      	NEG  R30
                 +
-00015d 81ac     +LDD R26 , Y + 4
-00015e 81bd     +LDD R27 , Y + 4 + 1
-00015f 9613     +ADIW R26 , 3
-000160 93ec     +ST X , R30
+00020f 81ac     +LDD R26 , Y + 4
+000210 81bd     +LDD R27 , Y + 4 + 1
+000211 9613     +ADIW R26 , 3
+000212 93ec     +ST X , R30
                  	__PUTB1SNS 4,3
-000161 d194      	RCALL SUBOPT_0x0
-                 ; 0001 0047   buffer->buffer[PN532_TFI]=0xD4;                       ++msg_length;
-000162 d1b1      	RCALL SUBOPT_0x9
-000163 9614      	ADIW R26,4
-000164 ede4      	LDI  R30,LOW(212)
-000165 d1b1      	RCALL SUBOPT_0xA
-                 ; 0001 0048   for(i = 0; i<msg->length; ++i){
-000166 d19c      	RCALL SUBOPT_0x4
-                 _0x20017:
-000167 d1b7      	RCALL SUBOPT_0xC
-000168 d19d      	RCALL SUBOPT_0x5
-000169 d19f      	RCALL SUBOPT_0x6
-00016a f464      	BRGE _0x20018
-                 ; 0001 0049     buffer->buffer[PN532_DATA+i]=msg->buffer[i];              ++msg_length;
-00016b 01f4      	MOVW R30,R8
-00016c 9635      	ADIW R30,5
-00016d d1a6      	RCALL SUBOPT_0x9
-00016e d1b3      	RCALL SUBOPT_0xD
-00016f 010f      	MOVW R0,R30
-000170 d1b4      	RCALL SUBOPT_0xE
-000171 01d0      	MOVW R26,R0
-000172 d1a4      	RCALL SUBOPT_0xA
-                 ; 0001 004A     checksum += msg->buffer[i];
-000173 d1b1      	RCALL SUBOPT_0xE
-000174 0e6e      	ADD  R6,R30
-                 ; 0001 004B   }
-000175 d19a      	RCALL SUBOPT_0x8
-000176 cff0      	RJMP _0x20017
-                 _0x20018:
-                 ; 0001 004C   buffer->buffer[PN532_DATA+i]= (~(checksum&0xFF))+1;   ++msg_length;
-000177 01f4      	MOVW R30,R8
-000178 9635      	ADIW R30,5
-000179 d19a      	RCALL SUBOPT_0x9
-00017a d192      	RCALL SUBOPT_0x7
-00017b 2de6      	MOV  R30,R6
-00017c 95e1      	NEG  R30
-00017d d199      	RCALL SUBOPT_0xA
-                 ; 0001 004D   buffer->length = msg_length;
-00017e 01f8      	MOVW R30,R16
+000213 d1a3      	RCALL SUBOPT_0x4
+                 ; 0001 004B   buffer->buffer[PN532_TFI]=0xD4;                       ++msg_length;
+000214 d1d9      	RCALL SUBOPT_0x12
+000215 9614      	ADIW R26,4
+000216 ede4      	LDI  R30,LOW(212)
+000217 d1d9      	RCALL SUBOPT_0x13
+                 ; 0001 004C   for(i = 0; i<msg->length; ++i){
+000218 d1c4      	RCALL SUBOPT_0xD
+                 _0x2001B:
+000219 d1df      	RCALL SUBOPT_0x15
+00021a d1c5      	RCALL SUBOPT_0xE
+00021b d1c7      	RCALL SUBOPT_0xF
+00021c f464      	BRGE _0x2001C
+                 ; 0001 004D     buffer->buffer[PN532_DATA+i]=msg->buffer[i];              ++msg_length;
+00021d 01f5      	MOVW R30,R10
+00021e 9635      	ADIW R30,5
+00021f d1ce      	RCALL SUBOPT_0x12
+000220 d1db      	RCALL SUBOPT_0x16
+000221 010f      	MOVW R0,R30
+000222 d1dc      	RCALL SUBOPT_0x17
+000223 01d0      	MOVW R26,R0
+000224 d1cc      	RCALL SUBOPT_0x13
+                 ; 0001 004E     checksum += msg->buffer[i];
+000225 d1d9      	RCALL SUBOPT_0x17
+000226 0e8e      	ADD  R8,R30
+                 ; 0001 004F   }
+000227 d1c2      	RCALL SUBOPT_0x11
+000228 cff0      	RJMP _0x2001B
+                 _0x2001C:
+                 ; 0001 0050   buffer->buffer[PN532_DATA+i]= (~(checksum&0xFF))+1;   ++msg_length;
+000229 01f5      	MOVW R30,R10
+00022a 9635      	ADIW R30,5
+00022b d1c2      	RCALL SUBOPT_0x12
+00022c d1ba      	RCALL SUBOPT_0x10
+00022d 2de8      	MOV  R30,R8
+00022e 95e1      	NEG  R30
+00022f d1c1      	RCALL SUBOPT_0x13
+                 ; 0001 0051   buffer->length = msg_length;
+000230 01f8      	MOVW R30,R16
                 +
-00017f 81ac     +LDD R26 , Y + 4
-000180 81bd     +LDD R27 , Y + 4 + 1
-000181 5ba0     +SUBI R26 , LOW ( - 80 )
-000182 4fbf     +SBCI R27 , HIGH ( - 80 )
-000183 93ed     +ST X + , R30
-000184 93fc     +ST X , R31
+000231 81ac     +LDD R26 , Y + 4
+000232 81bd     +LDD R27 , Y + 4 + 1
+000233 5ba0     +SUBI R26 , LOW ( - 80 )
+000234 4fbf     +SBCI R27 , HIGH ( - 80 )
+000235 93ed     +ST X + , R30
+000236 93fc     +ST X , R31
                  	__PUTW1SN 4,80
-                 ; 0001 004E }
-000185 d201      	RCALL __LOADLOCR2
-000186 9626      	ADIW R28,6
-000187 9508      	RET
+                 ; 0001 0052 }
+000237 d22a      	RCALL __LOADLOCR2
+000238 9626      	ADIW R28,6
+000239 9508      	RET
                  ; .FEND
                  ;
                  ;bool PN532_read(TWI_BUFFER_STRUCT* dest)
-                 ; 0001 0051 {
+                 ; 0001 0055 {
                  _PN532_read:
                  ; .FSTART _PN532_read
-                 ; 0001 0052   unsigned char data = 0x00;
-                 ; 0001 0053   unsigned char len = 0x00;
-                 ; 0001 0054   // check ready bit
-                 ; 0001 0055   while(1){
-000188 d177      	RCALL SUBOPT_0x3
-000189 d1fa      	RCALL __SAVELOCR2
+                 ; 0001 0056   unsigned char data = 0x00;
+                 ; 0001 0057   unsigned char len = 0x00;
+                 ; 0001 0058   // check ready bit
+                 ; 0001 0059   while(1){
+00023a d19f      	RCALL SUBOPT_0xC
+00023b d223      	RCALL __SAVELOCR2
                  ;	*dest -> Y+2
                  ;	data -> R17
                  ;	len -> R16
-00018a e010      	LDI  R17,0
-00018b e000      	LDI  R16,0
-                 _0x20019:
-                 ; 0001 0056     TWIStart();
-00018c d19d      	RCALL SUBOPT_0xF
-                 ; 0001 0057     TWIWrite(PN532_ADD | 1);
-                 ; 0001 0058     if(TWSR == 0x48) continue;
-00018d f3f1      	BREQ _0x20019
-                 ; 0001 0059     data = TWIRead(1);
-00018e d1a1      	RCALL SUBOPT_0x10
-00018f 2f1e      	MOV  R17,R30
-                 ; 0001 005A     if(data==0x00) TWIStop();
-000190 3010      	CPI  R17,0
-000191 f411      	BRNE _0x2001D
-000192 df84      	RCALL _TWIStop
-                 ; 0001 005B     else if(data==0x01) break;
-000193 c002      	RJMP _0x2001E
+00023c e010      	LDI  R17,0
+00023d e000      	LDI  R16,0
                  _0x2001D:
-000194 3011      	CPI  R17,1
-000195 f009      	BREQ _0x2001B
-                 ; 0001 005C   }
-                 _0x2001E:
-000196 cff5      	RJMP _0x20019
-                 _0x2001B:
-                 ; 0001 005D   // get rid of preamble
-                 ; 0001 005E   TWIRead(1);
-000197 d198      	RCALL SUBOPT_0x10
-                 ; 0001 005F   //check start of packet
-                 ; 0001 0060   if((data=TWIRead(1))!=0x00) {TWIStop(); return false;}
-000198 d197      	RCALL SUBOPT_0x10
-000199 2f1e      	MOV  R17,R30
-00019a 30e0      	CPI  R30,0
-00019b f011      	BREQ _0x20020
-00019c d196      	RCALL SUBOPT_0x11
-00019d c040      	RJMP _0x2080003
-                 ; 0001 0061   dest->buffer[len++]=data;
-                 _0x20020:
-00019e d197      	RCALL SUBOPT_0x12
-                 ; 0001 0062   if((data=TWIRead(1))!=0xFF) {TWIStop(); return false;}
-00019f d190      	RCALL SUBOPT_0x10
-0001a0 2f1e      	MOV  R17,R30
-0001a1 3fef      	CPI  R30,LOW(0xFF)
-0001a2 f011      	BREQ _0x20021
-0001a3 d18f      	RCALL SUBOPT_0x11
-0001a4 c039      	RJMP _0x2080003
-                 ; 0001 0063   dest->buffer[len++]=data;
+                 ; 0001 005A     TWIStart();
+00023e d1c5      	RCALL SUBOPT_0x18
+                 ; 0001 005B     TWIWrite(PN532_ADD | 1);
+                 ; 0001 005C     if(TWSR == 0x48) continue;
+00023f f3f1      	BREQ _0x2001D
+                 ; 0001 005D     data = TWIRead(1);
+000240 d1c9      	RCALL SUBOPT_0x19
+000241 2f1e      	MOV  R17,R30
+                 ; 0001 005E     if(data==0x00) TWIStop();
+000242 3010      	CPI  R17,0
+000243 f411      	BRNE _0x20021
+000244 df83      	RCALL _TWIStop
+                 ; 0001 005F     else if(data==0x01) break;
+000245 c002      	RJMP _0x20022
                  _0x20021:
-0001a5 d190      	RCALL SUBOPT_0x12
-                 ; 0001 0064 
-                 ; 0001 0065   //get length
-                 ; 0001 0066   dest->buffer[len++]=TWIRead(1);
-0001a6 d196      	RCALL SUBOPT_0x13
-0001a7 93ff      	PUSH R31
-0001a8 93ef      	PUSH R30
-0001a9 d186      	RCALL SUBOPT_0x10
-0001aa 91af      	POP  R26
-0001ab 91bf      	POP  R27
-0001ac 93ec      	ST   X,R30
-                 ; 0001 0067   //get length checksum
-                 ; 0001 0068   dest->buffer[len++]=TWIRead(1);
-0001ad d18f      	RCALL SUBOPT_0x13
-0001ae 93ff      	PUSH R31
-0001af 93ef      	PUSH R30
-0001b0 d17f      	RCALL SUBOPT_0x10
-0001b1 91af      	POP  R26
-0001b2 91bf      	POP  R27
-0001b3 93ec      	ST   X,R30
-                 ; 0001 0069   //get TFI (should be D5)
-                 ; 0001 006A   dest->buffer[len++]=TWIRead(1);
-0001b4 d188      	RCALL SUBOPT_0x13
-0001b5 93ff      	PUSH R31
-0001b6 93ef      	PUSH R30
-0001b7 d178      	RCALL SUBOPT_0x10
-0001b8 91af      	POP  R26
-0001b9 91bf      	POP  R27
-0001ba 93ec      	ST   X,R30
-                 ; 0001 006B 
-                 ; 0001 006C   for(i =0; i < dest->buffer[PN532_LEN]-1; ++i)
-0001bb d147      	RCALL SUBOPT_0x4
-                 _0x20023:
-0001bc 81ea      	LDD  R30,Y+2
-0001bd 81fb      	LDD  R31,Y+2+1
-0001be 81e2      	LDD  R30,Z+2
-0001bf e0f0      	LDI  R31,0
-0001c0 9731      	SBIW R30,1
-0001c1 168e      	CP   R8,R30
-0001c2 069f      	CPC  R9,R31
-0001c3 f44c      	BRGE _0x20024
-                 ; 0001 006D   {
-                 ; 0001 006E     dest->buffer[len++] = TWIRead(1);
-0001c4 d178      	RCALL SUBOPT_0x13
-0001c5 93ff      	PUSH R31
-0001c6 93ef      	PUSH R30
-0001c7 d168      	RCALL SUBOPT_0x10
-0001c8 91af      	POP  R26
-0001c9 91bf      	POP  R27
-0001ca 93ec      	ST   X,R30
-                 ; 0001 006F   }
-0001cb d144      	RCALL SUBOPT_0x8
-0001cc cfef      	RJMP _0x20023
+000246 3011      	CPI  R17,1
+000247 f009      	BREQ _0x2001F
+                 ; 0001 0060   }
+                 _0x20022:
+000248 cff5      	RJMP _0x2001D
+                 _0x2001F:
+                 ; 0001 0061   // get rid of preamble
+                 ; 0001 0062   TWIRead(1);
+000249 d1c0      	RCALL SUBOPT_0x19
+                 ; 0001 0063   //check start of packet
+                 ; 0001 0064   if((data=TWIRead(1))!=0x00) {TWIStop(); return false;}
+00024a d1bf      	RCALL SUBOPT_0x19
+00024b 2f1e      	MOV  R17,R30
+00024c 30e0      	CPI  R30,0
+00024d f011      	BREQ _0x20024
+00024e d1be      	RCALL SUBOPT_0x1A
+00024f c03f      	RJMP _0x2080003
+                 ; 0001 0065   dest->buffer[len++]=data;
                  _0x20024:
-                 ; 0001 0070 
-                 ; 0001 0071   //skip data checksum
-                 ; 0001 0072   dest->buffer[len++]=TWIRead(0);
-0001cd d16f      	RCALL SUBOPT_0x13
-0001ce 93ff      	PUSH R31
-0001cf 93ef      	PUSH R30
-0001d0 e0a0      	LDI  R26,LOW(0)
-0001d1 e0b0      	LDI  R27,0
-0001d2 df53      	RCALL _TWIRead
-0001d3 91af      	POP  R26
-0001d4 91bf      	POP  R27
-0001d5 93ec      	ST   X,R30
-                 ; 0001 0073 
-                 ; 0001 0074   //set buffer length
-                 ; 0001 0075   dest->length = len;
-0001d6 d148      	RCALL SUBOPT_0xC
-0001d7 d12e      	RCALL SUBOPT_0x5
-0001d8 2fe0      	MOV  R30,R16
-0001d9 e0f0      	LDI  R31,0
-0001da 93ed      	ST   X+,R30
-0001db 93fc      	ST   X,R31
-                 ; 0001 0076 
-                 ; 0001 0077   //close comm
-                 ; 0001 0078   TWIStop();
-0001dc df3a      	RCALL _TWIStop
-                 ; 0001 0079 
-                 ; 0001 007A   //return true on success
-                 ; 0001 007B   return true;
-0001dd e0e1      	LDI  R30,LOW(1)
+000250 d1bf      	RCALL SUBOPT_0x1B
+                 ; 0001 0066   if((data=TWIRead(1))!=0xFF) {TWIStop(); return false;}
+000251 d1b8      	RCALL SUBOPT_0x19
+000252 2f1e      	MOV  R17,R30
+000253 3fef      	CPI  R30,LOW(0xFF)
+000254 f011      	BREQ _0x20025
+000255 d1b7      	RCALL SUBOPT_0x1A
+000256 c038      	RJMP _0x2080003
+                 ; 0001 0067   dest->buffer[len++]=data;
+                 _0x20025:
+000257 d1b8      	RCALL SUBOPT_0x1B
+                 ; 0001 0068 
+                 ; 0001 0069   //get length
+                 ; 0001 006A   dest->buffer[len++]=TWIRead(1);
+000258 d1be      	RCALL SUBOPT_0x1C
+000259 93ff      	PUSH R31
+00025a 93ef      	PUSH R30
+00025b d1ae      	RCALL SUBOPT_0x19
+00025c 91af      	POP  R26
+00025d 91bf      	POP  R27
+00025e 93ec      	ST   X,R30
+                 ; 0001 006B   //get length checksum
+                 ; 0001 006C   dest->buffer[len++]=TWIRead(1);
+00025f d1b7      	RCALL SUBOPT_0x1C
+000260 93ff      	PUSH R31
+000261 93ef      	PUSH R30
+000262 d1a7      	RCALL SUBOPT_0x19
+000263 91af      	POP  R26
+000264 91bf      	POP  R27
+000265 93ec      	ST   X,R30
+                 ; 0001 006D   //get TFI (should be D5)
+                 ; 0001 006E   dest->buffer[len++]=TWIRead(1);
+000266 d1b0      	RCALL SUBOPT_0x1C
+000267 93ff      	PUSH R31
+000268 93ef      	PUSH R30
+000269 d1a0      	RCALL SUBOPT_0x19
+00026a 91af      	POP  R26
+00026b 91bf      	POP  R27
+00026c 93ec      	ST   X,R30
+                 ; 0001 006F 
+                 ; 0001 0070   for(i =0; i < dest->buffer[PN532_LEN]-1; ++i)
+00026d d16f      	RCALL SUBOPT_0xD
+                 _0x20027:
+00026e 81ea      	LDD  R30,Y+2
+00026f 81fb      	LDD  R31,Y+2+1
+000270 81e2      	LDD  R30,Z+2
+000271 50e1      	SUBI R30,LOW(1)
+000272 01d5      	MOVW R26,R10
+000273 e0f0      	LDI  R31,0
+000274 17ae      	CP   R26,R30
+000275 07bf      	CPC  R27,R31
+000276 f44c      	BRGE _0x20028
+                 ; 0001 0071   {
+                 ; 0001 0072     dest->buffer[len++] = TWIRead(1);
+000277 d19f      	RCALL SUBOPT_0x1C
+000278 93ff      	PUSH R31
+000279 93ef      	PUSH R30
+00027a d18f      	RCALL SUBOPT_0x19
+00027b 91af      	POP  R26
+00027c 91bf      	POP  R27
+00027d 93ec      	ST   X,R30
+                 ; 0001 0073   }
+00027e d16b      	RCALL SUBOPT_0x11
+00027f cfee      	RJMP _0x20027
+                 _0x20028:
+                 ; 0001 0074 
+                 ; 0001 0075   //skip data checksum
+                 ; 0001 0076   dest->buffer[len++]=TWIRead(0);
+000280 d196      	RCALL SUBOPT_0x1C
+000281 93ff      	PUSH R31
+000282 93ef      	PUSH R30
+000283 e0a0      	LDI  R26,LOW(0)
+000284 e0b0      	LDI  R27,0
+000285 df53      	RCALL _TWIRead
+000286 91af      	POP  R26
+000287 91bf      	POP  R27
+000288 93ec      	ST   X,R30
+                 ; 0001 0077 
+                 ; 0001 0078   //set buffer length
+                 ; 0001 0079   dest->length = len;
+000289 d16f      	RCALL SUBOPT_0x15
+00028a d155      	RCALL SUBOPT_0xE
+00028b 2fe0      	MOV  R30,R16
+00028c d18f      	RCALL SUBOPT_0x1D
+                 ; 0001 007A 
+                 ; 0001 007B   //close comm
+                 ; 0001 007C   TWIStop();
+00028d df3a      	RCALL _TWIStop
+                 ; 0001 007D 
+                 ; 0001 007E   //return true on success
+                 ; 0001 007F   return true;
+00028e e0e1      	LDI  R30,LOW(1)
                  _0x2080003:
-0001de d1a8      	RCALL __LOADLOCR2
-0001df 9624      	ADIW R28,4
-0001e0 9508      	RET
-                 ; 0001 007C }
+00028f d1d2      	RCALL __LOADLOCR2
+000290 9624      	ADIW R28,4
+000291 9508      	RET
+                 ; 0001 0080 }
                  ; .FEND
                  ;
                  ;void PN532_get_msg(TWI_BUFFER_STRUCT* src, TWI_BUFFER_STRUCT* dest, unsigned char offset)
-                 ; 0001 007F {
+                 ; 0001 0083 {
                  _PN532_get_msg:
                  ; .FSTART _PN532_get_msg
-                 ; 0001 0080   // exclude TFI from src, thus -1
-                 ; 0001 0081   dest->length = src->buffer[PN532_LEN]-1-offset;
-0001e1 93aa      	ST   -Y,R26
+                 ; 0001 0084   // exclude TFI from src, thus -1
+                 ; 0001 0085   dest->length = src->buffer[PN532_LEN]-1-offset;
+000292 93aa      	ST   -Y,R26
                  ;	*src -> Y+3
                  ;	*dest -> Y+1
                  ;	offset -> Y+0
-0001e2 81eb      	LDD  R30,Y+3
-0001e3 81fc      	LDD  R31,Y+3+1
-0001e4 81e2      	LDD  R30,Z+2
-0001e5 e0f0      	LDI  R31,0
-0001e6 9731      	SBIW R30,1
-0001e7 01df      	MOVW R26,R30
-0001e8 81e8      	LD   R30,Y
-0001e9 e0f0      	LDI  R31,0
-0001ea d192      	RCALL __SWAPW12
-0001eb 1bea      	SUB  R30,R26
-0001ec 0bfb      	SBC  R31,R27
-                +
-0001ed 81a9     +LDD R26 , Y + 1
-0001ee 81ba     +LDD R27 , Y + 1 + 1
-0001ef 5ba0     +SUBI R26 , LOW ( - 80 )
-0001f0 4fbf     +SBCI R27 , HIGH ( - 80 )
-0001f1 93ed     +ST X + , R30
-0001f2 93fc     +ST X , R31
-                 	__PUTW1SN 1,80
-                 ; 0001 0082   for(i=0; i < dest->length; ++i)
-0001f3 d10f      	RCALL SUBOPT_0x4
-                 _0x20026:
-0001f4 81a9      	LDD  R26,Y+1
-0001f5 81ba      	LDD  R27,Y+1+1
-0001f6 d10f      	RCALL SUBOPT_0x5
-0001f7 d111      	RCALL SUBOPT_0x6
-0001f8 f494      	BRGE _0x20027
-                 ; 0001 0083   {
-                 ; 0001 0084     dest->buffer[i] = src->buffer[PN532_DATA+i+offset];
-0001f9 01f4      	MOVW R30,R8
-0001fa 81a9      	LDD  R26,Y+1
-0001fb 81ba      	LDD  R27,Y+1+1
-0001fc d125      	RCALL SUBOPT_0xD
-0001fd 010f      	MOVW R0,R30
-0001fe 01d4      	MOVW R26,R8
-0001ff 9615      	ADIW R26,5
-000200 81e8      	LD   R30,Y
-000201 e0f0      	LDI  R31,0
-000202 d11f      	RCALL SUBOPT_0xD
-000203 81ab      	LDD  R26,Y+3
-000204 81bc      	LDD  R27,Y+3+1
-000205 d107      	RCALL SUBOPT_0x7
-000206 91ec      	LD   R30,X
-000207 01d0      	MOVW R26,R0
-000208 93ec      	ST   X,R30
-                 ; 0001 0085   }
-000209 d106      	RCALL SUBOPT_0x8
-00020a cfe9      	RJMP _0x20026
-                 _0x20027:
-                 ; 0001 0086 }
-00020b 9625      	ADIW R28,5
-00020c 9508      	RET
+000293 81e9      	LDD  R30,Y+1
+000294 81fa      	LDD  R31,Y+1+1
+000295 5be0      	SUBI R30,LOW(-80)
+000296 4fff      	SBCI R31,HIGH(-80)
+000297 010f      	MOVW R0,R30
+000298 81eb      	LDD  R30,Y+3
+000299 81fc      	LDD  R31,Y+3+1
+00029a 81e2      	LDD  R30,Z+2
+00029b 50e1      	SUBI R30,LOW(1)
+00029c 81a8      	LD   R26,Y
+00029d 1bea      	SUB  R30,R26
+00029e 01d0      	MOVW R26,R0
+00029f d17c      	RCALL SUBOPT_0x1D
+                 ; 0001 0086   for(i=0; i < dest->length; ++i)
+0002a0 d13c      	RCALL SUBOPT_0xD
+                 _0x2002A:
+0002a1 81a9      	LDD  R26,Y+1
+0002a2 81ba      	LDD  R27,Y+1+1
+0002a3 d13c      	RCALL SUBOPT_0xE
+0002a4 d13e      	RCALL SUBOPT_0xF
+0002a5 f494      	BRGE _0x2002B
+                 ; 0001 0087   {
+                 ; 0001 0088     dest->buffer[i] = src->buffer[PN532_DATA+i+offset];
+0002a6 01f5      	MOVW R30,R10
+0002a7 81a9      	LDD  R26,Y+1
+0002a8 81ba      	LDD  R27,Y+1+1
+0002a9 d152      	RCALL SUBOPT_0x16
+0002aa 010f      	MOVW R0,R30
+0002ab 01d5      	MOVW R26,R10
+0002ac 9615      	ADIW R26,5
+0002ad 81e8      	LD   R30,Y
+0002ae e0f0      	LDI  R31,0
+0002af d14c      	RCALL SUBOPT_0x16
+0002b0 81ab      	LDD  R26,Y+3
+0002b1 81bc      	LDD  R27,Y+3+1
+0002b2 d134      	RCALL SUBOPT_0x10
+0002b3 91ec      	LD   R30,X
+0002b4 01d0      	MOVW R26,R0
+0002b5 93ec      	ST   X,R30
+                 ; 0001 0089   }
+0002b6 d133      	RCALL SUBOPT_0x11
+0002b7 cfe9      	RJMP _0x2002A
+                 _0x2002B:
+                 ; 0001 008A }
+0002b8 9625      	ADIW R28,5
+0002b9 9508      	RET
                  ; .FEND
                  ;
                  ;bool PN532_wait_for_ack(){
-                 ; 0001 0088 _Bool PN532_wait_for_ack(){
+                 ; 0001 008C _Bool PN532_wait_for_ack(){
                  _PN532_wait_for_ack:
                  ; .FSTART _PN532_wait_for_ack
-                 ; 0001 0089   unsigned char data = 0x00;
-                 ; 0001 008A   // check ready bit
-                 ; 0001 008B   while(1){
-00020d 931a      	ST   -Y,R17
+                 ; 0001 008D   unsigned char data = 0x00;
+                 ; 0001 008E   // check ready bit
+                 ; 0001 008F   while(1){
+0002ba 931a      	ST   -Y,R17
                  ;	data -> R17
-00020e e010      	LDI  R17,0
-                 _0x20028:
-                 ; 0001 008C     TWIStart();
-00020f d11a      	RCALL SUBOPT_0xF
-                 ; 0001 008D     TWIWrite(PN532_ADD | 1);
-                 ; 0001 008E 
-                 ; 0001 008F     // if NACK received, repeat data request
-                 ; 0001 0090     if(TWSR == 0x48) continue;
-000210 f3f1      	BREQ _0x20028
-                 ; 0001 0091     //TWIStart();
-                 ; 0001 0092     data = TWIRead(1);
-000211 d11e      	RCALL SUBOPT_0x10
-000212 2f1e      	MOV  R17,R30
-                 ; 0001 0093     if(data==0x00) TWIStop();
-000213 3010      	CPI  R17,0
-000214 f411      	BRNE _0x2002C
-000215 df01      	RCALL _TWIStop
-                 ; 0001 0094     else if(data==0x01) break;
-000216 c002      	RJMP _0x2002D
+0002bb e010      	LDI  R17,0
                  _0x2002C:
-000217 3011      	CPI  R17,1
-000218 f009      	BREQ _0x2002A
-                 ; 0001 0095   }
-                 _0x2002D:
-000219 cff5      	RJMP _0x20028
-                 _0x2002A:
-                 ; 0001 0096   // get rid of preamble
-                 ; 0001 0097   TWIRead(1);
-00021a d115      	RCALL SUBOPT_0x10
-                 ; 0001 0098   //check start of packet
-                 ; 0001 0099   if(TWIRead(1)!=0x00) {TWIStop(); return false;}
-00021b d114      	RCALL SUBOPT_0x10
-00021c 30e0      	CPI  R30,0
-00021d f011      	BREQ _0x2002F
-00021e d114      	RCALL SUBOPT_0x11
-00021f c013      	RJMP _0x2080002
-                 ; 0001 009A   if(TWIRead(1)!=0xFF) {TWIStop(); return false;}
-                 _0x2002F:
-000220 d10f      	RCALL SUBOPT_0x10
-000221 3fef      	CPI  R30,LOW(0xFF)
-000222 f011      	BREQ _0x20030
-000223 d10f      	RCALL SUBOPT_0x11
-000224 c00e      	RJMP _0x2080002
-                 ; 0001 009B 
-                 ; 0001 009C   //check ack
-                 ; 0001 009D   if(TWIRead(1)!=0x00) {TWIStop(); return false;}
+                 ; 0001 0090     TWIStart();
+0002bc d147      	RCALL SUBOPT_0x18
+                 ; 0001 0091     TWIWrite(PN532_ADD | 1);
+                 ; 0001 0092 
+                 ; 0001 0093     // if NACK received, repeat data request
+                 ; 0001 0094     if(TWSR == 0x48) continue;
+0002bd f3f1      	BREQ _0x2002C
+                 ; 0001 0095     //TWIStart();
+                 ; 0001 0096     data = TWIRead(1);
+0002be d14b      	RCALL SUBOPT_0x19
+0002bf 2f1e      	MOV  R17,R30
+                 ; 0001 0097     if(data==0x00) TWIStop();
+0002c0 3010      	CPI  R17,0
+0002c1 f411      	BRNE _0x20030
+0002c2 df05      	RCALL _TWIStop
+                 ; 0001 0098     else if(data==0x01) break;
+0002c3 c002      	RJMP _0x20031
                  _0x20030:
-000225 d10a      	RCALL SUBOPT_0x10
-000226 30e0      	CPI  R30,0
-000227 f011      	BREQ _0x20031
-000228 d10a      	RCALL SUBOPT_0x11
-000229 c009      	RJMP _0x2080002
-                 ; 0001 009E   if(TWIRead(0)!=0xFF) {TWIStop(); return false;}
+0002c4 3011      	CPI  R17,1
+0002c5 f009      	BREQ _0x2002E
+                 ; 0001 0099   }
                  _0x20031:
-00022a e0a0      	LDI  R26,LOW(0)
-00022b e0b0      	LDI  R27,0
-00022c def9      	RCALL _TWIRead
-00022d 3fef      	CPI  R30,LOW(0xFF)
-00022e f011      	BREQ _0x20032
-00022f d103      	RCALL SUBOPT_0x11
-000230 c002      	RJMP _0x2080002
-                 ; 0001 009F   TWIStop();
-                 _0x20032:
-000231 dee5      	RCALL _TWIStop
-                 ; 0001 00A0   return true;
-000232 e0e1      	LDI  R30,LOW(1)
+0002c6 cff5      	RJMP _0x2002C
+                 _0x2002E:
+                 ; 0001 009A   // get rid of preamble
+                 ; 0001 009B   TWIRead(1);
+0002c7 d142      	RCALL SUBOPT_0x19
+                 ; 0001 009C   //check start of packet
+                 ; 0001 009D   if(TWIRead(1)!=0x00) {TWIStop(); return false;}
+0002c8 d141      	RCALL SUBOPT_0x19
+0002c9 30e0      	CPI  R30,0
+0002ca f011      	BREQ _0x20033
+0002cb d141      	RCALL SUBOPT_0x1A
+0002cc c013      	RJMP _0x2080002
+                 ; 0001 009E   if(TWIRead(1)!=0xFF) {TWIStop(); return false;}
+                 _0x20033:
+0002cd d13c      	RCALL SUBOPT_0x19
+0002ce 3fef      	CPI  R30,LOW(0xFF)
+0002cf f011      	BREQ _0x20034
+0002d0 d13c      	RCALL SUBOPT_0x1A
+0002d1 c00e      	RJMP _0x2080002
+                 ; 0001 009F 
+                 ; 0001 00A0   //check ack
+                 ; 0001 00A1   if(TWIRead(1)!=0x00) {TWIStop(); return false;}
+                 _0x20034:
+0002d2 d137      	RCALL SUBOPT_0x19
+0002d3 30e0      	CPI  R30,0
+0002d4 f011      	BREQ _0x20035
+0002d5 d137      	RCALL SUBOPT_0x1A
+0002d6 c009      	RJMP _0x2080002
+                 ; 0001 00A2   if(TWIRead(0)!=0xFF) {TWIStop(); return false;}
+                 _0x20035:
+0002d7 e0a0      	LDI  R26,LOW(0)
+0002d8 e0b0      	LDI  R27,0
+0002d9 deff      	RCALL _TWIRead
+0002da 3fef      	CPI  R30,LOW(0xFF)
+0002db f011      	BREQ _0x20036
+0002dc d130      	RCALL SUBOPT_0x1A
+0002dd c002      	RJMP _0x2080002
+                 ; 0001 00A3   TWIStop();
+                 _0x20036:
+0002de dee9      	RCALL _TWIStop
+                 ; 0001 00A4   return true;
+0002df e0e1      	LDI  R30,LOW(1)
                  _0x2080002:
-000233 9119      	LD   R17,Y+
-000234 9508      	RET
-                 ; 0001 00A1 }
+0002e0 9119      	LD   R17,Y+
+0002e1 9508      	RET
+                 ; 0001 00A5 }
                  ; .FEND
                  ;
                  ;void PN532_get_firmware()
-                 ; 0001 00A4 {
+                 ; 0001 00A8 {
                  _PN532_get_firmware:
                  ; .FSTART _PN532_get_firmware
-                 ; 0001 00A5   PN532_msg.buffer[0]=PN532_CMD_GETFIRMWARE;
-000235 e0e2      	LDI  R30,LOW(2)
-000236 93e0 0204 	STS  _PN532_msg,R30
-                 ; 0001 00A6   PN532_msg.length=1;
-000238 e0e1      	LDI  R30,LOW(1)
-000239 e0f0      	LDI  R31,HIGH(1)
-00023a d107      	RCALL SUBOPT_0x14
-                 ; 0001 00A7   PN532_build_msg(&twi_tx, &PN532_msg);
-                 ; 0001 00A8   PN532_cmd(&twi_tx);
-                 ; 0001 00A9   TWIInit();
-00023b dece      	RCALL _TWIInit
-                 ; 0001 00AA   delay_ms(20);
-00023c d113      	RCALL SUBOPT_0x15
-                 ; 0001 00AB   while(!PN532_wait_for_ack()) delay_ms(20);
-                 _0x20033:
-00023d dfcf      	RCALL _PN532_wait_for_ack
-00023e 30e0      	CPI  R30,0
-00023f f411      	BRNE _0x20035
-000240 d10f      	RCALL SUBOPT_0x15
-000241 cffb      	RJMP _0x20033
-                 _0x20035:
-                 ; 0001 00AC delay_ms(20);
-000242 d10d      	RCALL SUBOPT_0x15
-                 ; 0001 00AD   PN532_read(&twi_rx);
-000243 d10e      	RCALL SUBOPT_0x16
-                 ; 0001 00AE   PN532_get_msg(&twi_rx, &PN532_msg, 1);
-000244 e0a1      	LDI  R26,LOW(1)
-000245 df9b      	RCALL _PN532_get_msg
-                 ; 0001 00AF }
-000246 9508      	RET
+                 ; 0001 00A9   PN532_msg.buffer[0]=PN532_CMD_GETFIRMWARE;
+0002e2 e0e2      	LDI  R30,LOW(2)
+0002e3 93e0 0204 	STS  _PN532_msg,R30
+                 ; 0001 00AA   PN532_msg.length=1;
+0002e5 e0e1      	LDI  R30,LOW(1)
+0002e6 e0f0      	LDI  R31,HIGH(1)
+0002e7 d138      	RCALL SUBOPT_0x1E
+                 ; 0001 00AB   PN532_build_msg(&twi_tx, &PN532_msg);
+                 ; 0001 00AC   PN532_cmd(&twi_tx);
+                 ; 0001 00AD   TWIInit();
+0002e8 ded2      	RCALL _TWIInit
+                 ; 0001 00AE   delay_ms(20);
+0002e9 d144      	RCALL SUBOPT_0x1F
+                 ; 0001 00AF   while(!PN532_wait_for_ack()) delay_ms(20);
+                 _0x20037:
+0002ea dfcf      	RCALL _PN532_wait_for_ack
+0002eb 30e0      	CPI  R30,0
+0002ec f411      	BRNE _0x20039
+0002ed d140      	RCALL SUBOPT_0x1F
+0002ee cffb      	RJMP _0x20037
+                 _0x20039:
+                 ; 0001 00B0 delay_ms(20);
+0002ef d13e      	RCALL SUBOPT_0x1F
+                 ; 0001 00B1   PN532_read(&twi_rx);
+0002f0 d13f      	RCALL SUBOPT_0x20
+                 ; 0001 00B2   PN532_get_msg(&twi_rx, &PN532_msg, 1);
+0002f1 e0a1      	LDI  R26,LOW(1)
+0002f2 df9f      	RCALL _PN532_get_msg
+                 ; 0001 00B3 }
+0002f3 9508      	RET
                  ; .FEND
                  ;
                  ;bool PN532_SAM_config()
-                 ; 0001 00B2 {
+                 ; 0001 00B6 {
                  _PN532_SAM_config:
                  ; .FSTART _PN532_SAM_config
-                 ; 0001 00B3   PN532_msg.buffer[0] = PN532_CMD_SAMCONFIGURATION;
-000247 e1e4      	LDI  R30,LOW(20)
-000248 d115      	RCALL SUBOPT_0x17
-                 ; 0001 00B4   PN532_msg.buffer[1] = 0x01; // normal mode;
-                 ; 0001 00B5   PN532_msg.buffer[2] = 0x14; // timeout 50ms * 20 = 1 second
-000249 e1e4      	LDI  R30,LOW(20)
+                 ; 0001 00B7   PN532_msg.buffer[0] = PN532_CMD_SAMCONFIGURATION;
+0002f4 e1e4      	LDI  R30,LOW(20)
+0002f5 d146      	RCALL SUBOPT_0x21
+                 ; 0001 00B8   PN532_msg.buffer[1] = 0x01; // normal mode;
+                 ; 0001 00B9   PN532_msg.buffer[2] = 0x14; // timeout 50ms * 20 = 1 second
+0002f6 e1e4      	LDI  R30,LOW(20)
                 +
-00024a 93e0 0206+STS _PN532_msg + ( 2 ) , R30
+0002f7 93e0 0206+STS _PN532_msg + ( 2 ) , R30
                  	__PUTB1MN _PN532_msg,2
-                 ; 0001 00B6   PN532_msg.buffer[3] = 0x00; // not using IRQ pin!
-00024c e0e0      	LDI  R30,LOW(0)
+                 ; 0001 00BA   PN532_msg.buffer[3] = 0x00; // not using IRQ pin!
+0002f9 e0e0      	LDI  R30,LOW(0)
                 +
-00024d 93e0 0207+STS _PN532_msg + ( 3 ) , R30
+0002fa 93e0 0207+STS _PN532_msg + ( 3 ) , R30
                  	__PUTB1MN _PN532_msg,3
-                 ; 0001 00B7   PN532_msg.length=4;
-00024f e0e4      	LDI  R30,LOW(4)
-000250 e0f0      	LDI  R31,HIGH(4)
-000251 d0f0      	RCALL SUBOPT_0x14
-                 ; 0001 00B8   PN532_build_msg(&twi_tx, &PN532_msg);
-                 ; 0001 00B9   PN532_cmd(&twi_tx);
-                 ; 0001 00BA   delay_ms(20);
-000252 d0fd      	RCALL SUBOPT_0x15
-                 ; 0001 00BB   while(!PN532_wait_for_ack()) delay_ms(20);
-                 _0x20036:
-000253 dfb9      	RCALL _PN532_wait_for_ack
-000254 30e0      	CPI  R30,0
-000255 f411      	BRNE _0x20038
-000256 d0f9      	RCALL SUBOPT_0x15
-000257 cffb      	RJMP _0x20036
-                 _0x20038:
-                 ; 0001 00BC delay_ms(20);
-000258 d0f7      	RCALL SUBOPT_0x15
-                 ; 0001 00BD   PN532_read(&twi_rx);
-000259 d0f8      	RCALL SUBOPT_0x16
-                 ; 0001 00BE   PN532_get_msg(&twi_rx, &PN532_msg, 0);
-00025a e0a0      	LDI  R26,LOW(0)
-00025b df85      	RCALL _PN532_get_msg
-                 ; 0001 00BF   if(PN532_msg.buffer[0]==0x15) return true;
-00025c 91a0 0204 	LDS  R26,_PN532_msg
-00025e 31a5      	CPI  R26,LOW(0x15)
-00025f f411      	BRNE _0x20039
-000260 e0e1      	LDI  R30,LOW(1)
-000261 9508      	RET
-                 ; 0001 00C0   else return false;
-                 _0x20039:
-000262 e0e0      	LDI  R30,LOW(0)
-000263 9508      	RET
-                 ; 0001 00C1 }
-000264 9508      	RET
+                 ; 0001 00BB   PN532_msg.length=4;
+0002fc e0e4      	LDI  R30,LOW(4)
+0002fd e0f0      	LDI  R31,HIGH(4)
+0002fe d121      	RCALL SUBOPT_0x1E
+                 ; 0001 00BC   PN532_build_msg(&twi_tx, &PN532_msg);
+                 ; 0001 00BD   PN532_cmd(&twi_tx);
+                 ; 0001 00BE   delay_ms(20);
+0002ff d12e      	RCALL SUBOPT_0x1F
+                 ; 0001 00BF   while(!PN532_wait_for_ack()) delay_ms(20);
+                 _0x2003A:
+000300 dfb9      	RCALL _PN532_wait_for_ack
+000301 30e0      	CPI  R30,0
+000302 f411      	BRNE _0x2003C
+000303 d12a      	RCALL SUBOPT_0x1F
+000304 cffb      	RJMP _0x2003A
+                 _0x2003C:
+                 ; 0001 00C0 delay_ms(20);
+000305 d128      	RCALL SUBOPT_0x1F
+                 ; 0001 00C1   PN532_read(&twi_rx);
+000306 d129      	RCALL SUBOPT_0x20
+                 ; 0001 00C2   PN532_get_msg(&twi_rx, &PN532_msg, 0);
+000307 e0a0      	LDI  R26,LOW(0)
+000308 df89      	RCALL _PN532_get_msg
+                 ; 0001 00C3   if(PN532_msg.buffer[0]==0x15) return true;
+000309 91a0 0204 	LDS  R26,_PN532_msg
+00030b 31a5      	CPI  R26,LOW(0x15)
+00030c f411      	BRNE _0x2003D
+00030d e0e1      	LDI  R30,LOW(1)
+00030e 9508      	RET
+                 ; 0001 00C4   else return false;
+                 _0x2003D:
+00030f e0e0      	LDI  R30,LOW(0)
+000310 9508      	RET
+                 ; 0001 00C5 }
+000311 9508      	RET
                  ; .FEND
                  ;
                  ;void PN532_read_uid()
-                 ; 0001 00C4 {
+                 ; 0001 00C8 {
                  _PN532_read_uid:
                  ; .FSTART _PN532_read_uid
-                 ; 0001 00C5   PN532_msg.buffer[0] = PN532_CMD_INLISTPASSIVETARGET;
-000265 e4ea      	LDI  R30,LOW(74)
-000266 d0f7      	RCALL SUBOPT_0x17
-                 ; 0001 00C6   PN532_msg.buffer[1] = 1;  // max 1 cards at once
-                 ; 0001 00C7   PN532_msg.buffer[2] = PN532_MIFARE_ISO14443A; //baudrate
-000267 e0e0      	LDI  R30,LOW(0)
+                 ; 0001 00C9   PN532_msg.buffer[0] = PN532_CMD_INLISTPASSIVETARGET;
+000312 e4ea      	LDI  R30,LOW(74)
+000313 d128      	RCALL SUBOPT_0x21
+                 ; 0001 00CA   PN532_msg.buffer[1] = 1;  // max 1 cards at once
+                 ; 0001 00CB   PN532_msg.buffer[2] = PN532_MIFARE_ISO14443A; //baudrate
+000314 e0e0      	LDI  R30,LOW(0)
                 +
-000268 93e0 0206+STS _PN532_msg + ( 2 ) , R30
+000315 93e0 0206+STS _PN532_msg + ( 2 ) , R30
                  	__PUTB1MN _PN532_msg,2
-                 ; 0001 00C8   PN532_msg.length=3;
-00026a e0e3      	LDI  R30,LOW(3)
-00026b e0f0      	LDI  R31,HIGH(3)
-00026c d0d5      	RCALL SUBOPT_0x14
-                 ; 0001 00C9   PN532_build_msg(&twi_tx, &PN532_msg);
-                 ; 0001 00CA   PN532_cmd(&twi_tx);
-                 ; 0001 00CB   delay_ms(20);
-00026d d0e2      	RCALL SUBOPT_0x15
-                 ; 0001 00CC   while(!PN532_wait_for_ack()) delay_ms(20);
-                 _0x2003B:
-00026e df9e      	RCALL _PN532_wait_for_ack
-00026f 30e0      	CPI  R30,0
-000270 f411      	BRNE _0x2003D
-000271 d0de      	RCALL SUBOPT_0x15
-000272 cffb      	RJMP _0x2003B
-                 _0x2003D:
-                 ; 0001 00CD delay_ms(20);
-000273 d0dc      	RCALL SUBOPT_0x15
-                 ; 0001 00CE   PN532_read(&twi_rx);
-000274 d0dd      	RCALL SUBOPT_0x16
-                 ; 0001 00CF   PN532_get_msg(&twi_rx, &PN532_msg, 1);
-000275 e0a1      	LDI  R26,LOW(1)
-000276 df6a      	RCALL _PN532_get_msg
-                 ; 0001 00D0   tag_uid.length = PN532_msg.buffer[5];
+                 ; 0001 00CC   PN532_msg.length=3;
+000317 e0e3      	LDI  R30,LOW(3)
+000318 e0f0      	LDI  R31,HIGH(3)
+000319 d106      	RCALL SUBOPT_0x1E
+                 ; 0001 00CD   PN532_build_msg(&twi_tx, &PN532_msg);
+                 ; 0001 00CE   PN532_cmd(&twi_tx);
+                 ; 0001 00CF   delay_ms(20);
+00031a d113      	RCALL SUBOPT_0x1F
+                 ; 0001 00D0   while(!PN532_wait_for_ack()) delay_ms(20);
+                 _0x2003F:
+00031b df9e      	RCALL _PN532_wait_for_ack
+00031c 30e0      	CPI  R30,0
+00031d f411      	BRNE _0x20041
+00031e d10f      	RCALL SUBOPT_0x1F
+00031f cffb      	RJMP _0x2003F
+                 _0x20041:
+                 ; 0001 00D1 delay_ms(20);
+000320 d10d      	RCALL SUBOPT_0x1F
+                 ; 0001 00D2   PN532_read(&twi_rx);
+000321 d10e      	RCALL SUBOPT_0x20
+                 ; 0001 00D3   PN532_get_msg(&twi_rx, &PN532_msg, 1);
+000322 e0a1      	LDI  R26,LOW(1)
+000323 df6e      	RCALL _PN532_get_msg
+                 ; 0001 00D4   tag_uid.length = PN532_msg.buffer[5];
                 +
-000277 eaa6     +LDI R26 , LOW ( _tag_uid + ( 80 ) )
-000278 e0b2     +LDI R27 , HIGH ( _tag_uid + ( 80 ) )
+000324 eaa6     +LDI R26 , LOW ( _tag_uid + ( 80 ) )
+000325 e0b2     +LDI R27 , HIGH ( _tag_uid + ( 80 ) )
                  	__POINTW2MN _tag_uid,80
                 +
-000279 91e0 0209+LDS R30 , _PN532_msg + ( 5 )
+000326 91e0 0209+LDS R30 , _PN532_msg + ( 5 )
                  	__GETB1MN _PN532_msg,5
-00027b e0f0      	LDI  R31,0
-00027c 93ed      	ST   X+,R30
-00027d 93fc      	ST   X,R31
-                 ; 0001 00D1   for(i = 0; i<tag_uid.length; ++i)
-00027e d084      	RCALL SUBOPT_0x4
-                 _0x2003F:
-00027f d079      	RCALL SUBOPT_0x1
-000280 168e      	CP   R8,R30
-000281 069f      	CPC  R9,R31
-000282 f454      	BRGE _0x20040
-                 ; 0001 00D2   {
-                 ; 0001 00D3     tag_uid.buffer[i] = PN532_msg.buffer[6+i];
-000283 01d4      	MOVW R26,R8
-000284 5aaa      	SUBI R26,LOW(-_tag_uid)
-000285 4fbd      	SBCI R27,HIGH(-_tag_uid)
-000286 01f4      	MOVW R30,R8
+000328 d0f3      	RCALL SUBOPT_0x1D
+                 ; 0001 00D5   for(i = 0; i<tag_uid.length; ++i)
+000329 d0b3      	RCALL SUBOPT_0xD
+                 _0x20043:
+00032a d096      	RCALL SUBOPT_0x7
+00032b 16ae      	CP   R10,R30
+00032c 06bf      	CPC  R11,R31
+00032d f454      	BRGE _0x20044
+                 ; 0001 00D6   {
+                 ; 0001 00D7     tag_uid.buffer[i] = PN532_msg.buffer[6+i];
+00032e 01d5      	MOVW R26,R10
+00032f 5aaa      	SUBI R26,LOW(-_tag_uid)
+000330 4fbd      	SBCI R27,HIGH(-_tag_uid)
+000331 01f5      	MOVW R30,R10
                 +
-000287 5fe6     +SUBI R30 , LOW ( - _PN532_msg - ( 6 ) )
-000288 4ffd     +SBCI R31 , HIGH ( - _PN532_msg - ( 6 ) )
+000332 5fe6     +SUBI R30 , LOW ( - _PN532_msg - ( 6 ) )
+000333 4ffd     +SBCI R31 , HIGH ( - _PN532_msg - ( 6 ) )
                  	__ADDW1MN _PN532_msg,6
-000289 81e0      	LD   R30,Z
-00028a 93ec      	ST   X,R30
-                 ; 0001 00D4   }
-00028b d084      	RCALL SUBOPT_0x8
-00028c cff2      	RJMP _0x2003F
-                 _0x20040:
-                 ; 0001 00D5 }
-00028d 9508      	RET
+000334 81e0      	LD   R30,Z
+000335 93ec      	ST   X,R30
+                 ; 0001 00D8   }
+000336 d0b3      	RCALL SUBOPT_0x11
+000337 cff2      	RJMP _0x20043
+                 _0x20044:
+                 ; 0001 00D9 }
+000338 9508      	RET
                  ; .FEND
                  ;
                  ;bool PN532_auth_tag(unsigned char block_number, unsigned char key_select, unsigned char* key_buffer)
-                 ; 0001 00D8 {
-                 ; 0001 00D9   PN532_read_uid();
+                 ; 0001 00DC {
+                 ; 0001 00DD   PN532_read_uid();
                  ;	block_number -> Y+3
                  ;	key_select -> Y+2
                  ;	*key_buffer -> Y+0
-                 ; 0001 00DA   PN532_msg.buffer[0] = PN532_CMD_INDATAEXCHANGE;
-                 ; 0001 00DB   PN532_msg.buffer[1] = 1;                              /* Max card numbers */
-                 ; 0001 00DC   PN532_msg.buffer[2] = (key_select) ? MIFARE_CMD_AUTH_B : MIFARE_CMD_AUTH_A;
-                 ; 0001 00DD   PN532_msg.buffer[3] = block_number;                    /* Block Number (1K = 0..63, 4K = 0..255 */
-                 ; 0001 00DE   for (i = 0; i < 6; ++i)
-                 ; 0001 00DF   {
-                 ; 0001 00E0     PN532_msg.buffer[4+i] = key_buffer[i];                /* 6 byte auth key */
-                 ; 0001 00E1   }
-                 ; 0001 00E2   for (i = 0; i < tag_uid.length; ++i)
+                 ; 0001 00DE   PN532_msg.buffer[0] = PN532_CMD_INDATAEXCHANGE;
+                 ; 0001 00DF   PN532_msg.buffer[1] = 1;                              /* Max card numbers */
+                 ; 0001 00E0   PN532_msg.buffer[2] = (key_select) ? MIFARE_CMD_AUTH_B : MIFARE_CMD_AUTH_A;
+                 ; 0001 00E1   PN532_msg.buffer[3] = block_number;                    /* Block Number (1K = 0..63, 4K = 0..255 */
+                 ; 0001 00E2   for (i = 0; i < 6; ++i)
                  ; 0001 00E3   {
-                 ; 0001 00E4     PN532_msg.buffer[10+i] = tag_uid.buffer[i];                /* 4 byte card ID */
+                 ; 0001 00E4     PN532_msg.buffer[4+i] = key_buffer[i];                /* 6 byte auth key */
                  ; 0001 00E5   }
-                 ; 0001 00E6   PN532_msg.length = 10+tag_uid.length;
-                 ; 0001 00E7 
-                 ; 0001 00E8   PN532_build_msg(&twi_tx, &PN532_msg);
-                 ; 0001 00E9   PN532_cmd(&twi_tx);
-                 ; 0001 00EA   delay_ms(20);
-                 ; 0001 00EB   while(!PN532_wait_for_ack()) delay_ms(20);
-                 ; 0001 00EC delay_ms(20);
-                 ; 0001 00ED   PN532_read(&twi_rx);
-                 ; 0001 00EE   PN532_get_msg(&twi_rx, &PN532_msg, 1);
-                 ; 0001 00EF   if(PN532_msg.buffer[0] != 0x00) return false;
-                 ; 0001 00F0   return true;
-                 ; 0001 00F1 }
+                 ; 0001 00E6   for (i = 0; i < tag_uid.length; ++i)
+                 ; 0001 00E7   {
+                 ; 0001 00E8     PN532_msg.buffer[10+i] = tag_uid.buffer[i];                /* 4 byte card ID */
+                 ; 0001 00E9   }
+                 ; 0001 00EA   PN532_msg.length = 10+tag_uid.length;
+                 ; 0001 00EB 
+                 ; 0001 00EC   PN532_build_msg(&twi_tx, &PN532_msg);
+                 ; 0001 00ED   PN532_cmd(&twi_tx);
+                 ; 0001 00EE   delay_ms(20);
+                 ; 0001 00EF   while(!PN532_wait_for_ack()) delay_ms(20);
+                 ; 0001 00F0 delay_ms(20);
+                 ; 0001 00F1   PN532_read(&twi_rx);
+                 ; 0001 00F2   PN532_get_msg(&twi_rx, &PN532_msg, 1);
+                 ; 0001 00F3   if(PN532_msg.buffer[0] != 0x00) return false;
+                 ; 0001 00F4   return true;
+                 ; 0001 00F5 }
                  ;
                  ;bool PN532_read_passive_tag(unsigned char block_number)
-                 ; 0001 00F4 {
-                 ; 0001 00F5   if(!PN532_auth_tag(block_number, 0, MIFARE_Key_A)) return false;
+                 ; 0001 00F8 {
+                 ; 0001 00F9   if(!PN532_auth_tag(block_number, 0, MIFARE_Key_A)) return false;
                  ;	block_number -> Y+0
-                 ; 0001 00F6   PN532_msg.buffer[0] = PN532_CMD_INDATAEXCHANGE;
-                 ; 0001 00F7   PN532_msg.buffer[1] = 1;                              /* Max card numbers */
-                 ; 0001 00F8   PN532_msg.buffer[2] = MIFARE_CMD_READ;
-                 ; 0001 00F9   PN532_msg.buffer[3] = block_number;                    /* Block Number (1K = 0..63, 4K = 0..255 */
-                 ; 0001 00FA   PN532_msg.length = 4;
-                 ; 0001 00FB 
-                 ; 0001 00FC   PN532_build_msg(&twi_tx, &PN532_msg);
-                 ; 0001 00FD   PN532_cmd(&twi_tx);
-                 ; 0001 00FE   delay_ms(20);
-                 ; 0001 00FF   while(!PN532_wait_for_ack()) delay_ms(20);
-                 ; 0001 0100 delay_ms(20);
-                 ; 0001 0101   PN532_read(&twi_rx);
-                 ; 0001 0102   PN532_get_msg(&twi_rx, &PN532_msg, 1);
-                 ; 0001 0103   if(PN532_msg.buffer[0] != 0x00) return false;
-                 ; 0001 0104   PN532_get_msg(&twi_rx, &tag_data, 2);
-                 ; 0001 0105   return true;
-                 ; 0001 0106 }
+                 ; 0001 00FA   PN532_msg.buffer[0] = PN532_CMD_INDATAEXCHANGE;
+                 ; 0001 00FB   PN532_msg.buffer[1] = 1;                              /* Max card numbers */
+                 ; 0001 00FC   PN532_msg.buffer[2] = MIFARE_CMD_READ;
+                 ; 0001 00FD   PN532_msg.buffer[3] = block_number;                    /* Block Number (1K = 0..63, 4K = 0..255 */
+                 ; 0001 00FE   PN532_msg.length = 4;
+                 ; 0001 00FF 
+                 ; 0001 0100   PN532_build_msg(&twi_tx, &PN532_msg);
+                 ; 0001 0101   PN532_cmd(&twi_tx);
+                 ; 0001 0102   delay_ms(20);
+                 ; 0001 0103   while(!PN532_wait_for_ack()) delay_ms(20);
+                 ; 0001 0104 delay_ms(20);
+                 ; 0001 0105   PN532_read(&twi_rx);
+                 ; 0001 0106   PN532_get_msg(&twi_rx, &PN532_msg, 1);
+                 ; 0001 0107   if(PN532_msg.buffer[0] != 0x00) return false;
+                 ; 0001 0108   PN532_get_msg(&twi_rx, &tag_data, 2);
+                 ; 0001 0109   return true;
+                 ; 0001 010A }
                  ;
                  ;bool PN532_write_passive_tag(unsigned char block_number, TWI_BUFFER_STRUCT* data)
-                 ; 0001 0109 {
-                 ; 0001 010A   if(!PN532_auth_tag(block_number, 0, MIFARE_Key_A)) return false;
+                 ; 0001 010D {
+                 ; 0001 010E   if(!PN532_auth_tag(block_number, 0, MIFARE_Key_A)) return false;
                  ;	block_number -> Y+2
                  ;	*data -> Y+0
-                 ; 0001 010B   PN532_msg.buffer[0] = PN532_CMD_INDATAEXCHANGE;
-                 ; 0001 010C   PN532_msg.buffer[1] = 1;                              /* Max card numbers */
-                 ; 0001 010D   PN532_msg.buffer[2] = MIFARE_CMD_WRITE;
-                 ; 0001 010E   PN532_msg.buffer[3] = block_number;                    /* Block Number (1K = 0..63, 4K = 0..255 */
-                 ; 0001 010F   for (i = 0; i < data->length && i < 16; ++i)
-                 ; 0001 0110   {
-                 ; 0001 0111     PN532_msg.buffer[4+i] = data->buffer[i];                /* 16 byte data */
-                 ; 0001 0112   }
-                 ; 0001 0113   PN532_msg.length = 4+i;
-                 ; 0001 0114 
-                 ; 0001 0115   PN532_build_msg(&twi_tx, &PN532_msg);
-                 ; 0001 0116   PN532_cmd(&twi_tx);
-                 ; 0001 0117   delay_ms(20);
-                 ; 0001 0118   while(!PN532_wait_for_ack()) delay_ms(20);
-                 ; 0001 0119 delay_ms(20);
-                 ; 0001 011A   PN532_read(&twi_rx);
-                 ; 0001 011B   PN532_get_msg(&twi_rx, &PN532_msg, 1);
-                 ; 0001 011C   if(PN532_msg.buffer[0] != 0x00) return false;
-                 ; 0001 011D   PN532_get_msg(&twi_rx, &tag_data, 2);
-                 ; 0001 011E   return true;
-                 ; 0001 011F }
+                 ; 0001 010F   PN532_msg.buffer[0] = PN532_CMD_INDATAEXCHANGE;
+                 ; 0001 0110   PN532_msg.buffer[1] = 1;                              /* Max card numbers */
+                 ; 0001 0111   PN532_msg.buffer[2] = MIFARE_CMD_WRITE;
+                 ; 0001 0112   PN532_msg.buffer[3] = block_number;                    /* Block Number (1K = 0..63, 4K = 0..255 */
+                 ; 0001 0113   for (i = 0; i < data->length && i < 16; ++i)
+                 ; 0001 0114   {
+                 ; 0001 0115     PN532_msg.buffer[4+i] = data->buffer[i];                /* 16 byte data */
+                 ; 0001 0116   }
+                 ; 0001 0117   PN532_msg.length = 4+i;
+                 ; 0001 0118 
+                 ; 0001 0119   PN532_build_msg(&twi_tx, &PN532_msg);
+                 ; 0001 011A   PN532_cmd(&twi_tx);
+                 ; 0001 011B   delay_ms(20);
+                 ; 0001 011C   while(!PN532_wait_for_ack()) delay_ms(20);
+                 ; 0001 011D delay_ms(20);
+                 ; 0001 011E   PN532_read(&twi_rx);
+                 ; 0001 011F   PN532_get_msg(&twi_rx, &PN532_msg, 1);
+                 ; 0001 0120   if(PN532_msg.buffer[0] != 0x00) return false;
+                 ; 0001 0121   PN532_get_msg(&twi_rx, &tag_data, 2);
+                 ; 0001 0122   return true;
+                 ; 0001 0123 }
                  
                  	.CSEG
                  	#ifndef __SLEEP_DEFINED__
@@ -2550,128 +2890,128 @@ D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1094): warning: Register
                  	.CSEG
                  __lcd_write_nibble_G101:
                  ; .FSTART __lcd_write_nibble_G101
-00028e 93aa      	ST   -Y,R26
-00028f 81e8      	LD   R30,Y
-000290 71e0      	ANDI R30,LOW(0x10)
-000291 f011      	BREQ _0x2020004
-000292 9aab      	SBI  0x15,3
-000293 c001      	RJMP _0x2020005
+000339 93aa      	ST   -Y,R26
+00033a 81e8      	LD   R30,Y
+00033b 71e0      	ANDI R30,LOW(0x10)
+00033c f011      	BREQ _0x2020004
+00033d 9aab      	SBI  0x15,3
+00033e c001      	RJMP _0x2020005
                  _0x2020004:
-000294 98ab      	CBI  0x15,3
+00033f 98ab      	CBI  0x15,3
                  _0x2020005:
-000295 81e8      	LD   R30,Y
-000296 72e0      	ANDI R30,LOW(0x20)
-000297 f011      	BREQ _0x2020006
-000298 9aaa      	SBI  0x15,2
-000299 c001      	RJMP _0x2020007
+000340 81e8      	LD   R30,Y
+000341 72e0      	ANDI R30,LOW(0x20)
+000342 f011      	BREQ _0x2020006
+000343 9aaa      	SBI  0x15,2
+000344 c001      	RJMP _0x2020007
                  _0x2020006:
-00029a 98aa      	CBI  0x15,2
+000345 98aa      	CBI  0x15,2
                  _0x2020007:
-00029b 81e8      	LD   R30,Y
-00029c 74e0      	ANDI R30,LOW(0x40)
-00029d f011      	BREQ _0x2020008
-00029e 9aa9      	SBI  0x15,1
-00029f c001      	RJMP _0x2020009
+000346 81e8      	LD   R30,Y
+000347 74e0      	ANDI R30,LOW(0x40)
+000348 f011      	BREQ _0x2020008
+000349 9aa9      	SBI  0x15,1
+00034a c001      	RJMP _0x2020009
                  _0x2020008:
-0002a0 98a9      	CBI  0x15,1
+00034b 98a9      	CBI  0x15,1
                  _0x2020009:
-0002a1 81e8      	LD   R30,Y
-0002a2 78e0      	ANDI R30,LOW(0x80)
-0002a3 f011      	BREQ _0x202000A
-0002a4 9aa8      	SBI  0x15,0
-0002a5 c001      	RJMP _0x202000B
+00034c 81e8      	LD   R30,Y
+00034d 78e0      	ANDI R30,LOW(0x80)
+00034e f011      	BREQ _0x202000A
+00034f 9aa8      	SBI  0x15,0
+000350 c001      	RJMP _0x202000B
                  _0x202000A:
-0002a6 98a8      	CBI  0x15,0
+000351 98a8      	CBI  0x15,0
                  _0x202000B:
-0002a7 d0bc      	RCALL SUBOPT_0x18
-0002a8 9a94      	SBI  0x12,4
-0002a9 d0ba      	RCALL SUBOPT_0x18
-0002aa 9894      	CBI  0x12,4
-0002ab d0b8      	RCALL SUBOPT_0x18
-0002ac c047      	RJMP _0x2080001
+000352 d0ef      	RCALL SUBOPT_0x22
+000353 9a94      	SBI  0x12,4
+000354 d0ed      	RCALL SUBOPT_0x22
+000355 9894      	CBI  0x12,4
+000356 d0eb      	RCALL SUBOPT_0x22
+000357 c048      	RJMP _0x2080001
                  ; .FEND
                  __lcd_write_data:
                  ; .FSTART __lcd_write_data
-0002ad 93aa      	ST   -Y,R26
-0002ae 81a8      	LD   R26,Y
-0002af dfde      	RCALL __lcd_write_nibble_G101
-0002b0 81e8          ld    r30,y
-0002b1 95e2          swap  r30
-0002b2 83e8          st    y,r30
-0002b3 81a8      	LD   R26,Y
-0002b4 dfd9      	RCALL __lcd_write_nibble_G101
+000358 93aa      	ST   -Y,R26
+000359 81a8      	LD   R26,Y
+00035a dfde      	RCALL __lcd_write_nibble_G101
+00035b 81e8          ld    r30,y
+00035c 95e2          swap  r30
+00035d 83e8          st    y,r30
+00035e 81a8      	LD   R26,Y
+00035f dfd9      	RCALL __lcd_write_nibble_G101
                 +
-0002b5 ec88     +LDI R24 , LOW ( 200 )
+000360 ec88     +LDI R24 , LOW ( 200 )
                 +__DELAY_USB_LOOP :
-0002b6 958a     +DEC R24
-0002b7 f7f1     +BRNE __DELAY_USB_LOOP
+000361 958a     +DEC R24
+000362 f7f1     +BRNE __DELAY_USB_LOOP
                  	__DELAY_USB 200
-0002b8 c03b      	RJMP _0x2080001
+000363 c03c      	RJMP _0x2080001
                  ; .FEND
                  _lcd_clear:
                  ; .FSTART _lcd_clear
-0002b9 e0a2      	LDI  R26,LOW(2)
-0002ba dff2      	RCALL __lcd_write_data
-0002bb e0a3      	LDI  R26,LOW(3)
-0002bc d041      	RCALL SUBOPT_0x2
-0002bd e0ac      	LDI  R26,LOW(12)
-0002be dfee      	RCALL __lcd_write_data
-0002bf e0a1      	LDI  R26,LOW(1)
-0002c0 dfec      	RCALL __lcd_write_data
-0002c1 e0a3      	LDI  R26,LOW(3)
-0002c2 d03b      	RCALL SUBOPT_0x2
-0002c3 e0e0      	LDI  R30,LOW(0)
-0002c4 2eae      	MOV  R10,R30
-0002c5 2ebe      	MOV  R11,R30
-0002c6 9508      	RET
+000364 e0a2      	LDI  R26,LOW(2)
+000365 dff2      	RCALL __lcd_write_data
+000366 e0a3      	LDI  R26,LOW(3)
+000367 d070      	RCALL SUBOPT_0xB
+000368 e0ac      	LDI  R26,LOW(12)
+000369 dfee      	RCALL __lcd_write_data
+00036a e0a1      	LDI  R26,LOW(1)
+00036b dfec      	RCALL __lcd_write_data
+00036c e0a3      	LDI  R26,LOW(3)
+00036d d06a      	RCALL SUBOPT_0xB
+00036e e0e0      	LDI  R30,LOW(0)
+00036f 2ece      	MOV  R12,R30
+000370 2ede      	MOV  R13,R30
+000371 9508      	RET
                  ; .FEND
                  _lcd_init:
                  ; .FSTART _lcd_init
-0002c7 93aa      	ST   -Y,R26
-0002c8 9aa3      	SBI  0x14,3
-0002c9 9aa2      	SBI  0x14,2
-0002ca 9aa1      	SBI  0x14,1
-0002cb 9aa0      	SBI  0x14,0
-0002cc 9a8c      	SBI  0x11,4
-0002cd 9a8e      	SBI  0x11,6
-0002ce 9a8d      	SBI  0x11,5
-0002cf 9894      	CBI  0x12,4
-0002d0 9896      	CBI  0x12,6
-0002d1 9895      	CBI  0x12,5
-0002d2 80d8      	LDD  R13,Y+0
-0002d3 81e8      	LD   R30,Y
-0002d4 58e0      	SUBI R30,-LOW(128)
+000372 93aa      	ST   -Y,R26
+000373 9aa3      	SBI  0x14,3
+000374 9aa2      	SBI  0x14,2
+000375 9aa1      	SBI  0x14,1
+000376 9aa0      	SBI  0x14,0
+000377 9a8c      	SBI  0x11,4
+000378 9a8e      	SBI  0x11,6
+000379 9a8d      	SBI  0x11,5
+00037a 9894      	CBI  0x12,4
+00037b 9896      	CBI  0x12,6
+00037c 9895      	CBI  0x12,5
+00037d 81e8      	LD   R30,Y
+00037e 93e0 03c8 	STS  __lcd_maxx,R30
+000380 58e0      	SUBI R30,-LOW(128)
                 +
-0002d5 93e0 034c+STS __base_y_G101 + ( 2 ) , R30
+000381 93e0 03c6+STS __base_y_G101 + ( 2 ) , R30
                  	__PUTB1MN __base_y_G101,2
-0002d7 81e8      	LD   R30,Y
-0002d8 54e0      	SUBI R30,-LOW(192)
+000383 81e8      	LD   R30,Y
+000384 54e0      	SUBI R30,-LOW(192)
                 +
-0002d9 93e0 034d+STS __base_y_G101 + ( 3 ) , R30
+000385 93e0 03c7+STS __base_y_G101 + ( 3 ) , R30
                  	__PUTB1MN __base_y_G101,3
-0002db d074      	RCALL SUBOPT_0x15
-0002dc d08b      	RCALL SUBOPT_0x19
-0002dd d08a      	RCALL SUBOPT_0x19
-0002de d089      	RCALL SUBOPT_0x19
-0002df e2a0      	LDI  R26,LOW(32)
-0002e0 dfad      	RCALL __lcd_write_nibble_G101
+000387 d0a6      	RCALL SUBOPT_0x1F
+000388 d0bd      	RCALL SUBOPT_0x23
+000389 d0bc      	RCALL SUBOPT_0x23
+00038a d0bb      	RCALL SUBOPT_0x23
+00038b e2a0      	LDI  R26,LOW(32)
+00038c dfac      	RCALL __lcd_write_nibble_G101
                 +
-0002e1 e28c     +LDI R24 , LOW ( 300 )
-0002e2 e091     +LDI R25 , HIGH ( 300 )
+00038d e28c     +LDI R24 , LOW ( 300 )
+00038e e091     +LDI R25 , HIGH ( 300 )
                 +__DELAY_USW_LOOP :
-0002e3 9701     +SBIW R24 , 1
-0002e4 f7f1     +BRNE __DELAY_USW_LOOP
+00038f 9701     +SBIW R24 , 1
+000390 f7f1     +BRNE __DELAY_USW_LOOP
                  	__DELAY_USW 300
-0002e5 e2a8      	LDI  R26,LOW(40)
-0002e6 dfc6      	RCALL __lcd_write_data
-0002e7 e0a4      	LDI  R26,LOW(4)
-0002e8 dfc4      	RCALL __lcd_write_data
-0002e9 e8a5      	LDI  R26,LOW(133)
-0002ea dfc2      	RCALL __lcd_write_data
-0002eb e0a6      	LDI  R26,LOW(6)
-0002ec dfc0      	RCALL __lcd_write_data
-0002ed dfcb      	RCALL _lcd_clear
-0002ee c005      	RJMP _0x2080001
+000391 e2a8      	LDI  R26,LOW(40)
+000392 dfc5      	RCALL __lcd_write_data
+000393 e0a4      	LDI  R26,LOW(4)
+000394 dfc3      	RCALL __lcd_write_data
+000395 e8a5      	LDI  R26,LOW(133)
+000396 dfc1      	RCALL __lcd_write_data
+000397 e0a6      	LDI  R26,LOW(6)
+000398 dfbf      	RCALL __lcd_write_data
+000399 dfca      	RCALL _lcd_clear
+00039a c005      	RJMP _0x2080001
                  ; .FEND
                  	#ifndef __SLEEP_DEFINED__
                  	#endif
@@ -2679,15 +3019,15 @@ D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1094): warning: Register
                  	.CSEG
                  _putchar:
                  ; .FSTART _putchar
-0002ef 93aa      	ST   -Y,R26
+00039b 93aa      	ST   -Y,R26
                  putchar0:
-0002f0 9b5d           sbis usr,udre
-0002f1 cffe           rjmp putchar0
-0002f2 81e8           ld   r30,y
-0002f3 b9ec           out  udr,r30
+00039c 9b5d           sbis usr,udre
+00039d cffe           rjmp putchar0
+00039e 81e8           ld   r30,y
+00039f b9ec           out  udr,r30
                  _0x2080001:
-0002f4 9621      	ADIW R28,1
-0002f5 9508      	RET
+0003a0 9621      	ADIW R28,1
+0003a1 9508      	RET
                  ; .FEND
                  
                  	.CSEG
@@ -2708,265 +3048,345 @@ D:\My Files\AA\TEKNIK ELEKTRO\TA\obu\Debug\List\obu.asm(1094): warning: Register
                  _GTC_Gate_ID:
 00033a           	.BYTE 0x2
                  _rx_buffer:
-00033c           	.BYTE 0x8
+00033c           	.BYTE 0x80
+                 _gtc_timeout:
+0003bc           	.BYTE 0x2
                  _MIFARE_Key_A:
-000344           	.BYTE 0x6
+0003be           	.BYTE 0x6
                  __base_y_G101:
-00034a           	.BYTE 0x4
+0003c4           	.BYTE 0x4
+                 __lcd_maxx:
+0003c8           	.BYTE 0x1
                  
                  	.CSEG
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 9 TIMES, CODE SIZE REDUCTION:6 WORDS
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:1 WORDS
                  SUBOPT_0x0:
-                +
-0002f6 5f0f     +SUBI R16 , LOW ( - 1 )
-0002f7 4f1f     +SBCI R17 , HIGH ( - 1 )
-                 	__ADDWRN 16,17,1
-0002f8 9508      	RET
+0003a2 ede1      	LDI  R30,LOW(209)
+0003a3 bded      	OUT  0x2D,R30
+0003a4 e2e0      	LDI  R30,LOW(32)
+0003a5 bdec      	OUT  0x2C,R30
+0003a6 9508      	RET
                  
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:1 WORDS
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 12 TIMES, CODE SIZE REDUCTION:9 WORDS
                  SUBOPT_0x1:
-                +
-0002f9 91e0 02a6+LDS R30 , _tag_uid + ( 80 )
-0002fb 91f0 02a7+LDS R31 , _tag_uid + ( 80 ) + 1
-                 	__GETW1MN _tag_uid,80
-0002fd 9508      	RET
-                 
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 13 TIMES, CODE SIZE REDUCTION:10 WORDS
-                 SUBOPT_0x2:
-0002fe e0b0      	LDI  R27,0
-0002ff c06f      	RJMP _delay_ms
-                 
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 4 TIMES, CODE SIZE REDUCTION:1 WORDS
-                 SUBOPT_0x3:
-000300 93ba      	ST   -Y,R27
-000301 93aa      	ST   -Y,R26
-000302 9508      	RET
-                 
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:2 WORDS
-                 SUBOPT_0x4:
-000303 2488      	CLR  R8
-000304 2499      	CLR  R9
-000305 9508      	RET
-                 
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 6 TIMES, CODE SIZE REDUCTION:3 WORDS
-                 SUBOPT_0x5:
-000306 5ba0      	SUBI R26,LOW(-80)
-000307 4fbf      	SBCI R27,HIGH(-80)
-000308 9508      	RET
-                 
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:2 WORDS
-                 SUBOPT_0x6:
-000309 d06f      	RCALL __GETW1P
-00030a 168e      	CP   R8,R30
-00030b 069f      	CPC  R9,R31
-00030c 9508      	RET
-                 
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:2 WORDS
-                 SUBOPT_0x7:
-00030d 0fae      	ADD  R26,R30
-00030e 1fbf      	ADC  R27,R31
-00030f 9508      	RET
-                 
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:6 WORDS
-                 SUBOPT_0x8:
-000310 01f4      	MOVW R30,R8
-000311 9631      	ADIW R30,1
-000312 014f      	MOVW R8,R30
-000313 9508      	RET
-                 
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:2 WORDS
-                 SUBOPT_0x9:
-000314 81ac      	LDD  R26,Y+4
-000315 81bd      	LDD  R27,Y+4+1
-000316 9508      	RET
-                 
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:2 WORDS
-                 SUBOPT_0xA:
-000317 93ec      	ST   X,R30
-000318 cfdd      	RJMP SUBOPT_0x0
-                 
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
-                 SUBOPT_0xB:
-000319 81aa      	LDD  R26,Y+2
-00031a 81bb      	LDD  R27,Y+2+1
-00031b dfea      	RCALL SUBOPT_0x5
-00031c 91ec      	LD   R30,X
-00031d 5fef      	SUBI R30,-LOW(1)
-00031e 9508      	RET
-                 
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 11 TIMES, CODE SIZE REDUCTION:8 WORDS
-                 SUBOPT_0xC:
-00031f 81aa      	LDD  R26,Y+2
-000320 81bb      	LDD  R27,Y+2+1
-000321 9508      	RET
-                 
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 10 TIMES, CODE SIZE REDUCTION:7 WORDS
-                 SUBOPT_0xD:
-000322 0fea      	ADD  R30,R26
-000323 1ffb      	ADC  R31,R27
-000324 9508      	RET
-                 
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:1 WORDS
-                 SUBOPT_0xE:
-000325 01f4      	MOVW R30,R8
-000326 dff8      	RCALL SUBOPT_0xC
-000327 dfe5      	RCALL SUBOPT_0x7
-000328 91ec      	LD   R30,X
-000329 9508      	RET
-                 
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
-                 SUBOPT_0xF:
-00032a dde6      	RCALL _TWIStart
-00032b e4a9      	LDI  R26,LOW(73)
-00032c ddf0      	RCALL _TWIWrite
-00032d b1e1      	IN   R30,0x1
-00032e 34e8      	CPI  R30,LOW(0x48)
-00032f 9508      	RET
-                 
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 13 TIMES, CODE SIZE REDUCTION:22 WORDS
-                 SUBOPT_0x10:
-000330 e0a1      	LDI  R26,LOW(1)
-000331 e0b0      	LDI  R27,0
-000332 cdf3      	RJMP _TWIRead
-                 
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 6 TIMES, CODE SIZE REDUCTION:3 WORDS
-                 SUBOPT_0x11:
-000333 dde3      	RCALL _TWIStop
-000334 e0e0      	LDI  R30,LOW(0)
-000335 9508      	RET
+0003a7 dcdb      	RCALL _getchar
+0003a8 2f5e      	MOV  R21,R30
+0003a9 9508      	RET
                  
                  ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:3 WORDS
-                 SUBOPT_0x12:
-000336 2fe0      	MOV  R30,R16
-000337 5f0f      	SUBI R16,-1
-000338 dfe6      	RCALL SUBOPT_0xC
-000339 e0f0      	LDI  R31,0
-00033a dfe7      	RCALL SUBOPT_0xD
-00033b 8310      	ST   Z,R17
-00033c 9508      	RET
-                 
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:14 WORDS
-                 SUBOPT_0x13:
-00033d 2fe0      	MOV  R30,R16
-00033e 5f0f      	SUBI R16,-1
-00033f dfdf      	RCALL SUBOPT_0xC
-000340 e0f0      	LDI  R31,0
-000341 cfe0      	RJMP SUBOPT_0xD
-                 
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:24 WORDS
-                 SUBOPT_0x14:
+                 SUBOPT_0x2:
+0003aa e040      	LDI  R20,LOW(0)
+0003ab dcd7      	RCALL _getchar
+0003ac 2f2e      	MOV  R18,R30
+0003ad 2733      	CLR  R19
                 +
-000342 93e0 0254+STS _PN532_msg + ( 80 ) , R30
-000344 93f0 0255+STS _PN532_msg + ( 80 ) + 1 , R31
-                 	__PUTW1MN _PN532_msg,80
-000346 ebe2      	LDI  R30,LOW(_twi_tx)
-000347 e0f1      	LDI  R31,HIGH(_twi_tx)
-000348 93fa      	ST   -Y,R31
-000349 93ea      	ST   -Y,R30
-00034a e0a4      	LDI  R26,LOW(_PN532_msg)
-00034b e0b2      	LDI  R27,HIGH(_PN532_msg)
-00034c ddfb      	RCALL _PN532_build_msg
-00034d eba2      	LDI  R26,LOW(_twi_tx)
-00034e e0b1      	LDI  R27,HIGH(_twi_tx)
-00034f cde3      	RJMP _PN532_cmd
+0003ae e000     +LDI R16 , LOW ( 0 )
+0003af e010     +LDI R17 , HIGH ( 0 )
+                 	__GETWRN 16,17,0
+0003b0 9508      	RET
                  
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 10 TIMES, CODE SIZE REDUCTION:7 WORDS
-                 SUBOPT_0x15:
-000350 e1a4      	LDI  R26,LOW(20)
-000351 cfac      	RJMP SUBOPT_0x2
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:6 WORDS
+                 SUBOPT_0x3:
+0003b1 01f8      	MOVW R30,R16
+0003b2 50e6      	SUBI R30,LOW(-_GTC_Buffer)
+0003b3 4ffd      	SBCI R31,HIGH(-_GTC_Buffer)
+0003b4 8350      	ST   Z,R21
+0003b5 0f45      	ADD  R20,R21
+0003b6 9508      	RET
                  
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:18 WORDS
-                 SUBOPT_0x16:
-000352 e6a0      	LDI  R26,LOW(_twi_rx)
-000353 e0b1      	LDI  R27,HIGH(_twi_rx)
-000354 de33      	RCALL _PN532_read
-000355 e6e0      	LDI  R30,LOW(_twi_rx)
-000356 e0f1      	LDI  R31,HIGH(_twi_rx)
-000357 93fa      	ST   -Y,R31
-000358 93ea      	ST   -Y,R30
-000359 e0e4      	LDI  R30,LOW(_PN532_msg)
-00035a e0f2      	LDI  R31,HIGH(_PN532_msg)
-00035b 93fa      	ST   -Y,R31
-00035c 93ea      	ST   -Y,R30
-00035d 9508      	RET
-                 
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
-                 SUBOPT_0x17:
-00035e 93e0 0204 	STS  _PN532_msg,R30
-000360 e0e1      	LDI  R30,LOW(1)
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 12 TIMES, CODE SIZE REDUCTION:9 WORDS
+                 SUBOPT_0x4:
                 +
-000361 93e0 0205+STS _PN532_msg + ( 1 ) , R30
-                 	__PUTB1MN _PN532_msg,1
-000363 9508      	RET
+0003b7 5f0f     +SUBI R16 , LOW ( - 1 )
+0003b8 4f1f     +SBCI R17 , HIGH ( - 1 )
+                 	__ADDWRN 16,17,1
+0003b9 9508      	RET
                  
                  ;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:2 WORDS
-                 SUBOPT_0x18:
+                 SUBOPT_0x5:
+0003ba 91a0 02fa 	LDS  R26,_GTC_Buffer
+0003bc 3aa1      	CPI  R26,LOW(0xA1)
+0003bd 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 4 TIMES, CODE SIZE REDUCTION:1 WORDS
+                 SUBOPT_0x6:
                 +
-000364 e184     +LDI R24 , LOW ( 20 )
+0003be e000     +LDI R16 , LOW ( 0 )
+0003bf e010     +LDI R17 , HIGH ( 0 )
+                 	__GETWRN 16,17,0
+0003c0 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:1 WORDS
+                 SUBOPT_0x7:
+                +
+0003c1 91e0 02a6+LDS R30 , _tag_uid + ( 80 )
+0003c3 91f0 02a7+LDS R31 , _tag_uid + ( 80 ) + 1
+                 	__GETW1MN _tag_uid,80
+0003c5 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:4 WORDS
+                 SUBOPT_0x8:
+0003c6 e5a6      	LDI  R26,LOW(_tag_uid)
+0003c7 e0b2      	LDI  R27,HIGH(_tag_uid)
+0003c8 0fa0      	ADD  R26,R16
+0003c9 1fb1      	ADC  R27,R17
+0003ca 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
+                 SUBOPT_0x9:
+0003cb 91e0 03bc 	LDS  R30,_gtc_timeout
+0003cd 91f0 03bd 	LDS  R31,_gtc_timeout+1
+0003cf 9730      	SBIW R30,0
+0003d0 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:4 WORDS
+                 SUBOPT_0xA:
+0003d1 e0e0      	LDI  R30,LOW(0)
+0003d2 93e0 033a 	STS  _GTC_Gate_ID,R30
+                +
+0003d4 93e0 033b+STS _GTC_Gate_ID + ( 1 ) , R30
+                 	__PUTB1MN _GTC_Gate_ID,1
+0003d6 2466      	CLR  R6
+0003d7 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 13 TIMES, CODE SIZE REDUCTION:10 WORDS
+                 SUBOPT_0xB:
+0003d8 e0b0      	LDI  R27,0
+0003d9 c073      	RJMP _delay_ms
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 4 TIMES, CODE SIZE REDUCTION:1 WORDS
+                 SUBOPT_0xC:
+0003da 93ba      	ST   -Y,R27
+0003db 93aa      	ST   -Y,R26
+0003dc 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:2 WORDS
+                 SUBOPT_0xD:
+0003dd 24aa      	CLR  R10
+0003de 24bb      	CLR  R11
+0003df 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 6 TIMES, CODE SIZE REDUCTION:3 WORDS
+                 SUBOPT_0xE:
+0003e0 5ba0      	SUBI R26,LOW(-80)
+0003e1 4fbf      	SBCI R27,HIGH(-80)
+0003e2 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:2 WORDS
+                 SUBOPT_0xF:
+0003e3 d073      	RCALL __GETW1P
+0003e4 16ae      	CP   R10,R30
+0003e5 06bf      	CPC  R11,R31
+0003e6 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:2 WORDS
+                 SUBOPT_0x10:
+0003e7 0fae      	ADD  R26,R30
+0003e8 1fbf      	ADC  R27,R31
+0003e9 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:6 WORDS
+                 SUBOPT_0x11:
+0003ea 01f5      	MOVW R30,R10
+0003eb 9631      	ADIW R30,1
+0003ec 015f      	MOVW R10,R30
+0003ed 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:2 WORDS
+                 SUBOPT_0x12:
+0003ee 81ac      	LDD  R26,Y+4
+0003ef 81bd      	LDD  R27,Y+4+1
+0003f0 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:2 WORDS
+                 SUBOPT_0x13:
+0003f1 93ec      	ST   X,R30
+0003f2 cfc4      	RJMP SUBOPT_0x4
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
+                 SUBOPT_0x14:
+0003f3 81aa      	LDD  R26,Y+2
+0003f4 81bb      	LDD  R27,Y+2+1
+0003f5 dfea      	RCALL SUBOPT_0xE
+0003f6 91ec      	LD   R30,X
+0003f7 5fef      	SUBI R30,-LOW(1)
+0003f8 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 11 TIMES, CODE SIZE REDUCTION:8 WORDS
+                 SUBOPT_0x15:
+0003f9 81aa      	LDD  R26,Y+2
+0003fa 81bb      	LDD  R27,Y+2+1
+0003fb 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 10 TIMES, CODE SIZE REDUCTION:7 WORDS
+                 SUBOPT_0x16:
+0003fc 0fea      	ADD  R30,R26
+0003fd 1ffb      	ADC  R31,R27
+0003fe 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:1 WORDS
+                 SUBOPT_0x17:
+0003ff 01f5      	MOVW R30,R10
+000400 dff8      	RCALL SUBOPT_0x15
+000401 dfe5      	RCALL SUBOPT_0x10
+000402 91ec      	LD   R30,X
+000403 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
+                 SUBOPT_0x18:
+000404 ddbd      	RCALL _TWIStart
+000405 e4a9      	LDI  R26,LOW(73)
+000406 ddc9      	RCALL _TWIWrite
+000407 b1e1      	IN   R30,0x1
+000408 34e8      	CPI  R30,LOW(0x48)
+000409 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 13 TIMES, CODE SIZE REDUCTION:22 WORDS
+                 SUBOPT_0x19:
+00040a e0a1      	LDI  R26,LOW(1)
+00040b e0b0      	LDI  R27,0
+00040c cdcc      	RJMP _TWIRead
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 6 TIMES, CODE SIZE REDUCTION:3 WORDS
+                 SUBOPT_0x1A:
+00040d ddba      	RCALL _TWIStop
+00040e e0e0      	LDI  R30,LOW(0)
+00040f 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:3 WORDS
+                 SUBOPT_0x1B:
+000410 2fe0      	MOV  R30,R16
+000411 5f0f      	SUBI R16,-1
+000412 dfe6      	RCALL SUBOPT_0x15
+000413 e0f0      	LDI  R31,0
+000414 dfe7      	RCALL SUBOPT_0x16
+000415 8310      	ST   Z,R17
+000416 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:14 WORDS
+                 SUBOPT_0x1C:
+000417 2fe0      	MOV  R30,R16
+000418 5f0f      	SUBI R16,-1
+000419 dfdf      	RCALL SUBOPT_0x15
+00041a e0f0      	LDI  R31,0
+00041b cfe0      	RJMP SUBOPT_0x16
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:2 WORDS
+                 SUBOPT_0x1D:
+00041c e0f0      	LDI  R31,0
+00041d 93ed      	ST   X+,R30
+00041e 93fc      	ST   X,R31
+00041f 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:24 WORDS
+                 SUBOPT_0x1E:
+                +
+000420 93e0 0254+STS _PN532_msg + ( 80 ) , R30
+000422 93f0 0255+STS _PN532_msg + ( 80 ) + 1 , R31
+                 	__PUTW1MN _PN532_msg,80
+000424 ebe2      	LDI  R30,LOW(_twi_tx)
+000425 e0f1      	LDI  R31,HIGH(_twi_tx)
+000426 93fa      	ST   -Y,R31
+000427 93ea      	ST   -Y,R30
+000428 e0a4      	LDI  R26,LOW(_PN532_msg)
+000429 e0b2      	LDI  R27,HIGH(_PN532_msg)
+00042a ddd0      	RCALL _PN532_build_msg
+00042b eba2      	LDI  R26,LOW(_twi_tx)
+00042c e0b1      	LDI  R27,HIGH(_twi_tx)
+00042d cdb8      	RJMP _PN532_cmd
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 10 TIMES, CODE SIZE REDUCTION:7 WORDS
+                 SUBOPT_0x1F:
+00042e e1a4      	LDI  R26,LOW(20)
+00042f cfa8      	RJMP SUBOPT_0xB
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:18 WORDS
+                 SUBOPT_0x20:
+000430 e6a0      	LDI  R26,LOW(_twi_rx)
+000431 e0b1      	LDI  R27,HIGH(_twi_rx)
+000432 de07      	RCALL _PN532_read
+000433 e6e0      	LDI  R30,LOW(_twi_rx)
+000434 e0f1      	LDI  R31,HIGH(_twi_rx)
+000435 93fa      	ST   -Y,R31
+000436 93ea      	ST   -Y,R30
+000437 e0e4      	LDI  R30,LOW(_PN532_msg)
+000438 e0f2      	LDI  R31,HIGH(_PN532_msg)
+000439 93fa      	ST   -Y,R31
+00043a 93ea      	ST   -Y,R30
+00043b 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
+                 SUBOPT_0x21:
+00043c 93e0 0204 	STS  _PN532_msg,R30
+00043e e0e1      	LDI  R30,LOW(1)
+                +
+00043f 93e0 0205+STS _PN532_msg + ( 1 ) , R30
+                 	__PUTB1MN _PN532_msg,1
+000441 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:2 WORDS
+                 SUBOPT_0x22:
+                +
+000442 e184     +LDI R24 , LOW ( 20 )
                 +__DELAY_USB_LOOP :
-000365 958a     +DEC R24
-000366 f7f1     +BRNE __DELAY_USB_LOOP
+000443 958a     +DEC R24
+000444 f7f1     +BRNE __DELAY_USB_LOOP
                  	__DELAY_USB 20
-000367 9508      	RET
+000445 9508      	RET
                  
                  ;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:8 WORDS
-                 SUBOPT_0x19:
-000368 e3a0      	LDI  R26,LOW(48)
-000369 df24      	RCALL __lcd_write_nibble_G101
+                 SUBOPT_0x23:
+000446 e3a0      	LDI  R26,LOW(48)
+000447 def1      	RCALL __lcd_write_nibble_G101
                 +
-00036a e28c     +LDI R24 , LOW ( 300 )
-00036b e091     +LDI R25 , HIGH ( 300 )
+000448 e28c     +LDI R24 , LOW ( 300 )
+000449 e091     +LDI R25 , HIGH ( 300 )
                 +__DELAY_USW_LOOP :
-00036c 9701     +SBIW R24 , 1
-00036d f7f1     +BRNE __DELAY_USW_LOOP
+00044a 9701     +SBIW R24 , 1
+00044b f7f1     +BRNE __DELAY_USW_LOOP
                  	__DELAY_USW 300
-00036e 9508      	RET
+00044c 9508      	RET
                  
                  
                  	.CSEG
                  _delay_ms:
-00036f 9610      	adiw r26,0
-000370 f039      	breq __delay_ms1
+00044d 9610      	adiw r26,0
+00044e f039      	breq __delay_ms1
                  __delay_ms0:
                 +
-000371 eb88     +LDI R24 , LOW ( 0xBB8 )
-000372 e09b     +LDI R25 , HIGH ( 0xBB8 )
+00044f eb88     +LDI R24 , LOW ( 0xBB8 )
+000450 e09b     +LDI R25 , HIGH ( 0xBB8 )
                 +__DELAY_USW_LOOP :
-000373 9701     +SBIW R24 , 1
-000374 f7f1     +BRNE __DELAY_USW_LOOP
+000451 9701     +SBIW R24 , 1
+000452 f7f1     +BRNE __DELAY_USW_LOOP
                  	__DELAY_USW 0xBB8
-000375 95a8      	wdr
-000376 9711      	sbiw r26,1
-000377 f7c9      	brne __delay_ms0
+000453 95a8      	wdr
+000454 9711      	sbiw r26,1
+000455 f7c9      	brne __delay_ms0
                  __delay_ms1:
-000378 9508      	ret
+000456 9508      	ret
                  
                  __GETW1P:
-000379 91ed      	LD   R30,X+
-00037a 91fc      	LD   R31,X
-00037b 9711      	SBIW R26,1
-00037c 9508      	RET
+000457 91ed      	LD   R30,X+
+000458 91fc      	LD   R31,X
+000459 9711      	SBIW R26,1
+00045a 9508      	RET
                  
-                 __SWAPW12:
-00037d 2e1b      	MOV  R1,R27
-00037e 2fbf      	MOV  R27,R31
-00037f 2df1      	MOV  R31,R1
-                 
-                 __SWAPB12:
-000380 2e1a      	MOV  R1,R26
-000381 2fae      	MOV  R26,R30
-000382 2de1      	MOV  R30,R1
-000383 9508      	RET
+                 __CPW02:
+00045b 2400      	CLR  R0
+00045c 160a      	CP   R0,R26
+00045d 060b      	CPC  R0,R27
+00045e 9508      	RET
                  
                  __SAVELOCR2:
-000384 931a      	ST   -Y,R17
-000385 930a      	ST   -Y,R16
-000386 9508      	RET
+00045f 931a      	ST   -Y,R17
+000460 930a      	ST   -Y,R16
+000461 9508      	RET
                  
                  __LOADLOCR2:
-000387 8119      	LDD  R17,Y+1
-000388 8108      	LD   R16,Y
-000389 9508      	RET
+000462 8119      	LDD  R17,Y+1
+000463 8108      	LD   R16,Y
+000464 9508      	RET
                  
                  ;END OF CODE MARKER
                  __END_OF_CODE:
@@ -2987,41 +3407,41 @@ counted separately from r26..r31 here.
 .dseg memory usage only counts static data declared with .byte
 
 ATmega8A register use summary:
-r0 :   8 r1 :   5 r2 :   1 r3 :   0 r4 :   4 r5 :   4 r6 :   3 r7 :   5 
-r8 :  14 r9 :   4 r10:   1 r11:   1 r12:   0 r13:   1 r14:   0 r15:   0 
-r16:  20 r17:  28 r18:   2 r19:   2 r20:   0 r21:   6 r22:   2 r23:   0 
-r24:  17 r25:   5 r26:  91 r27:  41 r28:   6 r29:   1 r30: 254 r31:  51 
-x  :  28 y  :  73 z  :  14 
-Registers used: 29 out of 35 (82.9%)
+r0 :  17 r1 :   1 r2 :   1 r3 :   0 r4 :   5 r5 :   5 r6 :   5 r7 :   6 
+r8 :   3 r9 :   4 r10:  14 r11:   3 r12:   1 r13:   1 r14:   0 r15:   0 
+r16:  23 r17:  29 r18:   5 r19:   5 r20:  11 r21:  12 r22:   2 r23:   0 
+r24:  17 r25:   5 r26: 109 r27:  42 r28:   6 r29:   1 r30: 305 r31:  55 
+x  :  30 y  :  84 z  :  15 
+Registers used: 31 out of 35 (88.6%)
 
 ATmega8A instruction use summary:
-.lds  :   0 .lds.l:   0 .sts  :   0 .sts.l:   0 adc   :   3 add   :   4 
+.lds  :   0 .lds.l:   0 .sts  :   0 .sts.l:   0 adc   :   3 add   :  10 
 adiw  :  14 and   :   0 andi  :   6 asr   :   0 bclr  :   0 bld   :   1 
-brbc  :   0 brbs  :   0 brcc  :   0 brcs  :   0 break :   0 breq  :  19 
-brge  :   7 brhc  :   0 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 
-brlt  :   0 brmi  :   0 brne  :  22 brpl  :   0 brsh  :   0 brtc  :   0 
-brts  :   0 brvc  :   0 brvs  :   0 bset  :   0 bst   :   0 cbi   :  10 
-cbr   :   0 clc   :   0 clh   :   0 cli   :   2 cln   :   0 clr   :   8 
-cls   :   0 clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :  10 
-cpc   :   5 cpi   :  18 cpse  :   0 dec   :   4 des   :   0 eor   :   0 
-fmul  :   0 fmuls :   0 fmulsu:   0 icall :   0 ijmp  :   0 in    :   8 
-inc   :   3 ld    :  32 ldd   :  30 ldi   : 127 lds   :  11 lpm   :   7 
-lsl   :   2 lsr   :   0 mov   :  25 movw  :  20 mul   :   0 muls  :   0 
-mulsu :   0 neg   :   2 nop   :   0 or    :   0 ori   :   1 out   :  48 
-pop   :  10 push  :  10 rcall : 163 ret   :  40 reti  :   1 rjmp  :  64 
-rol   :   0 ror   :   0 sbc   :   1 sbci  :   9 sbi   :  13 sbic  :   0 
+brbc  :   0 brbs  :   0 brcc  :   0 brcs  :   0 break :   0 breq  :  23 
+brge  :  11 brhc  :   0 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 
+brlt  :   0 brmi  :   0 brne  :  37 brpl  :   0 brsh  :   0 brtc  :   0 
+brts  :   0 brvc  :   0 brvs  :   0 bset  :   0 bst   :   0 cbi   :   9 
+cbr   :   0 clc   :   0 clh   :   0 cli   :   2 cln   :   0 clr   :  16 
+cls   :   0 clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :  15 
+cpc   :   9 cpi   :  28 cpse  :   0 dec   :   4 des   :   0 eor   :   0 
+fmul  :   0 fmuls :   0 fmulsu:   0 icall :   0 ijmp  :   0 in    :   9 
+inc   :   3 ld    :  43 ldd   :  29 ldi   : 143 lds   :  22 lpm   :   7 
+lsl   :   2 lsr   :   0 mov   :  28 movw  :  24 mul   :   0 muls  :   0 
+mulsu :   0 neg   :   3 nop   :   0 or    :   0 ori   :   1 out   :  49 
+pop   :  10 push  :  10 rcall : 216 ret   :  52 reti  :   2 rjmp  :  80 
+rol   :   0 ror   :   0 sbc   :   0 sbci  :  10 sbi   :  16 sbic  :   0 
 sbis  :   1 sbiw  :  10 sbr   :   0 sbrc  :   0 sbrs  :   3 sec   :   0 
 seh   :   0 sei   :   2 sen   :   0 ser   :   0 ses   :   0 set   :   1 
-sev   :   0 sez   :   0 sleep :   0 spm   :   0 st    :  46 std   :   0 
-sts   :  12 sub   :   1 subi  :  14 swap  :   2 tst   :   1 wdr   :   1 
+sev   :   0 sez   :   0 sleep :   0 spm   :   0 st    :  50 std   :   0 
+sts   :  17 sub   :   1 subi  :  19 swap  :   2 tst   :   2 wdr   :   1 
 
-Instructions used: 49 out of 114 (43.0%)
+Instructions used: 48 out of 114 (42.1%)
 
 ATmega8A memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x000714   1754     58   1812    8192  22.1%
-[.dseg] 0x000060 0x00034e      0    494    494    1024  48.2%
+[.cseg] 0x000000 0x0008ca   2190     60   2250    8192  27.5%
+[.dseg] 0x000060 0x0003c9      0    617    617    1024  60.3%
 [.eseg] 0x000000 0x000000      0      0      0     512   0.0%
 
-Assembly complete, 0 errors, 9 warnings
+Assembly complete, 0 errors, 10 warnings
