@@ -69,7 +69,7 @@ bool PN532_SAM_config();
     b12             NFCID Length
     b13..NFCIDLen   NFCID                                      
 */
-void PN532_read_uid();
+bool PN532_read_uid();
 bool PN532_auth_tag(unsigned char, unsigned char, unsigned char*);
 bool PN532_read_passive_tag(unsigned char);
 bool PN532_write_passive_tag(unsigned char, TWI_BUFFER_STRUCT*);

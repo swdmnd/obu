@@ -4,7 +4,6 @@
 #include <mega8.h>
 #include <delay.h>
 #include <stdbool.h>
-#include <mega8.h>
 
 #define PN532_ADD (0x48)
 #define TWI_BUFFER_SIZE 80

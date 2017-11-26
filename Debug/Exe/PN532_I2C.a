@@ -95,7 +95,7 @@
 ;PCODE: $0000002B VOL: 0
 ;PCODE: $0000002C VOL: 0
 ;PCODE: $0000002D VOL: 0
-; 0001 0025     delay_ms(2);
+; 0001 0025     delay_ms(1);
 ;PCODE: $0000002E VOL: 0
 ;PCODE: $0000002F VOL: 0
 ;PCODE: $00000030 VOL: 0
@@ -721,223 +721,221 @@
 ;PCODE: $00000207 VOL: 0
 ; 0001 00AD   TWIInit();
 ;PCODE: $00000208 VOL: 0
-; 0001 00AE   delay_ms(20);
+; 0001 00AE   while(!PN532_wait_for_ack());
 ;PCODE: $00000209 VOL: 0
 ;PCODE: $0000020A VOL: 0
 ;PCODE: $0000020B VOL: 0
-; 0001 00AF   while(!PN532_wait_for_ack()) delay_ms(20);
 ;PCODE: $0000020C VOL: 0
 ;PCODE: $0000020D VOL: 0
 ;PCODE: $0000020E VOL: 0
+; 0001 00AF   PN532_read(&twi_rx);
 ;PCODE: $0000020F VOL: 0
 ;PCODE: $00000210 VOL: 0
+; 0001 00B0   PN532_get_msg(&twi_rx, &PN532_msg, 1);
 ;PCODE: $00000211 VOL: 0
 ;PCODE: $00000212 VOL: 0
 ;PCODE: $00000213 VOL: 0
 ;PCODE: $00000214 VOL: 0
-; 0001 00B0 delay_ms(20);
 ;PCODE: $00000215 VOL: 0
 ;PCODE: $00000216 VOL: 0
+; 0001 00B1 }
 ;PCODE: $00000217 VOL: 0
-; 0001 00B1   PN532_read(&twi_rx);
 ;PCODE: $00000218 VOL: 0
+;
+;bool PN532_SAM_config()
+; 0001 00B4 {
 ;PCODE: $00000219 VOL: 0
-; 0001 00B2   PN532_get_msg(&twi_rx, &PN532_msg, 1);
 ;PCODE: $0000021A VOL: 0
+; 0001 00B5   PN532_msg.buffer[0] = PN532_CMD_SAMCONFIGURATION;
 ;PCODE: $0000021B VOL: 0
 ;PCODE: $0000021C VOL: 0
+; 0001 00B6   PN532_msg.buffer[1] = 0x01; // normal mode;
 ;PCODE: $0000021D VOL: 0
 ;PCODE: $0000021E VOL: 0
 ;PCODE: $0000021F VOL: 0
-; 0001 00B3 }
+; 0001 00B7   PN532_msg.buffer[2] = 0x14; // timeout 50ms * 20 = 1 second
 ;PCODE: $00000220 VOL: 0
 ;PCODE: $00000221 VOL: 0
-;
-;bool PN532_SAM_config()
-; 0001 00B6 {
 ;PCODE: $00000222 VOL: 0
+; 0001 00B8   PN532_msg.buffer[3] = 0x00; // not using IRQ pin!
 ;PCODE: $00000223 VOL: 0
-; 0001 00B7   PN532_msg.buffer[0] = PN532_CMD_SAMCONFIGURATION;
 ;PCODE: $00000224 VOL: 0
 ;PCODE: $00000225 VOL: 0
-; 0001 00B8   PN532_msg.buffer[1] = 0x01; // normal mode;
+; 0001 00B9   PN532_msg.length=4;
 ;PCODE: $00000226 VOL: 0
 ;PCODE: $00000227 VOL: 0
 ;PCODE: $00000228 VOL: 0
-; 0001 00B9   PN532_msg.buffer[2] = 0x14; // timeout 50ms * 20 = 1 second
+; 0001 00BA   PN532_build_msg(&twi_tx, &PN532_msg);
 ;PCODE: $00000229 VOL: 0
 ;PCODE: $0000022A VOL: 0
 ;PCODE: $0000022B VOL: 0
-; 0001 00BA   PN532_msg.buffer[3] = 0x00; // not using IRQ pin!
 ;PCODE: $0000022C VOL: 0
+; 0001 00BB   PN532_cmd(&twi_tx);
 ;PCODE: $0000022D VOL: 0
 ;PCODE: $0000022E VOL: 0
-; 0001 00BB   PN532_msg.length=4;
+; 0001 00BC   while(!PN532_wait_for_ack());
 ;PCODE: $0000022F VOL: 0
 ;PCODE: $00000230 VOL: 0
 ;PCODE: $00000231 VOL: 0
-; 0001 00BC   PN532_build_msg(&twi_tx, &PN532_msg);
 ;PCODE: $00000232 VOL: 0
 ;PCODE: $00000233 VOL: 0
 ;PCODE: $00000234 VOL: 0
+; 0001 00BD   PN532_read(&twi_rx);
 ;PCODE: $00000235 VOL: 0
-; 0001 00BD   PN532_cmd(&twi_tx);
 ;PCODE: $00000236 VOL: 0
+; 0001 00BE   PN532_get_msg(&twi_rx, &PN532_msg, 0);
 ;PCODE: $00000237 VOL: 0
-; 0001 00BE   delay_ms(20);
 ;PCODE: $00000238 VOL: 0
 ;PCODE: $00000239 VOL: 0
 ;PCODE: $0000023A VOL: 0
-; 0001 00BF   while(!PN532_wait_for_ack()) delay_ms(20);
 ;PCODE: $0000023B VOL: 0
 ;PCODE: $0000023C VOL: 0
+; 0001 00BF   if(PN532_msg.buffer[0]==0x15) return true;
 ;PCODE: $0000023D VOL: 0
 ;PCODE: $0000023E VOL: 0
 ;PCODE: $0000023F VOL: 0
 ;PCODE: $00000240 VOL: 0
 ;PCODE: $00000241 VOL: 0
+; 0001 00C0   else return false;
 ;PCODE: $00000242 VOL: 0
 ;PCODE: $00000243 VOL: 0
-; 0001 00C0 delay_ms(20);
 ;PCODE: $00000244 VOL: 0
+; 0001 00C1 }
 ;PCODE: $00000245 VOL: 0
 ;PCODE: $00000246 VOL: 0
-; 0001 00C1   PN532_read(&twi_rx);
 ;PCODE: $00000247 VOL: 0
+;
+;bool PN532_read_uid()
+; 0001 00C4 {
 ;PCODE: $00000248 VOL: 0
-; 0001 00C2   PN532_get_msg(&twi_rx, &PN532_msg, 0);
 ;PCODE: $00000249 VOL: 0
+; 0001 00C5   PN532_msg.buffer[0] = PN532_CMD_INLISTPASSIVETARGET;
 ;PCODE: $0000024A VOL: 0
 ;PCODE: $0000024B VOL: 0
+; 0001 00C6   PN532_msg.buffer[1] = 1;  // max 1 cards at once
 ;PCODE: $0000024C VOL: 0
 ;PCODE: $0000024D VOL: 0
 ;PCODE: $0000024E VOL: 0
-; 0001 00C3   if(PN532_msg.buffer[0]==0x15) return true;
+; 0001 00C7   PN532_msg.buffer[2] = PN532_MIFARE_ISO14443A; //baudrate
 ;PCODE: $0000024F VOL: 0
 ;PCODE: $00000250 VOL: 0
 ;PCODE: $00000251 VOL: 0
+; 0001 00C8   PN532_msg.length=3;
 ;PCODE: $00000252 VOL: 0
 ;PCODE: $00000253 VOL: 0
-; 0001 00C4   else return false;
 ;PCODE: $00000254 VOL: 0
+; 0001 00C9   PN532_build_msg(&twi_tx, &PN532_msg);
 ;PCODE: $00000255 VOL: 0
 ;PCODE: $00000256 VOL: 0
-; 0001 00C5 }
 ;PCODE: $00000257 VOL: 0
 ;PCODE: $00000258 VOL: 0
+; 0001 00CA   PN532_cmd(&twi_tx);
 ;PCODE: $00000259 VOL: 0
-;
-;void PN532_read_uid()
-; 0001 00C8 {
 ;PCODE: $0000025A VOL: 0
+; 0001 00CB   while(!PN532_wait_for_ack());
 ;PCODE: $0000025B VOL: 0
-; 0001 00C9   PN532_msg.buffer[0] = PN532_CMD_INLISTPASSIVETARGET;
 ;PCODE: $0000025C VOL: 0
 ;PCODE: $0000025D VOL: 0
-; 0001 00CA   PN532_msg.buffer[1] = 1;  // max 1 cards at once
 ;PCODE: $0000025E VOL: 0
 ;PCODE: $0000025F VOL: 0
 ;PCODE: $00000260 VOL: 0
-; 0001 00CB   PN532_msg.buffer[2] = PN532_MIFARE_ISO14443A; //baudrate
+; 0001 00CC   PN532_read(&twi_rx);
 ;PCODE: $00000261 VOL: 0
 ;PCODE: $00000262 VOL: 0
+; 0001 00CD   PN532_get_msg(&twi_rx, &PN532_msg, 0);
 ;PCODE: $00000263 VOL: 0
-; 0001 00CC   PN532_msg.length=3;
 ;PCODE: $00000264 VOL: 0
 ;PCODE: $00000265 VOL: 0
 ;PCODE: $00000266 VOL: 0
-; 0001 00CD   PN532_build_msg(&twi_tx, &PN532_msg);
 ;PCODE: $00000267 VOL: 0
 ;PCODE: $00000268 VOL: 0
+; 0001 00CE   if(PN532_msg.buffer[0] != PN532_CMD_INLISTPASSIVETARGET+1 || PN532_msg.buffer[1] < 1) return false;
 ;PCODE: $00000269 VOL: 0
 ;PCODE: $0000026A VOL: 0
-; 0001 00CE   PN532_cmd(&twi_tx);
 ;PCODE: $0000026B VOL: 0
 ;PCODE: $0000026C VOL: 0
-; 0001 00CF   delay_ms(20);
 ;PCODE: $0000026D VOL: 0
 ;PCODE: $0000026E VOL: 0
 ;PCODE: $0000026F VOL: 0
-; 0001 00D0   while(!PN532_wait_for_ack()) delay_ms(20);
 ;PCODE: $00000270 VOL: 0
 ;PCODE: $00000271 VOL: 0
 ;PCODE: $00000272 VOL: 0
 ;PCODE: $00000273 VOL: 0
+; 0001 00CF   tag_uid.length = PN532_msg.buffer[6];
 ;PCODE: $00000274 VOL: 0
 ;PCODE: $00000275 VOL: 0
 ;PCODE: $00000276 VOL: 0
 ;PCODE: $00000277 VOL: 0
 ;PCODE: $00000278 VOL: 0
-; 0001 00D1 delay_ms(20);
 ;PCODE: $00000279 VOL: 0
 ;PCODE: $0000027A VOL: 0
+; 0001 00D0   for(i = 0; i<tag_uid.length; ++i)
 ;PCODE: $0000027B VOL: 0
-; 0001 00D2   PN532_read(&twi_rx);
 ;PCODE: $0000027C VOL: 0
 ;PCODE: $0000027D VOL: 0
-; 0001 00D3   PN532_get_msg(&twi_rx, &PN532_msg, 1);
 ;PCODE: $0000027E VOL: 0
 ;PCODE: $0000027F VOL: 0
 ;PCODE: $00000280 VOL: 0
 ;PCODE: $00000281 VOL: 0
 ;PCODE: $00000282 VOL: 0
 ;PCODE: $00000283 VOL: 0
-; 0001 00D4   tag_uid.length = PN532_msg.buffer[5];
 ;PCODE: $00000284 VOL: 0
+; 0001 00D1   {
+; 0001 00D2     tag_uid.buffer[i] = PN532_msg.buffer[7+i];
 ;PCODE: $00000285 VOL: 0
 ;PCODE: $00000286 VOL: 0
 ;PCODE: $00000287 VOL: 0
 ;PCODE: $00000288 VOL: 0
 ;PCODE: $00000289 VOL: 0
-; 0001 00D5   for(i = 0; i<tag_uid.length; ++i)
 ;PCODE: $0000028A VOL: 0
 ;PCODE: $0000028B VOL: 0
+; 0001 00D3   }
 ;PCODE: $0000028C VOL: 0
 ;PCODE: $0000028D VOL: 0
 ;PCODE: $0000028E VOL: 0
 ;PCODE: $0000028F VOL: 0
 ;PCODE: $00000290 VOL: 0
 ;PCODE: $00000291 VOL: 0
+; 0001 00D4   return true;
 ;PCODE: $00000292 VOL: 0
 ;PCODE: $00000293 VOL: 0
-; 0001 00D6   {
-; 0001 00D7     tag_uid.buffer[i] = PN532_msg.buffer[6+i];
+; 0001 00D5 }
 ;PCODE: $00000294 VOL: 0
-;PCODE: $00000295 VOL: 0
-;PCODE: $00000296 VOL: 0
-;PCODE: $00000297 VOL: 0
-;PCODE: $00000298 VOL: 0
-;PCODE: $00000299 VOL: 0
-;PCODE: $0000029A VOL: 0
-; 0001 00D8   }
-;PCODE: $0000029B VOL: 0
-;PCODE: $0000029C VOL: 0
-;PCODE: $0000029D VOL: 0
-;PCODE: $0000029E VOL: 0
-;PCODE: $0000029F VOL: 0
-;PCODE: $000002A0 VOL: 0
-; 0001 00D9 }
-;PCODE: $000002A1 VOL: 0
-;PCODE: $000002A2 VOL: 0
 ;
 ;bool PN532_auth_tag(unsigned char block_number, unsigned char key_select, unsigned char* key_buffer)
-; 0001 00DC {
-;PCODE: $000002A3 VOL: 0
-;PCODE: $000002A4 VOL: 0
-; 0001 00DD   PN532_read_uid();
-;PCODE: $000002A5 VOL: 0
+; 0001 00D8 {
+;PCODE: $00000295 VOL: 0
+;PCODE: $00000296 VOL: 0
+; 0001 00D9   PN532_read_uid();
+;PCODE: $00000297 VOL: 0
 ;	block_number -> Y+3
 ;	key_select -> Y+2
 ;	*key_buffer -> Y+0
+;PCODE: $00000298 VOL: 0
+; 0001 00DA   PN532_msg.buffer[0] = PN532_CMD_INDATAEXCHANGE;
+;PCODE: $00000299 VOL: 0
+;PCODE: $0000029A VOL: 0
+; 0001 00DB   PN532_msg.buffer[1] = 1;                              /* Max card numbers */
+;PCODE: $0000029B VOL: 0
+;PCODE: $0000029C VOL: 0
+;PCODE: $0000029D VOL: 0
+; 0001 00DC   PN532_msg.buffer[2] = (key_select) ? MIFARE_CMD_AUTH_B : MIFARE_CMD_AUTH_A;
+;PCODE: $0000029E VOL: 0
+;PCODE: $0000029F VOL: 0
+;PCODE: $000002A0 VOL: 0
+;PCODE: $000002A1 VOL: 0
+;PCODE: $000002A2 VOL: 0
+;PCODE: $000002A3 VOL: 0
+;PCODE: $000002A4 VOL: 0
+;PCODE: $000002A5 VOL: 0
 ;PCODE: $000002A6 VOL: 0
-; 0001 00DE   PN532_msg.buffer[0] = PN532_CMD_INDATAEXCHANGE;
 ;PCODE: $000002A7 VOL: 0
 ;PCODE: $000002A8 VOL: 0
-; 0001 00DF   PN532_msg.buffer[1] = 1;                              /* Max card numbers */
+; 0001 00DD   PN532_msg.buffer[3] = block_number;                    /* Block Number (1K = 0..63, 4K = 0..255 */
 ;PCODE: $000002A9 VOL: 0
 ;PCODE: $000002AA VOL: 0
 ;PCODE: $000002AB VOL: 0
-; 0001 00E0   PN532_msg.buffer[2] = (key_select) ? MIFARE_CMD_AUTH_B : MIFARE_CMD_AUTH_A;
+; 0001 00DE   for (i = 0; i < 6; ++i)
 ;PCODE: $000002AC VOL: 0
 ;PCODE: $000002AD VOL: 0
 ;PCODE: $000002AE VOL: 0
@@ -947,26 +945,26 @@
 ;PCODE: $000002B2 VOL: 0
 ;PCODE: $000002B3 VOL: 0
 ;PCODE: $000002B4 VOL: 0
+; 0001 00DF   {
+; 0001 00E0     PN532_msg.buffer[4+i] = key_buffer[i];                /* 6 byte auth key */
 ;PCODE: $000002B5 VOL: 0
 ;PCODE: $000002B6 VOL: 0
-; 0001 00E1   PN532_msg.buffer[3] = block_number;                    /* Block Number (1K = 0..63, 4K = 0..255 */
 ;PCODE: $000002B7 VOL: 0
 ;PCODE: $000002B8 VOL: 0
 ;PCODE: $000002B9 VOL: 0
-; 0001 00E2   for (i = 0; i < 6; ++i)
 ;PCODE: $000002BA VOL: 0
 ;PCODE: $000002BB VOL: 0
 ;PCODE: $000002BC VOL: 0
 ;PCODE: $000002BD VOL: 0
 ;PCODE: $000002BE VOL: 0
+; 0001 00E1   }
 ;PCODE: $000002BF VOL: 0
 ;PCODE: $000002C0 VOL: 0
 ;PCODE: $000002C1 VOL: 0
 ;PCODE: $000002C2 VOL: 0
-; 0001 00E3   {
-; 0001 00E4     PN532_msg.buffer[4+i] = key_buffer[i];                /* 6 byte auth key */
 ;PCODE: $000002C3 VOL: 0
 ;PCODE: $000002C4 VOL: 0
+; 0001 00E2   for (i = 0; i < tag_uid.length; ++i)
 ;PCODE: $000002C5 VOL: 0
 ;PCODE: $000002C6 VOL: 0
 ;PCODE: $000002C7 VOL: 0
@@ -975,205 +973,204 @@
 ;PCODE: $000002CA VOL: 0
 ;PCODE: $000002CB VOL: 0
 ;PCODE: $000002CC VOL: 0
-; 0001 00E5   }
 ;PCODE: $000002CD VOL: 0
 ;PCODE: $000002CE VOL: 0
+; 0001 00E3   {
+; 0001 00E4     PN532_msg.buffer[10+i] = tag_uid.buffer[i];                /* 4 byte card ID */
 ;PCODE: $000002CF VOL: 0
 ;PCODE: $000002D0 VOL: 0
 ;PCODE: $000002D1 VOL: 0
 ;PCODE: $000002D2 VOL: 0
-; 0001 00E6   for (i = 0; i < tag_uid.length; ++i)
 ;PCODE: $000002D3 VOL: 0
 ;PCODE: $000002D4 VOL: 0
 ;PCODE: $000002D5 VOL: 0
 ;PCODE: $000002D6 VOL: 0
 ;PCODE: $000002D7 VOL: 0
+; 0001 00E5   }
 ;PCODE: $000002D8 VOL: 0
 ;PCODE: $000002D9 VOL: 0
 ;PCODE: $000002DA VOL: 0
 ;PCODE: $000002DB VOL: 0
 ;PCODE: $000002DC VOL: 0
-; 0001 00E7   {
-; 0001 00E8     PN532_msg.buffer[10+i] = tag_uid.buffer[i];                /* 4 byte card ID */
 ;PCODE: $000002DD VOL: 0
+; 0001 00E6   PN532_msg.length = 10+tag_uid.length;
 ;PCODE: $000002DE VOL: 0
 ;PCODE: $000002DF VOL: 0
 ;PCODE: $000002E0 VOL: 0
 ;PCODE: $000002E1 VOL: 0
 ;PCODE: $000002E2 VOL: 0
+; 0001 00E7 
+; 0001 00E8   PN532_build_msg(&twi_tx, &PN532_msg);
 ;PCODE: $000002E3 VOL: 0
 ;PCODE: $000002E4 VOL: 0
 ;PCODE: $000002E5 VOL: 0
-; 0001 00E9   }
 ;PCODE: $000002E6 VOL: 0
+; 0001 00E9   PN532_cmd(&twi_tx);
 ;PCODE: $000002E7 VOL: 0
 ;PCODE: $000002E8 VOL: 0
+; 0001 00EA   while(!PN532_wait_for_ack());
 ;PCODE: $000002E9 VOL: 0
 ;PCODE: $000002EA VOL: 0
 ;PCODE: $000002EB VOL: 0
-; 0001 00EA   PN532_msg.length = 10+tag_uid.length;
 ;PCODE: $000002EC VOL: 0
 ;PCODE: $000002ED VOL: 0
 ;PCODE: $000002EE VOL: 0
+; 0001 00EB   PN532_read(&twi_rx);
 ;PCODE: $000002EF VOL: 0
 ;PCODE: $000002F0 VOL: 0
-; 0001 00EB 
-; 0001 00EC   PN532_build_msg(&twi_tx, &PN532_msg);
+; 0001 00EC   PN532_get_msg(&twi_rx, &PN532_msg, 1);
 ;PCODE: $000002F1 VOL: 0
 ;PCODE: $000002F2 VOL: 0
 ;PCODE: $000002F3 VOL: 0
 ;PCODE: $000002F4 VOL: 0
-; 0001 00ED   PN532_cmd(&twi_tx);
 ;PCODE: $000002F5 VOL: 0
 ;PCODE: $000002F6 VOL: 0
-; 0001 00EE   delay_ms(20);
+; 0001 00ED   if(PN532_msg.buffer[0] != 0x00) return false;
 ;PCODE: $000002F7 VOL: 0
 ;PCODE: $000002F8 VOL: 0
 ;PCODE: $000002F9 VOL: 0
-; 0001 00EF   while(!PN532_wait_for_ack()) delay_ms(20);
 ;PCODE: $000002FA VOL: 0
 ;PCODE: $000002FB VOL: 0
 ;PCODE: $000002FC VOL: 0
+; 0001 00EE   return true;
 ;PCODE: $000002FD VOL: 0
 ;PCODE: $000002FE VOL: 0
 ;PCODE: $000002FF VOL: 0
 ;PCODE: $00000300 VOL: 0
+; 0001 00EF }
 ;PCODE: $00000301 VOL: 0
+;
+;bool PN532_read_passive_tag(unsigned char block_number)
+; 0001 00F2 {
 ;PCODE: $00000302 VOL: 0
-; 0001 00F0 delay_ms(20);
 ;PCODE: $00000303 VOL: 0
+; 0001 00F3   if(!PN532_auth_tag(block_number, 0, MIFARE_Key_A)) return false;
 ;PCODE: $00000304 VOL: 0
+;	block_number -> Y+0
 ;PCODE: $00000305 VOL: 0
-; 0001 00F1   PN532_read(&twi_rx);
 ;PCODE: $00000306 VOL: 0
 ;PCODE: $00000307 VOL: 0
-; 0001 00F2   PN532_get_msg(&twi_rx, &PN532_msg, 1);
 ;PCODE: $00000308 VOL: 0
 ;PCODE: $00000309 VOL: 0
 ;PCODE: $0000030A VOL: 0
 ;PCODE: $0000030B VOL: 0
 ;PCODE: $0000030C VOL: 0
 ;PCODE: $0000030D VOL: 0
-; 0001 00F3   if(PN532_msg.buffer[0] != 0x00) return false;
 ;PCODE: $0000030E VOL: 0
 ;PCODE: $0000030F VOL: 0
+; 0001 00F4   PN532_msg.buffer[0] = PN532_CMD_INDATAEXCHANGE;
 ;PCODE: $00000310 VOL: 0
 ;PCODE: $00000311 VOL: 0
 ;PCODE: $00000312 VOL: 0
+; 0001 00F5   PN532_msg.buffer[1] = 1;                              /* Max card numbers */
 ;PCODE: $00000313 VOL: 0
-; 0001 00F4   return true;
 ;PCODE: $00000314 VOL: 0
 ;PCODE: $00000315 VOL: 0
+; 0001 00F6   PN532_msg.buffer[2] = MIFARE_CMD_READ;
 ;PCODE: $00000316 VOL: 0
 ;PCODE: $00000317 VOL: 0
-; 0001 00F5 }
 ;PCODE: $00000318 VOL: 0
-;
-;bool PN532_read_passive_tag(unsigned char block_number)
-; 0001 00F8 {
+; 0001 00F7   PN532_msg.buffer[3] = block_number;                    /* Block Number (1K = 0..63, 4K = 0..255 */
 ;PCODE: $00000319 VOL: 0
 ;PCODE: $0000031A VOL: 0
-; 0001 00F9   if(!PN532_auth_tag(block_number, 0, MIFARE_Key_A)) return false;
 ;PCODE: $0000031B VOL: 0
-;	block_number -> Y+0
+; 0001 00F8   PN532_msg.length = 4;
 ;PCODE: $0000031C VOL: 0
 ;PCODE: $0000031D VOL: 0
 ;PCODE: $0000031E VOL: 0
+; 0001 00F9 
+; 0001 00FA   PN532_build_msg(&twi_tx, &PN532_msg);
 ;PCODE: $0000031F VOL: 0
 ;PCODE: $00000320 VOL: 0
 ;PCODE: $00000321 VOL: 0
 ;PCODE: $00000322 VOL: 0
+; 0001 00FB   PN532_cmd(&twi_tx);
 ;PCODE: $00000323 VOL: 0
 ;PCODE: $00000324 VOL: 0
+; 0001 00FC   while(!PN532_wait_for_ack());
 ;PCODE: $00000325 VOL: 0
 ;PCODE: $00000326 VOL: 0
-; 0001 00FA   PN532_msg.buffer[0] = PN532_CMD_INDATAEXCHANGE;
 ;PCODE: $00000327 VOL: 0
 ;PCODE: $00000328 VOL: 0
 ;PCODE: $00000329 VOL: 0
-; 0001 00FB   PN532_msg.buffer[1] = 1;                              /* Max card numbers */
 ;PCODE: $0000032A VOL: 0
+; 0001 00FD   PN532_read(&twi_rx);
 ;PCODE: $0000032B VOL: 0
 ;PCODE: $0000032C VOL: 0
-; 0001 00FC   PN532_msg.buffer[2] = MIFARE_CMD_READ;
+; 0001 00FE   PN532_get_msg(&twi_rx, &PN532_msg, 1);
 ;PCODE: $0000032D VOL: 0
 ;PCODE: $0000032E VOL: 0
 ;PCODE: $0000032F VOL: 0
-; 0001 00FD   PN532_msg.buffer[3] = block_number;                    /* Block Number (1K = 0..63, 4K = 0..255 */
 ;PCODE: $00000330 VOL: 0
 ;PCODE: $00000331 VOL: 0
 ;PCODE: $00000332 VOL: 0
-; 0001 00FE   PN532_msg.length = 4;
+; 0001 00FF   if(PN532_msg.buffer[0] != 0x00) return false;
 ;PCODE: $00000333 VOL: 0
 ;PCODE: $00000334 VOL: 0
 ;PCODE: $00000335 VOL: 0
-; 0001 00FF 
-; 0001 0100   PN532_build_msg(&twi_tx, &PN532_msg);
 ;PCODE: $00000336 VOL: 0
 ;PCODE: $00000337 VOL: 0
 ;PCODE: $00000338 VOL: 0
+; 0001 0100   PN532_get_msg(&twi_rx, &tag_data, 2);
 ;PCODE: $00000339 VOL: 0
-; 0001 0101   PN532_cmd(&twi_tx);
 ;PCODE: $0000033A VOL: 0
 ;PCODE: $0000033B VOL: 0
-; 0001 0102   delay_ms(20);
 ;PCODE: $0000033C VOL: 0
 ;PCODE: $0000033D VOL: 0
 ;PCODE: $0000033E VOL: 0
-; 0001 0103   while(!PN532_wait_for_ack()) delay_ms(20);
 ;PCODE: $0000033F VOL: 0
+; 0001 0101   return true;
 ;PCODE: $00000340 VOL: 0
 ;PCODE: $00000341 VOL: 0
 ;PCODE: $00000342 VOL: 0
+; 0001 0102 }
 ;PCODE: $00000343 VOL: 0
+;
+;bool PN532_write_passive_tag(unsigned char block_number, TWI_BUFFER_STRUCT* data)
+; 0001 0105 {
 ;PCODE: $00000344 VOL: 0
 ;PCODE: $00000345 VOL: 0
+; 0001 0106   if(!PN532_auth_tag(block_number, 0, MIFARE_Key_A)) return false;
 ;PCODE: $00000346 VOL: 0
+;	block_number -> Y+2
+;	*data -> Y+0
 ;PCODE: $00000347 VOL: 0
-; 0001 0104 delay_ms(20);
 ;PCODE: $00000348 VOL: 0
 ;PCODE: $00000349 VOL: 0
 ;PCODE: $0000034A VOL: 0
-; 0001 0105   PN532_read(&twi_rx);
 ;PCODE: $0000034B VOL: 0
 ;PCODE: $0000034C VOL: 0
-; 0001 0106   PN532_get_msg(&twi_rx, &PN532_msg, 1);
 ;PCODE: $0000034D VOL: 0
 ;PCODE: $0000034E VOL: 0
 ;PCODE: $0000034F VOL: 0
 ;PCODE: $00000350 VOL: 0
 ;PCODE: $00000351 VOL: 0
+; 0001 0107   PN532_msg.buffer[0] = PN532_CMD_INDATAEXCHANGE;
 ;PCODE: $00000352 VOL: 0
-; 0001 0107   if(PN532_msg.buffer[0] != 0x00) return false;
 ;PCODE: $00000353 VOL: 0
 ;PCODE: $00000354 VOL: 0
+; 0001 0108   PN532_msg.buffer[1] = 1;                              /* Max card numbers */
 ;PCODE: $00000355 VOL: 0
 ;PCODE: $00000356 VOL: 0
 ;PCODE: $00000357 VOL: 0
+; 0001 0109   PN532_msg.buffer[2] = MIFARE_CMD_WRITE;
 ;PCODE: $00000358 VOL: 0
-; 0001 0108   PN532_get_msg(&twi_rx, &tag_data, 2);
 ;PCODE: $00000359 VOL: 0
 ;PCODE: $0000035A VOL: 0
+; 0001 010A   PN532_msg.buffer[3] = block_number;                    /* Block Number (1K = 0..63, 4K = 0..255 */
 ;PCODE: $0000035B VOL: 0
 ;PCODE: $0000035C VOL: 0
 ;PCODE: $0000035D VOL: 0
+; 0001 010B   for (i = 0; i < data->length && i < 16; ++i)
 ;PCODE: $0000035E VOL: 0
 ;PCODE: $0000035F VOL: 0
-; 0001 0109   return true;
 ;PCODE: $00000360 VOL: 0
 ;PCODE: $00000361 VOL: 0
 ;PCODE: $00000362 VOL: 0
-; 0001 010A }
 ;PCODE: $00000363 VOL: 0
-;
-;bool PN532_write_passive_tag(unsigned char block_number, TWI_BUFFER_STRUCT* data)
-; 0001 010D {
 ;PCODE: $00000364 VOL: 0
 ;PCODE: $00000365 VOL: 0
-; 0001 010E   if(!PN532_auth_tag(block_number, 0, MIFARE_Key_A)) return false;
 ;PCODE: $00000366 VOL: 0
-;	block_number -> Y+2
-;	*data -> Y+0
 ;PCODE: $00000367 VOL: 0
 ;PCODE: $00000368 VOL: 0
 ;PCODE: $00000369 VOL: 0
@@ -1183,122 +1180,74 @@
 ;PCODE: $0000036D VOL: 0
 ;PCODE: $0000036E VOL: 0
 ;PCODE: $0000036F VOL: 0
+; 0001 010C   {
+; 0001 010D     PN532_msg.buffer[4+i] = data->buffer[i];                /* 16 byte data */
 ;PCODE: $00000370 VOL: 0
 ;PCODE: $00000371 VOL: 0
-; 0001 010F   PN532_msg.buffer[0] = PN532_CMD_INDATAEXCHANGE;
 ;PCODE: $00000372 VOL: 0
 ;PCODE: $00000373 VOL: 0
 ;PCODE: $00000374 VOL: 0
-; 0001 0110   PN532_msg.buffer[1] = 1;                              /* Max card numbers */
 ;PCODE: $00000375 VOL: 0
 ;PCODE: $00000376 VOL: 0
 ;PCODE: $00000377 VOL: 0
-; 0001 0111   PN532_msg.buffer[2] = MIFARE_CMD_WRITE;
 ;PCODE: $00000378 VOL: 0
 ;PCODE: $00000379 VOL: 0
+; 0001 010E   }
 ;PCODE: $0000037A VOL: 0
-; 0001 0112   PN532_msg.buffer[3] = block_number;                    /* Block Number (1K = 0..63, 4K = 0..255 */
 ;PCODE: $0000037B VOL: 0
 ;PCODE: $0000037C VOL: 0
 ;PCODE: $0000037D VOL: 0
-; 0001 0113   for (i = 0; i < data->length && i < 16; ++i)
 ;PCODE: $0000037E VOL: 0
 ;PCODE: $0000037F VOL: 0
+; 0001 010F   PN532_msg.length = 4+i;
 ;PCODE: $00000380 VOL: 0
 ;PCODE: $00000381 VOL: 0
 ;PCODE: $00000382 VOL: 0
 ;PCODE: $00000383 VOL: 0
+; 0001 0110 
+; 0001 0111   PN532_build_msg(&twi_tx, &PN532_msg);
 ;PCODE: $00000384 VOL: 0
 ;PCODE: $00000385 VOL: 0
 ;PCODE: $00000386 VOL: 0
 ;PCODE: $00000387 VOL: 0
+; 0001 0112   PN532_cmd(&twi_tx);
 ;PCODE: $00000388 VOL: 0
 ;PCODE: $00000389 VOL: 0
+; 0001 0113   while(!PN532_wait_for_ack());
 ;PCODE: $0000038A VOL: 0
 ;PCODE: $0000038B VOL: 0
 ;PCODE: $0000038C VOL: 0
 ;PCODE: $0000038D VOL: 0
 ;PCODE: $0000038E VOL: 0
 ;PCODE: $0000038F VOL: 0
-; 0001 0114   {
-; 0001 0115     PN532_msg.buffer[4+i] = data->buffer[i];                /* 16 byte data */
+; 0001 0114   PN532_read(&twi_rx);
 ;PCODE: $00000390 VOL: 0
 ;PCODE: $00000391 VOL: 0
+; 0001 0115   PN532_get_msg(&twi_rx, &PN532_msg, 1);
 ;PCODE: $00000392 VOL: 0
 ;PCODE: $00000393 VOL: 0
 ;PCODE: $00000394 VOL: 0
 ;PCODE: $00000395 VOL: 0
 ;PCODE: $00000396 VOL: 0
 ;PCODE: $00000397 VOL: 0
+; 0001 0116   if(PN532_msg.buffer[0] != 0x00) return false;
 ;PCODE: $00000398 VOL: 0
 ;PCODE: $00000399 VOL: 0
-; 0001 0116   }
 ;PCODE: $0000039A VOL: 0
 ;PCODE: $0000039B VOL: 0
 ;PCODE: $0000039C VOL: 0
 ;PCODE: $0000039D VOL: 0
+; 0001 0117   PN532_get_msg(&twi_rx, &tag_data, 2);
 ;PCODE: $0000039E VOL: 0
 ;PCODE: $0000039F VOL: 0
-; 0001 0117   PN532_msg.length = 4+i;
 ;PCODE: $000003A0 VOL: 0
 ;PCODE: $000003A1 VOL: 0
 ;PCODE: $000003A2 VOL: 0
 ;PCODE: $000003A3 VOL: 0
-; 0001 0118 
-; 0001 0119   PN532_build_msg(&twi_tx, &PN532_msg);
 ;PCODE: $000003A4 VOL: 0
+; 0001 0118   return true;
 ;PCODE: $000003A5 VOL: 0
 ;PCODE: $000003A6 VOL: 0
 ;PCODE: $000003A7 VOL: 0
-; 0001 011A   PN532_cmd(&twi_tx);
+; 0001 0119 }
 ;PCODE: $000003A8 VOL: 0
-;PCODE: $000003A9 VOL: 0
-; 0001 011B   delay_ms(20);
-;PCODE: $000003AA VOL: 0
-;PCODE: $000003AB VOL: 0
-;PCODE: $000003AC VOL: 0
-; 0001 011C   while(!PN532_wait_for_ack()) delay_ms(20);
-;PCODE: $000003AD VOL: 0
-;PCODE: $000003AE VOL: 0
-;PCODE: $000003AF VOL: 0
-;PCODE: $000003B0 VOL: 0
-;PCODE: $000003B1 VOL: 0
-;PCODE: $000003B2 VOL: 0
-;PCODE: $000003B3 VOL: 0
-;PCODE: $000003B4 VOL: 0
-;PCODE: $000003B5 VOL: 0
-; 0001 011D delay_ms(20);
-;PCODE: $000003B6 VOL: 0
-;PCODE: $000003B7 VOL: 0
-;PCODE: $000003B8 VOL: 0
-; 0001 011E   PN532_read(&twi_rx);
-;PCODE: $000003B9 VOL: 0
-;PCODE: $000003BA VOL: 0
-; 0001 011F   PN532_get_msg(&twi_rx, &PN532_msg, 1);
-;PCODE: $000003BB VOL: 0
-;PCODE: $000003BC VOL: 0
-;PCODE: $000003BD VOL: 0
-;PCODE: $000003BE VOL: 0
-;PCODE: $000003BF VOL: 0
-;PCODE: $000003C0 VOL: 0
-; 0001 0120   if(PN532_msg.buffer[0] != 0x00) return false;
-;PCODE: $000003C1 VOL: 0
-;PCODE: $000003C2 VOL: 0
-;PCODE: $000003C3 VOL: 0
-;PCODE: $000003C4 VOL: 0
-;PCODE: $000003C5 VOL: 0
-;PCODE: $000003C6 VOL: 0
-; 0001 0121   PN532_get_msg(&twi_rx, &tag_data, 2);
-;PCODE: $000003C7 VOL: 0
-;PCODE: $000003C8 VOL: 0
-;PCODE: $000003C9 VOL: 0
-;PCODE: $000003CA VOL: 0
-;PCODE: $000003CB VOL: 0
-;PCODE: $000003CC VOL: 0
-;PCODE: $000003CD VOL: 0
-; 0001 0122   return true;
-;PCODE: $000003CE VOL: 0
-;PCODE: $000003CF VOL: 0
-;PCODE: $000003D0 VOL: 0
-; 0001 0123 }
-;PCODE: $000003D1 VOL: 0

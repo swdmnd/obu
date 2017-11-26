@@ -34,7 +34,7 @@ void TWIStop(void)
 //    DDRC.4=1;
     DDRC.4=DDRC.5=1;
     PORTC.4=0;PORTC.5=1;
-    delay_ms(2);
+    delay_ms(1);
     PORTC.4=1;                     
 }
 
@@ -171,9 +171,7 @@ void PN532_get_firmware()
   PN532_build_msg(&twi_tx, &PN532_msg);
   PN532_cmd(&twi_tx);
   TWIInit();
-  delay_ms(20);
-  while(!PN532_wait_for_ack()) delay_ms(20);
-  delay_ms(20);        
+  while(!PN532_wait_for_ack());
   PN532_read(&twi_rx);
   PN532_get_msg(&twi_rx, &PN532_msg, 1);
 }
@@ -187,16 +185,14 @@ bool PN532_SAM_config()
   PN532_msg.length=4;
   PN532_build_msg(&twi_tx, &PN532_msg);
   PN532_cmd(&twi_tx); 
-  delay_ms(20);
-  while(!PN532_wait_for_ack()) delay_ms(20); 
-  delay_ms(20);        
+  while(!PN532_wait_for_ack()); 
   PN532_read(&twi_rx);
   PN532_get_msg(&twi_rx, &PN532_msg, 0); 
   if(PN532_msg.buffer[0]==0x15) return true;
   else return false;   
 }
 
-void PN532_read_uid()
+bool PN532_read_uid()
 {  
   PN532_msg.buffer[0] = PN532_CMD_INLISTPASSIVETARGET;  
   PN532_msg.buffer[1] = 1;  // max 1 cards at once
@@ -204,16 +200,16 @@ void PN532_read_uid()
   PN532_msg.length=3;
   PN532_build_msg(&twi_tx, &PN532_msg);
   PN532_cmd(&twi_tx); 
-  delay_ms(20);
-  while(!PN532_wait_for_ack()) delay_ms(20); 
-  delay_ms(20);        
+  while(!PN532_wait_for_ack()); 
   PN532_read(&twi_rx);
-  PN532_get_msg(&twi_rx, &PN532_msg, 1);  
-  tag_uid.length = PN532_msg.buffer[5];
+  PN532_get_msg(&twi_rx, &PN532_msg, 0);  
+  if(PN532_msg.buffer[0] != PN532_CMD_INLISTPASSIVETARGET+1 || PN532_msg.buffer[1] < 1) return false;
+  tag_uid.length = PN532_msg.buffer[6];
   for(i = 0; i<tag_uid.length; ++i)
   {
-    tag_uid.buffer[i] = PN532_msg.buffer[6+i];
+    tag_uid.buffer[i] = PN532_msg.buffer[7+i];
   }
+  return true;
 }
 
 bool PN532_auth_tag(unsigned char block_number, unsigned char key_select, unsigned char* key_buffer)
@@ -235,9 +231,7 @@ bool PN532_auth_tag(unsigned char block_number, unsigned char key_select, unsign
   
   PN532_build_msg(&twi_tx, &PN532_msg);
   PN532_cmd(&twi_tx); 
-  delay_ms(20);
-  while(!PN532_wait_for_ack()) delay_ms(20); 
-  delay_ms(20);        
+  while(!PN532_wait_for_ack()); 
   PN532_read(&twi_rx);
   PN532_get_msg(&twi_rx, &PN532_msg, 1); 
   if(PN532_msg.buffer[0] != 0x00) return false;
@@ -255,9 +249,7 @@ bool PN532_read_passive_tag(unsigned char block_number)
   
   PN532_build_msg(&twi_tx, &PN532_msg);
   PN532_cmd(&twi_tx); 
-  delay_ms(20);
-  while(!PN532_wait_for_ack()) delay_ms(20); 
-  delay_ms(20);        
+  while(!PN532_wait_for_ack()); 
   PN532_read(&twi_rx);
   PN532_get_msg(&twi_rx, &PN532_msg, 1); 
   if(PN532_msg.buffer[0] != 0x00) return false;
@@ -280,9 +272,7 @@ bool PN532_write_passive_tag(unsigned char block_number, TWI_BUFFER_STRUCT* data
   
   PN532_build_msg(&twi_tx, &PN532_msg);
   PN532_cmd(&twi_tx); 
-  delay_ms(20);
-  while(!PN532_wait_for_ack()) delay_ms(20); 
-  delay_ms(20);        
+  while(!PN532_wait_for_ack()); 
   PN532_read(&twi_rx);
   PN532_get_msg(&twi_rx, &PN532_msg, 1); 
   if(PN532_msg.buffer[0] != 0x00) return false;
